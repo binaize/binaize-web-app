@@ -1,0 +1,35 @@
+
+.MuiListItem-button {
+    color: white;
+}
+
+.MuiListItem-button:hover {
+    color: cornflowerblue;
+    background-color: #0A0E13 !important;
+}
+
+.MuiList-padding {
+    color: white;
+
+}
+
+.MuiListItemIcon-root {
+    color: rgba(255, 255, 255, 0.6)!important;
+}
+
+.MuiAppBar-colorPrimary {
+    background-color: white !important;
+}
+
+.Experiments2-inputRoot-12 {
+    color: #3f51b5 !important;
+}
+
+.Experiments-inputRoot-12 {
+    color: #3f51b5 !important;
+}
+
+svg:not(:root) {
+    overflow: hidden;
+    color: #7181d9 !important;
+}

@@ -21,3 +21,8 @@
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
+
+vcs.xml
+binaize-ui.iml
+misc.xml
+modules.xml
