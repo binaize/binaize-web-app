@@ -178,7 +178,7 @@ class Dashboard extends React.Component {
         let mainDatasetVisitors = [];
         let mainDatasetConversion = [];
 
-        fetch('https://test.dev.binaize.com' + urlSession, {
+        fetch('https://test.binaize.com' + urlSession, {
             method: 'post',
             headers: {
                 'Access-Control-Allow-Origin': '*',
@@ -234,7 +234,7 @@ class Dashboard extends React.Component {
 
         console.log(urlVisitor);
 
-        fetch('https://test.dev.binaize.com' + urlVisitor, {
+        fetch('https://test.binaize.com' + urlVisitor, {
             method: 'POST',
             headers: {
                 'Access-Control-Allow-Origin': '*',
@@ -289,7 +289,7 @@ class Dashboard extends React.Component {
 
         console.log(urlConvert);
 
-        fetch('https://test.dev.binaize.com' + urlConvert, {
+        fetch('https://test.binaize.com' + urlConvert, {
             method: 'POST',
             headers: {
                 'Access-Control-Allow-Origin': '*',
@@ -345,7 +345,7 @@ class Dashboard extends React.Component {
 
         try {
 
-            fetch('https://test.dev.binaize.com' + urlConversationTable, {
+            fetch('https://test.binaize.com' + urlConversationTable, {
                 method: 'POST',
                 headers: {
                     'Access-Control-Allow-Origin': '*',
@@ -394,7 +394,7 @@ class Dashboard extends React.Component {
 
         console.log(urlSummary);
 
-        fetch('https://test.dev.binaize.com' + urlSummary, {
+        fetch('https://test.binaize.com' + urlSummary, {
             method: 'POST',
             headers: {
                 'Access-Control-Allow-Origin': '*',
