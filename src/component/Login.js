@@ -102,20 +102,20 @@ function InputAdornments() {
         <div className={classes.root}>
 
             <div className={classes.left_side}>
-                <LoginImage style={{width: 400, marginLeft: '0%'}}/>
+                <LoginImage style={{width: "33.32%", marginLeft: '8.33%', marginRight: '58.31%'}}/>
             </div>
 
 
-            <Card className={classes.right_side} style={{width: "40%", padding: "2% 5%", backgroundColor: "#F7F9FC"}}>
+            <Card className={classes.right_side} style={{width: "49.98%", marginLeft: '24.99%', marginRight: '24.99%', backgroundColor: "#F7F9FC"}}>
                 <CardContent>
                 <div >
                     <div>
-                        <BinaizeSVG style={{width: 220, marginLeft: '10%'}}/>
+                        <BinaizeSVG style={{width: "49.98%", marginLeft: '24.99%', marginRight: '24.99%'}}/>
                     </div>
                     <div>
                         <FormControl style={{backgroundColor: "white"}}
                             className={clsx(classes.margin, classes.textField)}
-                            variant="outlined">
+                            variant="outlined" style={{width: "66.64%", marginLeft: '16.33%', marginRight: '16.33%'}}>
                             <InputLabel htmlFor="outlined-adornment-email">Email</InputLabel>
                             <OutlinedInput
                                 id="outlined-adornment-email"
@@ -128,7 +128,7 @@ function InputAdornments() {
                     <div>
                         <FormControl style={{backgroundColor: "white"}}
                             className={clsx(classes.margin, classes.textField)}
-                            variant="outlined">
+                            variant="outlined" style={{width: "66.64%", marginLeft: '16.33%', marginRight: '16.33%'}}>
                             <InputLabel htmlFor="outlined-adornment-password">
                                 Password
                             </InputLabel>
@@ -154,7 +154,7 @@ function InputAdornments() {
                     </div>
                     <center>
                         <Button className={clsx(classes.margin, classes.textField)} style={{marginTop: "15px"}}
-                                variant="contained"
+                                variant="contained"  style={{width: "49.98%", marginLeft: '24.99%', marginRight: '24.99%'}}
                                 onClick={loginUser} color="primary">
                             Login
                         </Button>

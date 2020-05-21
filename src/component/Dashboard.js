@@ -157,7 +157,7 @@ class Dashboard extends React.Component {
             },
             bar_background_color: ['#38536c', '#247afb', '#da1a40'],
             bar_background_hover_color: ['rgba(56,83,108,0.58)', 'rgba(36,122,251,0.6)', 'rgba(218,26,64,0.53)'],
-            variation_name2: ["Variation Yellow", "Original", "Variation Blue"]
+            variation_name2: ["Variation Yel", "Original", "Variation Blue"]
         }
     }
 
@@ -565,10 +565,8 @@ class Dashboard extends React.Component {
                                 }}
                                 label="Experiment Name"
                             >
-                                <MenuItem value={"13e6f65bacbf4d74b8561e940287e604"} style={{color: "black"}}>Experiment
-                                    2</MenuItem>
-                                <MenuItem value={"66f5d1fc432d47b994250688fd728ff7"} style={{color: "black"}}>Experiment
-                                    1</MenuItem>
+                                <MenuItem value={"13e6f65bacbf4d74b8561e940287e604"} style={{color: "black"}}>Product page design</MenuItem>
+                                <MenuItem value={"66f5d1fc432d47b994250688fd728ff7"} style={{color: "black"}}>Home page messaging</MenuItem>
                             </Select>
                         </FormControl>
                     </div>
