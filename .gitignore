@@ -32,3 +32,5 @@ modules.xml
 .idea/binaize-ui.iml
 .idea/misc.xml
 config.env
+
+binaize-optimize.pem
