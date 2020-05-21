@@ -1,0 +1,25 @@
+version: "3"
+services:
+  theia:
+    build:
+      context: ""
+      dockerfile: Dockerfile.theia
+    image: theia:latest
+    entrypoint:
+      - /bin/entrypoint.sh
+    env_file:
+      - ./config.env
+    ports:
+      - "8080:8080"
+  nginx:
+    build:
+      context: ""
+      dockerfile: Dockerfile.nginx
+    env_file:
+      - ./config.env
+    ports:
+      - '80:80'
+      - '443:443'
+    links:
+      - theia
+    restart: always

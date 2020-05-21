@@ -26,3 +26,9 @@ vcs.xml
 binaize-ui.iml
 misc.xml
 modules.xml
+
+.idea/*
+.idea/
+.idea/binaize-ui.iml
+.idea/misc.xml
+config.env

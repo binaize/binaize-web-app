@@ -178,7 +178,7 @@ class Dashboard extends React.Component {
         let mainDatasetVisitors = [];
         let mainDatasetConversion = [];
 
-        fetch('https://test.binaize.com' + urlSession, {
+        fetch('https://api.binaize.com' + urlSession, {
             method: 'post',
             headers: {
                 'Access-Control-Allow-Origin': '*',
@@ -234,7 +234,7 @@ class Dashboard extends React.Component {
 
         console.log(urlVisitor);
 
-        fetch('https://test.binaize.com' + urlVisitor, {
+        fetch('https://api.binaize.com' + urlVisitor, {
             method: 'POST',
             headers: {
                 'Access-Control-Allow-Origin': '*',
@@ -289,7 +289,7 @@ class Dashboard extends React.Component {
 
         console.log(urlConvert);
 
-        fetch('https://test.binaize.com' + urlConvert, {
+        fetch('https://api.binaize.com' + urlConvert, {
             method: 'POST',
             headers: {
                 'Access-Control-Allow-Origin': '*',
@@ -345,7 +345,7 @@ class Dashboard extends React.Component {
 
         try {
 
-            fetch('https://test.binaize.com' + urlConversationTable, {
+            fetch('https://api.binaize.com' + urlConversationTable, {
                 method: 'POST',
                 headers: {
                     'Access-Control-Allow-Origin': '*',
@@ -394,7 +394,7 @@ class Dashboard extends React.Component {
 
         console.log(urlSummary);
 
-        fetch('https://test.binaize.com' + urlSummary, {
+        fetch('https://api.binaize.com' + urlSummary, {
             method: 'POST',
             headers: {
                 'Access-Control-Allow-Origin': '*',
@@ -560,7 +560,6 @@ class Dashboard extends React.Component {
                                 id="demo-simple-select-outlined"
                                 value={this.state.select_val}
                                 onChange={(e) => {
-                                    alert(e.target.value)
                                     this.setState({select_val: e.target.value})
                                     this.getSessionData(e.target.value);
                                 }}
@@ -590,10 +589,10 @@ class Dashboard extends React.Component {
                             <TableHead>
                                 <TableRow>
                                     <TableCell>Variant</TableCell>
-                                    <TableCell align="right">Sessions</TableCell>
-                                    <TableCell align="right">Visitors</TableCell>
-                                    <TableCell align="right">Visitors Converted</TableCell>
-                                    <TableCell align="right">Conversion Rate (%)</TableCell>
+                                    <TableCell align="left">Sessions</TableCell>
+                                    <TableCell align="left">Visitors</TableCell>
+                                    <TableCell align="left">Visitors Converted</TableCell>
+                                    <TableCell align="left">Conversion Rate (%)</TableCell>
                                 </TableRow>
                             </TableHead>
                             <TableBody>

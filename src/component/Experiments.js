@@ -145,7 +145,7 @@ class Experiments extends React.Component {
 
         let access = "Bearer " + localStorage.getItem("access_token");
         try {
-            fetch('https://test.binaize.com/list_experiments', {
+            fetch('https://api.binaize.com/list_experiments', {
                 method: 'get',
                 headers: {
                     'Access-Control-Allow-Origin': '*',

@@ -64,7 +64,7 @@ function InputAdornments() {
 
             console.log(values.email + values.password)
 
-            fetch("https://test.binaize.com/token", {
+            fetch("https://api.binaize.com/token", {
                 method: "post",
                 body: formData
             })
