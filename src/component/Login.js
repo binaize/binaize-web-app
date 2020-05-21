@@ -102,11 +102,11 @@ function InputAdornments() {
         <div className={classes.root}>
 
             <div className={classes.left_side}>
-                <LoginImage style={{width: 500, marginLeft: '10%'}}/>
+                <LoginImage style={{width: 400, marginLeft: '0%'}}/>
             </div>
 
 
-            <Card className={classes.right_side} style={{width: "30%", padding: "2% 5%", backgroundColor: "#F7F9FC"}}>
+            <Card className={classes.right_side} style={{width: "40%", padding: "2% 5%", backgroundColor: "#F7F9FC"}}>
                 <CardContent>
                 <div >
                     <div>
