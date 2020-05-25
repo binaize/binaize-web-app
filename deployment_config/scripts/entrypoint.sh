@@ -10,6 +10,9 @@
 # start web service to provide rest end points for this container
 # --------------------------------------------------------------------------------------------------
 
+printenv > /.env
+npm run build
+
 pm2 serve build/
 #gunicorn --pythonpath / -b 0.0.0.0:$SERVICE_PORT -k gevent -t $SERVICE_TIMEOUT -w $WORKER_COUNT optimization_platform.deployment.server:app -k uvicorn.workers.UvicornWorker
 

@@ -10,8 +10,6 @@ import ListItemIcon from '@material-ui/core/ListItemIcon';
 import MailIcon from '@material-ui/icons/Mail';
 import {MenuList, MenuItem, fade} from "@material-ui/core";
 import PriorityHighIcon from '@material-ui/icons/PriorityHigh';
-import SendIcon from '@material-ui/icons/Send';
-import Home from '@material-ui/icons/Home';
 import {Link} from "react-router-dom";
 import Paper from '@material-ui/core/Paper';
 import Table from '@material-ui/core/Table';
@@ -35,6 +33,8 @@ import MoreIcon from '@material-ui/icons/MoreVert';
 import {ReactComponent as BinaizeWhiteLogo} from "../images/binaize-logo-white.svg";
 import Typography from "@material-ui/core/Typography";
 import "./Experiments.css"
+
+import {REACT_APP_BASE_URL, REACT_APP_URL_EXPERIMENTS} from "../config"
 
 const drawerWidth = 300;
 const exp_style = theme => ({
@@ -127,6 +127,7 @@ class Experiments extends React.Component {
 
     constructor(props) {
         super(props);
+
         this.state = {
             rows: [],
             anchorEl: null,
@@ -145,8 +146,8 @@ class Experiments extends React.Component {
 
         let access = "Bearer " + localStorage.getItem("access_token");
         try {
-            fetch('https://api.binaize.com/list_experiments', {
-                method: 'get',
+            fetch(REACT_APP_BASE_URL + REACT_APP_URL_EXPERIMENTS, {
+                method: 'GET',
                 headers: {
                     'Access-Control-Allow-Origin': '*',
                     'Authorization': access,
@@ -191,7 +192,7 @@ class Experiments extends React.Component {
                 <CssBaseline/>
                 <AppBar position="fixed" className={classes.appBar}>
                     <Toolbar>
-                        <div className={classes.search}>
+                        <div className={classes.search} style={{color: "#1A2330"}}>
                             <div className={classes.searchIcon}>
                                 <SearchIcon/>
                             </div>

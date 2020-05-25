@@ -45,10 +45,7 @@ COPY ./public /public
 # --------------------------------------------------------------------------------------------------
 
 RUN npm install
-#RUN echo "npm install" | bash
-RUN npm run build
 RUN npm install pm2@4.4.0 -g
-
 
 ADD ./deployment_config/scripts/entrypoint.sh /bin/entrypoint.sh
 RUN chmod +x /bin/entrypoint.sh

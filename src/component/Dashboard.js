@@ -10,8 +10,6 @@ import ListItemIcon from '@material-ui/core/ListItemIcon';
 import MailIcon from '@material-ui/icons/Mail';
 import {MenuList, MenuItem, fade} from "@material-ui/core";
 import PriorityHighIcon from '@material-ui/icons/PriorityHigh';
-import SendIcon from '@material-ui/icons/Send';
-import Home from '@material-ui/icons/Home';
 import {Link} from "react-router-dom";
 import Paper from '@material-ui/core/Paper';
 import Table from '@material-ui/core/Table';
@@ -41,6 +39,16 @@ import {ReactComponent as BinaizeWhiteLogo} from "../images/binaize-logo-white.s
 import DashboardIcon from "@material-ui/icons/Dashboard";
 import DnsIcon from "@material-ui/icons/Dns";
 import AddIcon from "@material-ui/icons/Add";
+
+import {
+    REACT_APP_BASE_URL,
+    REACT_APP_URL_SESSION_COUNT,
+    REACT_APP_URL_CONVERSION_RATE,
+    REACT_APP_URL_CONVERSION_TABLE,
+    REACT_APP_URL_VISITOR_COUNT,
+    REACT_APP_URL_EXPERIMENTS,
+    REACT_APP_EXPERIMENT_SUMMARY
+} from "../config"
 
 const drawerWidth = 300;
 const exp_style = theme => ({
@@ -140,7 +148,11 @@ class Dashboard extends React.Component {
 
     constructor(props) {
         super(props);
+
+        console.log(process)
+
         this.state = {
+            access_token: localStorage.getItem("access_token"),
             select_val: "",
             options: [
                 {label: 'exp_2', value: '13e6f65bacbf4d74b8561e940287e604'},
@@ -156,10 +168,51 @@ class Dashboard extends React.Component {
                 summary_recommendation: '',
             },
             bar_background_color: ['#38536c', '#247afb', '#da1a40'],
-            bar_background_hover_color: ['rgba(56,83,108,0.58)', 'rgba(36,122,251,0.6)', 'rgba(218,26,64,0.53)'],
-            variation_name2: ["Variation Yel", "Original", "Variation Blue"]
+            bar_background_hover_color: ['rgba(56,83,108,0.8)', 'rgba(36,122,251,0.8)', 'rgba(218,26,64,0.8)'],
+            variation_name2: ["Variation Yel", "Original", "Variation Blue"],
+            experiment_names: [],
+            experiment_ids: []
         }
     }
+
+    createExpList(experiment_name, experiment_id) {
+        return [experiment_name, experiment_id];
+    }
+
+
+    getExperimentNames() {
+
+        try {
+            let localExp = [];
+            console.log(localStorage.getItem("access_token"));
+
+            let access = "Bearer " + this.state.access_token;
+
+            fetch(REACT_APP_BASE_URL + REACT_APP_URL_EXPERIMENTS, {
+                method: 'GET',
+                headers: {
+                    'Access-Control-Allow-Origin': '*',
+                    'Authorization': access,
+                    'Accept': 'application/json'
+                }
+            })
+                .then(response => response.json())
+                .then(res => {
+                    let result = res;
+                    let i = 0;
+
+                    for (i; i < result.length; i++) {
+                        localExp.push(this.createExpList(result[i].experiment_name, result[i].experiment_id))
+                    }
+
+                    this.setState({experiment_names: localExp})
+                    console.log(this.state.experiment_names);
+                });
+        } catch (e) {
+            console.error("Error!", e);
+        }
+    }
+
 
     getSessionData(exp_id) {
 
@@ -170,15 +223,15 @@ class Dashboard extends React.Component {
             experiment_id: exp_id
         })
 
-        let access = "Bearer " + localStorage.getItem("access_token");
-        const urlSession = `/get_session_count_for_dashboard?${params.toString()}`
+        let access = "Bearer " + this.state.access_token;
+        const urlSession = REACT_APP_URL_SESSION_COUNT + `?${params.toString()}`
 
         console.log(urlSession);
         let mainDatasetSession = [];
         let mainDatasetVisitors = [];
         let mainDatasetConversion = [];
 
-        fetch('https://api.binaize.com' + urlSession, {
+        fetch(REACT_APP_BASE_URL + urlSession, {
             method: 'post',
             headers: {
                 'Access-Control-Allow-Origin': '*',
@@ -230,11 +283,11 @@ class Dashboard extends React.Component {
             });
 
 
-        const urlVisitor = `/get_visitor_count_for_dashboard?${params.toString()}`
+        const urlVisitor = REACT_APP_URL_VISITOR_COUNT + `?${params.toString()}`
 
         console.log(urlVisitor);
 
-        fetch('https://api.binaize.com' + urlVisitor, {
+        fetch(REACT_APP_BASE_URL + urlVisitor, {
             method: 'POST',
             headers: {
                 'Access-Control-Allow-Origin': '*',
@@ -244,22 +297,21 @@ class Dashboard extends React.Component {
         })
             .then(response => response.json())
             .then(result => {
-                console.log("Success: ", result);
-
-                let dataV = [];
                 let datasetsV = [];
 
+                let dataV = [];
+                console.log("Success: ", result);
+
                 Object.keys(result.visitor_count).forEach(function (key) {
-                    // console.log(key)
-                    dataV.push(key)
                     datasetsV.push(result.visitor_count[key])
+                    dataV.push(key)
                 });
-                console.log(dataV);
-                console.log(datasetsV);
 
                 let localdataV = {}
-
                 let i = 0;
+                console.log(datasetsV);
+                console.log(dataV);
+
                 for (i; i < dataV.length; i++) {
 
                     localdataV = {
@@ -285,11 +337,11 @@ class Dashboard extends React.Component {
             });
 
 
-        const urlConvert = `/get_conversion_rate_for_dashboard?${params.toString()}`
+        const urlConvert = REACT_APP_URL_CONVERSION_RATE + `?${params.toString()}`
 
         console.log(urlConvert);
 
-        fetch('https://api.binaize.com' + urlConvert, {
+        fetch(REACT_APP_BASE_URL + urlConvert, {
             method: 'POST',
             headers: {
                 'Access-Control-Allow-Origin': '*',
@@ -299,7 +351,7 @@ class Dashboard extends React.Component {
         })
             .then(response => response.json())
             .then(result => {
-                console.log("Success: ", result);
+                console.log("Success : ", result);
 
                 let dataV = [];
                 let datasetsV = [];
@@ -339,13 +391,13 @@ class Dashboard extends React.Component {
             });
 
 
-        const urlConversationTable = `/get_conversion_table_for_dashboard?${params.toString()}`
+        const urlConversationTable = REACT_APP_URL_CONVERSION_TABLE + `?${params.toString()}`
 
         console.log(urlConversationTable);
 
         try {
 
-            fetch('https://api.binaize.com' + urlConversationTable, {
+            fetch(REACT_APP_BASE_URL + urlConversationTable, {
                 method: 'POST',
                 headers: {
                     'Access-Control-Allow-Origin': '*',
@@ -390,11 +442,11 @@ class Dashboard extends React.Component {
         }
 
 
-        const urlSummary = `/get_experiment_summary?${params.toString()}`
+        const urlSummary = REACT_APP_EXPERIMENT_SUMMARY + `?${params.toString()}`
 
         console.log(urlSummary);
 
-        fetch('https://api.binaize.com' + urlSummary, {
+        fetch(REACT_APP_BASE_URL + urlSummary, {
             method: 'POST',
             headers: {
                 'Access-Control-Allow-Origin': '*',
@@ -420,7 +472,7 @@ class Dashboard extends React.Component {
     }
 
     componentDidMount() {
-
+        this.getExperimentNames();
     }
 
     render() {
@@ -431,7 +483,8 @@ class Dashboard extends React.Component {
                 <CssBaseline/>
                 <AppBar position="fixed" className={classes.appBar}>
                     <Toolbar>
-                        <div className={classes.search}>
+                        {/* Toolbar */}
+                        <div className={classes.search} style={{color: "#1A2330"}}>
                             <div className={classes.searchIcon}>
                                 <SearchIcon/>
                             </div>
@@ -494,8 +547,8 @@ class Dashboard extends React.Component {
                 </AppBar>
 
                 <Drawer
-                    className={classes.drawer}
                     variant="permanent"
+                    className={classes.drawer}
                     classes={{
                         paper: classes.drawerPaper,
                     }}
@@ -560,13 +613,20 @@ class Dashboard extends React.Component {
                                 id="demo-simple-select-outlined"
                                 value={this.state.select_val}
                                 onChange={(e) => {
+                                    alert(e.target.value)
                                     this.setState({select_val: e.target.value})
                                     this.getSessionData(e.target.value);
                                 }}
-                                label="Experiment Name"
-                            >
-                                <MenuItem value={"13e6f65bacbf4d74b8561e940287e604"} style={{color: "black"}}>Product page design</MenuItem>
-                                <MenuItem value={"66f5d1fc432d47b994250688fd728ff7"} style={{color: "black"}}>Home page messaging</MenuItem>
+                                label="Experiment Name">
+
+                                {this.state.experiment_names.map((exp_name) => (
+                                    <MenuItem value={exp_name[1]}>{exp_name[0]}</MenuItem>
+                                ))}
+
+                                {/*<MenuItem value={"13e6f65bacbf4d74b8561e940287e604"} style={{color: "black"}}>Product*/}
+                                {/*    page design</MenuItem>*/}
+                                {/*<MenuItem value={"66f5d1fc432d47b994250688fd728ff7"} style={{color: "black"}}>Home page*/}
+                                {/*    messaging</MenuItem>*/}
                             </Select>
                         </FormControl>
                     </div>

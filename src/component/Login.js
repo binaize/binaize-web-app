@@ -18,6 +18,8 @@ import {ReactComponent as LoginImage} from "../images/login.svg";
 import Card from "@material-ui/core/Card";
 import CardContent from "@material-ui/core/CardContent";
 
+import {REACT_APP_BASE_URL, REACT_APP_TOKEN} from "../config"
+
 const useStyles = makeStyles(theme => ({
     root: {
         position: 'absolute', left: '50%', top: '50%',
@@ -64,7 +66,7 @@ function InputAdornments() {
 
             console.log(values.email + values.password)
 
-            fetch("https://api.binaize.com/token", {
+            fetch(REACT_APP_BASE_URL + REACT_APP_TOKEN, {
                 method: "post",
                 body: formData
             })
@@ -113,9 +115,9 @@ function InputAdornments() {
                         <BinaizeSVG style={{width: "49.98%", marginLeft: '24.99%', marginRight: '24.99%'}}/>
                     </div>
                     <div>
-                        <FormControl style={{backgroundColor: "white"}}
+                        <FormControl
                             className={clsx(classes.margin, classes.textField)}
-                            variant="outlined" style={{width: "66.64%", marginLeft: '16.33%', marginRight: '16.33%'}}>
+                            variant="outlined" style={{backgroundColor: "white", width: "66.64%", marginLeft: '16.33%', marginRight: '16.33%'}}>
                             <InputLabel htmlFor="outlined-adornment-email">Email</InputLabel>
                             <OutlinedInput
                                 id="outlined-adornment-email"
@@ -126,9 +128,9 @@ function InputAdornments() {
                         </FormControl>
                     </div>
                     <div>
-                        <FormControl style={{backgroundColor: "white"}}
+                        <FormControl
                             className={clsx(classes.margin, classes.textField)}
-                            variant="outlined" style={{width: "66.64%", marginLeft: '16.33%', marginRight: '16.33%'}}>
+                            variant="outlined" style={{backgroundColor: "white", width: "66.64%", marginLeft: '16.33%', marginRight: '16.33%'}}>
                             <InputLabel htmlFor="outlined-adornment-password">
                                 Password
                             </InputLabel>
@@ -153,8 +155,8 @@ function InputAdornments() {
                         </FormControl>
                     </div>
                     <center>
-                        <Button className={clsx(classes.margin, classes.textField)} style={{marginTop: "15px"}}
-                                variant="contained"  style={{width: "49.98%", marginLeft: '24.99%', marginRight: '24.99%'}}
+                        <Button className={clsx(classes.margin, classes.textField)}
+                                variant="contained"  style={{marginTop: "15px", width: "49.98%", marginLeft: '24.99%', marginRight: '24.99%'}}
                                 onClick={loginUser} color="primary">
                             Login
                         </Button>
