@@ -113,6 +113,14 @@ const exp_style = theme => ({
     inputRoot: {
         color: 'inherit',
     },
+    expMenu: {
+        color: 'rgba(32,46,120,0.85)',
+        backgroundColor: "#fff",
+        '&:hover': {
+            backgroundColor: '#eee !important',
+            color: "rgba(32,46,120,0.85)"
+        }
+    },
     inputInput: {
         padding: theme.spacing(1, 1, 1, 0),
         // vertical padding + font size from searchIcon
@@ -167,8 +175,8 @@ class Dashboard extends React.Component {
                 summary_conclusion: '',
                 summary_recommendation: '',
             },
-            bar_background_color: ['#38536c', '#247afb', '#da1a40'],
-            bar_background_hover_color: ['rgba(56,83,108,0.8)', 'rgba(36,122,251,0.8)', 'rgba(218,26,64,0.8)'],
+            bar_background_color: ['#5C6AC4', '#43467F', '#9C6ADE'],
+            bar_background_hover_color: ['#202E78', '#1C2260', '#50248F'],
             variation_name2: ["Variation Yel", "Original", "Variation Blue"],
             experiment_names: [],
             experiment_ids: []
@@ -613,14 +621,13 @@ class Dashboard extends React.Component {
                                 id="demo-simple-select-outlined"
                                 value={this.state.select_val}
                                 onChange={(e) => {
-                                    alert(e.target.value)
                                     this.setState({select_val: e.target.value})
                                     this.getSessionData(e.target.value);
                                 }}
                                 label="Experiment Name">
 
                                 {this.state.experiment_names.map((exp_name) => (
-                                    <MenuItem value={exp_name[1]}>{exp_name[0]}</MenuItem>
+                                    <MenuItem className={classes.expMenu} value={exp_name[1]}>{exp_name[0]}</MenuItem>
                                 ))}
 
                                 {/*<MenuItem value={"13e6f65bacbf4d74b8561e940287e604"} style={{color: "black"}}>Product*/}
