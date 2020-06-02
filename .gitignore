@@ -32,6 +32,7 @@ modules.xml
 .idea/
 .idea/binaize-ui.iml
 .idea/misc.xml
-config.env
+theia.env
+theia-*.env
 
 binaize-optimize.pem
