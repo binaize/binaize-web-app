@@ -41,13 +41,7 @@ import DnsIcon from "@material-ui/icons/Dns";
 import AddIcon from "@material-ui/icons/Add";
 
 import {
-    REACT_APP_BASE_URL,
-    REACT_APP_URL_SESSION_COUNT,
-    REACT_APP_URL_CONVERSION_RATE,
-    REACT_APP_URL_CONVERSION_TABLE,
-    REACT_APP_URL_VISITOR_COUNT,
-    REACT_APP_URL_EXPERIMENTS,
-    REACT_APP_EXPERIMENT_SUMMARY
+    REACT_APP_BASE_URL
 } from "../config"
 
 const drawerWidth = 300;
@@ -152,12 +146,12 @@ const exp_style = theme => ({
     },
 })
 
-class Dashboard extends React.Component {
+class DashboardAnother extends React.Component {
 
     constructor(props) {
         super(props);
 
-        console.log(process)
+        // console.log(process)
 
         this.state = {
             access_token: localStorage.getItem("access_token"),
@@ -179,50 +173,16 @@ class Dashboard extends React.Component {
             bar_background_hover_color: ['#006FBB', '#50B83C', '#DE3618'],
             variation_name2: ["Variation Yel", "Original", "Variation Blue"],
             experiment_names: [],
-            experiment_ids: []
-        }
-    }
+            experiment_ids: [],
 
-    createExpList(experiment_name, experiment_id) {
-        return [experiment_name, experiment_id];
-    }
-
-
-    getExperimentNames() {
-
-        try {
-            let localExp = [];
-            console.log(localStorage.getItem("access_token"));
-
-            let access = "Bearer " + this.state.access_token;
-
-            fetch(REACT_APP_BASE_URL + REACT_APP_URL_EXPERIMENTS, {
-                method: 'GET',
-                headers: {
-                    'Access-Control-Allow-Origin': '*',
-                    'Authorization': access,
-                    'Accept': 'application/json'
-                }
-            })
-                .then(response => response.json())
-                .then(res => {
-                    let result = res;
-                    let i = 0;
-
-                    for (i; i < result.length; i++) {
-                        localExp.push(this.createExpList(result[i].experiment_name, result[i].experiment_id))
-                    }
-
-                    this.setState({experiment_names: localExp})
-                    console.log(this.state.experiment_names);
-                });
-        } catch (e) {
-            console.error("Error!", e);
+            shop_funnels: {},
+            product_conversion: {},
+            landing_page_conversion: {}
         }
     }
 
 
-    getSessionData(exp_id) {
+    getAllData(exp_id) {
 
         console.log(exp_id)
 
@@ -232,14 +192,16 @@ class Dashboard extends React.Component {
         })
 
         let access = "Bearer " + this.state.access_token;
-        const urlSession = REACT_APP_URL_SESSION_COUNT + `?${params.toString()}`
+        // const urlSession = REACT_APP_URL_SESSION_COUNT + `?${params.toString()}`
+        //
+        // console.log(urlSession);
 
-        console.log(urlSession);
-        let mainDatasetSession = [];
-        let mainDatasetVisitors = [];
-        let mainDatasetConversion = [];
+        let mainDataFunnel = [];
 
-        fetch(REACT_APP_BASE_URL + urlSession, {
+        let mainDataProduct = [];
+        let mainDataLanding = [];
+
+        fetch(REACT_APP_BASE_URL + "/get_shop_funnel_analytics_for_dashboard", {
             method: 'post',
             headers: {
                 'Access-Control-Allow-Origin': '*',
@@ -251,17 +213,89 @@ class Dashboard extends React.Component {
             .then(result => {
                 console.log("Success:", result);
 
+
                 let data = []
                 let datasets = [];
 
 
-                Object.keys(result.session_count).forEach(function (key) {
-                    // console.log(key)
+                Object.keys(result.shop_funnel).forEach(function (key) {
                     data.push(key)
-                    datasets.push(result.session_count[key])
+                    datasets.push(result.shop_funnel[key])
                 });
-                console.log(data);
-                console.log(datasets);
+                // console.log(data);
+                // console.log(datasets);
+
+                let localdata = {}
+
+                let i = 0;
+                for (i; i < data.length; i++) {
+
+                    if (data[i] === "percentage") {
+                        localdata = {
+                            label: data[i],
+                            type: 'line',
+                            fill: false,
+                            backgroundColor: this.state.bar_background_color[i],
+                            borderColor: this.state.bar_background_color[i],
+                            borderWidth: 1,
+                            hoverBackgroundColor: this.state.bar_background_hover_color[i],
+                            hoverBorderColor: this.state.bar_background_hover_color[i],
+                            data: datasets[i],
+                            yAxisID: "y-axis-1",
+                        };
+                    } else {
+                        localdata = {
+                            label: data[i],
+                            backgroundColor: this.state.bar_background_color[i],
+                            borderColor: this.state.bar_background_color[i],
+                            borderWidth: 1,
+                            hoverBackgroundColor: this.state.bar_background_hover_color[i],
+                            hoverBorderColor: this.state.bar_background_hover_color[i],
+                            data: datasets[i],
+                            yAxisID: "y-axis-2"
+                        }
+                    }
+                    mainDataFunnel.push(localdata);
+                    localdata = {}
+                }
+
+                console.log(mainDataFunnel)
+                this.setState({
+                    shop_funnels: {
+                        labels: result.pages,
+                        datasets: mainDataFunnel
+                    }
+                })
+
+
+
+            });
+
+
+        // const urlVisitor = REACT_APP_URL_VISITOR_COUNT + `?${params.toString()}`
+        // console.log(urlVisitor);
+
+        fetch(REACT_APP_BASE_URL + "/get_product_conversion_analytics_for_dashboard", {
+            method: 'POST',
+            headers: {
+                'Access-Control-Allow-Origin': '*',
+                'Authorization': access,
+                'Accept': 'application/json'
+            }
+        })
+            .then(response => response.json())
+            .then(result => {
+
+                let data = []
+                let datasets = [];
+
+
+                Object.keys(result.product_conversion).forEach(function (key) {
+                    data.push(key)
+                    datasets.push(result.product_conversion[key])
+                });
+                // console.log(data);
+                // console.log(datasets);
 
                 let localdata = {}
 
@@ -277,79 +311,27 @@ class Dashboard extends React.Component {
                         hoverBorderColor: this.state.bar_background_hover_color[i],
                         data: datasets[i]
                     }
-                    mainDatasetSession.push(localdata);
+                    mainDataProduct.push(localdata);
                     localdata = {}
                 }
 
-                console.log(mainDatasetSession)
+                console.log(mainDataProduct)
                 this.setState({
-                    BarDataSession: {
-                        labels: result.date,
-                        datasets: mainDatasetSession
+                    product_conversion: {
+                        labels: result.products,
+                        datasets: mainDataProduct
                     }
                 })
+
+
             });
 
+        //
+        // const urlConvert = REACT_APP_URL_CONVERSION_RATE + `?${params.toString()}`
+        //
+        // console.log(urlConvert);
 
-        const urlVisitor = REACT_APP_URL_VISITOR_COUNT + `?${params.toString()}`
-
-        console.log(urlVisitor);
-
-        fetch(REACT_APP_BASE_URL + urlVisitor, {
-            method: 'POST',
-            headers: {
-                'Access-Control-Allow-Origin': '*',
-                'Authorization': access,
-                'Accept': 'application/json'
-            }
-        })
-            .then(response => response.json())
-            .then(result => {
-                let datasetsV = [];
-
-                let dataV = [];
-                console.log("Success: ", result);
-
-                Object.keys(result.visitor_count).forEach(function (key) {
-                    datasetsV.push(result.visitor_count[key])
-                    dataV.push(key)
-                });
-
-                let localdataV = {}
-                let i = 0;
-                console.log(datasetsV);
-                console.log(dataV);
-
-                for (i; i < dataV.length; i++) {
-
-                    localdataV = {
-                        label: dataV[i],
-                        backgroundColor: this.state.bar_background_color[i],
-                        borderColor: this.state.bar_background_color[i],
-                        borderWidth: 1,
-                        hoverBackgroundColor: this.state.bar_background_hover_color[i],
-                        hoverBorderColor: this.state.bar_background_hover_color[i],
-                        data: datasetsV[i]
-                    }
-                    mainDatasetVisitors.push(localdataV);
-                    localdataV = {}
-                }
-
-                console.log(mainDatasetVisitors)
-                this.setState({
-                    BarDataVisitors: {
-                        labels: result.date,
-                        datasets: mainDatasetVisitors
-                    }
-                })
-            });
-
-
-        const urlConvert = REACT_APP_URL_CONVERSION_RATE + `?${params.toString()}`
-
-        console.log(urlConvert);
-
-        fetch(REACT_APP_BASE_URL + urlConvert, {
+        fetch(REACT_APP_BASE_URL + "/get_landing_page_analytics_for_dashboard", {
             method: 'POST',
             headers: {
                 'Access-Control-Allow-Origin': '*',
@@ -361,127 +343,66 @@ class Dashboard extends React.Component {
             .then(result => {
                 console.log("Success : ", result);
 
-                let dataV = [];
-                let datasetsV = [];
 
-                Object.keys(result.conversion).forEach(function (key) {
-                    // console.log(key)
-                    dataV.push(key)
-                    datasetsV.push(result.conversion[key])
+                let data3 = {
+                    pages: [
+                        "Home Page",
+                        "Product Page",
+                        "Blog Page"
+                    ],
+                    landing_conversion: {
+                        conversion_percentage: [
+                            10.3,
+                            14.3,
+                            6.2
+                        ]
+                    }
+                }
+
+                let data = []
+                let datasets = [];
+
+
+                Object.keys(data3.landing_conversion).forEach(function (key) {
+                    data.push(key)
+                    datasets.push(data3.landing_conversion[key])
                 });
-                console.log(dataV);
-                console.log(datasetsV);
+                // console.log(data);
+                // console.log(datasets);
 
-                let localdataV = {}
+                let localdata = {}
 
                 let i = 0;
-                for (i; i < dataV.length; i++) {
+                for (i; i < data.length; i++) {
 
-                    localdataV = {
-                        label: dataV[i],
+                    localdata = {
+                        label: data[i],
+                        backgroundColor: this.state.bar_background_color[i],
                         borderColor: this.state.bar_background_color[i],
-                        borderWidth: 3,
-                        fill: false,
+                        borderWidth: 1,
                         hoverBackgroundColor: this.state.bar_background_hover_color[i],
                         hoverBorderColor: this.state.bar_background_hover_color[i],
-                        data: datasetsV[i]
+                        data: datasets[i]
                     }
-                    mainDatasetConversion.push(localdataV);
-                    localdataV = {}
+                    mainDataLanding.push(localdata);
+                    localdata = {}
                 }
 
-                console.log(mainDatasetConversion)
+                console.log(mainDataLanding)
                 this.setState({
-                    ConversionData: {
-                        labels: result.date,
-                        datasets: mainDatasetConversion
-                    }
-                })
-            });
-
-
-        const urlConversationTable = REACT_APP_URL_CONVERSION_TABLE + `?${params.toString()}`
-
-        console.log(urlConversationTable);
-
-        try {
-
-            fetch(REACT_APP_BASE_URL + urlConversationTable, {
-                method: 'POST',
-                headers: {
-                    'Access-Control-Allow-Origin': '*',
-                    'Authorization': access,
-                    'Accept': 'application/json'
-                }
-            })
-                .then(response => response.json())
-                .then(result => {
-
-                    let localData = [];
-                    let localRows = [];
-
-
-                    console.log("Success: TABLE ", result);
-
-                    let i = 0;
-                    console.log("Success: TABLE " + result[i].variation_name)
-
-                    let url = "www.smth.com"
-
-                    for (i; i < result.length; i++) {
-
-                        localData.push(<Link url={url}>{result[i].variation_name}</Link>);
-                        localData.push(result[i].num_session);
-                        localData.push(result[i].num_visitor);
-                        localData.push(result[i].visitor_converted);
-                        localData.push(result[i].conversion);
-
-                        localRows.push(localData);
-                        localData = [];
-
-                    }
-
-                    this.setState({rows: localRows})
-                    console.log(this.state.rows);
-                });
-
-
-        } catch (e) {
-            console.error("Error!", e);
-        }
-
-
-        const urlSummary = REACT_APP_EXPERIMENT_SUMMARY + `?${params.toString()}`
-
-        console.log(urlSummary);
-
-        fetch(REACT_APP_BASE_URL + urlSummary, {
-            method: 'POST',
-            headers: {
-                'Access-Control-Allow-Origin': '*',
-                'Authorization': access,
-                'Accept': 'application/json'
-            }
-        })
-            .then(response => response.json())
-            .then(result => {
-                console.log("Success: ", result);
-
-                this.setState({
-                    SummaryDetails: {
-                        summary_status: result.status,
-                        summary_conclusion: result.conclusion,
-                        summary_recommendation: result.recommendation
+                    landing_page_conversion: {
+                        labels: data3.pages,
+                        datasets: mainDataLanding
                     }
                 })
 
-            });
 
+            });
 
     }
 
     componentDidMount() {
-        this.getExperimentNames();
+        this.getAllData();
     }
 
     render() {
@@ -627,123 +548,174 @@ class Dashboard extends React.Component {
                     <div className={classes.toolbar}/>
 
                     <div style={{display: "flex"}}>
-                        <h2 style={{margin: "2% 2%"}}>A/B Testing  Dashboard</h2>
+                        <h2 style={{margin: "2% 2%"}}>Conversion Dashboard</h2>
 
-                        <FormControl variant="outlined" className={classes.formControl}>
-                            <InputLabel id="demo-simple-select-outlined-label">Experiment Name</InputLabel>
-                            <Select
-                                labelId="demo-simple-select-outlined-label"
-                                id="demo-simple-select-outlined"
-                                value={this.state.select_val}
-                                onChange={(e) => {
-                                    this.setState({select_val: e.target.value})
-                                    this.getSessionData(e.target.value);
-                                }}
-                                label="Experiment Name">
+                        {/*<FormControl variant="outlined" className={classes.formControl}>*/}
+                        {/*    <InputLabel id="demo-simple-select-outlined-label">Experiment Name</InputLabel>*/}
+                        {/*    <Select*/}
+                        {/*        labelId="demo-simple-select-outlined-label"*/}
+                        {/*        id="demo-simple-select-outlined"*/}
+                        {/*        value={this.state.select_val}*/}
+                        {/*        onChange={(e) => {*/}
+                        {/*            this.setState({select_val: e.target.value})*/}
+                        {/*            this.getSessionData(e.target.value);*/}
+                        {/*        }}*/}
+                        {/*        label="Experiment Name">*/}
 
-                                {this.state.experiment_names.map((exp_name) => (
-                                    <MenuItem className={classes.expMenu} value={exp_name[1]}>{exp_name[0]}</MenuItem>
-                                ))}
+                        {/*        {this.state.experiment_names.map((exp_name) => (*/}
+                        {/*            <MenuItem className={classes.expMenu} value={exp_name[1]}>{exp_name[0]}</MenuItem>*/}
+                        {/*        ))}*/}
 
-                                {/*<MenuItem value={"13e6f65bacbf4d74b8561e940287e604"} style={{color: "black"}}>Product*/}
-                                {/*    page design</MenuItem>*/}
-                                {/*<MenuItem value={"66f5d1fc432d47b994250688fd728ff7"} style={{color: "black"}}>Home page*/}
-                                {/*    messaging</MenuItem>*/}
-                            </Select>
-                        </FormControl>
+                        {/*        /!*<MenuItem value={"13e6f65bacbf4d74b8561e940287e604"} style={{color: "black"}}>Product*!/*/}
+                        {/*        /!*    page design</MenuItem>*!/*/}
+                        {/*        /!*<MenuItem value={"66f5d1fc432d47b994250688fd728ff7"} style={{color: "black"}}>Home page*!/*/}
+                        {/*        /!*    messaging</MenuItem>*!/*/}
+                        {/*    </Select>*/}
+                        {/*</FormControl>*/}
                     </div>
-                    <Card>
-                        <CardContent>
-                            <div style={{padding: "0.5%", margin: "0% 0% 0% 0.5%", width: "97%"}}>
-                                <p>{this.state.SummaryDetails.summary_status}</p>
-                                <p>{this.state.SummaryDetails.summary_conclusion}</p>
-                                <p>{this.state.SummaryDetails.summary_recommendation}</p>
-                            </div>
-                        </CardContent>
-                    </Card>
-
-                    <Divider style={{margin: "1%"}}/>
-
-                    <TableContainer component={Paper} style={{margin: "0% 0.5% 1% 1.5%", width: "97%"}}>
-                        <Table className={classes.table} aria-label="simple table">
-                            <TableHead>
-                                <TableRow>
-                                    <TableCell>Variant</TableCell>
-                                    <TableCell align="left">Sessions</TableCell>
-                                    <TableCell align="left">Visitors</TableCell>
-                                    <TableCell align="left">Visitors Converted</TableCell>
-                                    <TableCell align="left">Conversion Rate (%)</TableCell>
-                                </TableRow>
-                            </TableHead>
-                            <TableBody>
-                                {this.state.rows.map((row) => (
-                                    <TableRow key={row[0]}>
-                                        <TableCell component="th" scope="row">
-                                            {row[0]}
-                                        </TableCell>
-                                        <TableCell align="left">{row[1]}</TableCell>
-                                        <TableCell align="left">{row[2]}</TableCell>
-                                        <TableCell align="left">{row[3]}</TableCell>
-                                        <TableCell align="left">{row[4]}</TableCell>
-                                    </TableRow>
-                                ))}
-                            </TableBody>
-                        </Table>
-                    </TableContainer>
 
                     <Divider/>
 
-                    <Card>
+                    <Card style={{margin: "2% 5%"}}>
                         <CardContent>
-                            <div style={{margin: "0% 0.5% 1% 1.5%", width: "97%"}}>
-                                <h3>
-                                    Session Over Time
-                                </h3>
+
+                            <h2>
+                                SHOP FUNNEL ANALYSIS
+                            </h2>
+                            <Divider/>
+                            <div style={{padding: "0.5%", margin: "0% 0% 0% 0.5%", width: "97%"}}>
+                                <p>Home Page to Product Page CTR is the lowest.</p>
+                                <p>RECOMMENDATION: Improve Home Page by changing creatives of copy.</p>
+                            </div>
+
+
+                            <div style={{margin: "0% 0.5% 1% 1.5%", width: "80%"}}>
+
                                 <hr/>
                                 <Bar
-                                    width={100}
-                                    height={40}
-                                    data={this.state.BarDataSession}
-                                    options={{maintainAspectRatio: true,
-                                        scales: {}
+                                    width={45}
+                                    height={20}
+                                    type={'bar'}
+                                    data={this.state.shop_funnels}
+                                    options={{
+                                        maintainAspectRatio: true,
+                                        scales: {
+                                            xAxes: [{
+                                                barPercentage: 0.3
+                                            }],
+                                            yAxes: [{
+                                                type: "linear", // only linear but allow scale type registration. This allows extensions to exist solely for log scale for instance
+                                                display: false,
+                                                position: "left",
+                                                id: "y-axis-1",
+                                            }, {
+                                                type: "linear", // only linear but allow scale type registration. This allows extensions to exist solely for log scale for instance
+                                                display: true,
+                                                position: "left",
+                                                id: "y-axis-2",
+
+                                                // grid line settings
+                                                gridLines: {
+                                                    drawOnChartArea: false, // only want the grid lines for one axis to show up
+                                                },
+                                            }]
+                                        }
                                     }}>
                                 </Bar>
                             </div>
                         </CardContent>
                     </Card>
 
-                    <Card>
+                    <Divider/>
+
+                    <Card style={{margin: "2% 5%"}}>
                         <CardContent>
-                            <div style={{margin: "0% 0.5% 1% 1.5%", width: "97%"}}>
-                                <h3>
-                                    Visitor Over Time
-                                </h3>
+
+                            <h2>
+                                PRODUCT CONVERSION ANALYSIS
+                            </h2>
+                            <Divider/>
+                            <div style={{padding: "0.5%", margin: "0% 0% 0% 0.5%", width: "97%"}}>
+                                <p>Conversion for product B is significantly lower than others.</p>
+                                <p>RECOMMENDATION: Improve Product Page B by changing creatives or copy or price.</p>
+                            </div>
+
+                            <div style={{margin: "0% 0.5% 1% 1.5%", width: "80%"}}>
+
                                 <hr/>
                                 <Bar
 
                                     yAxisID="% Conversion"
-                                    width={100}
-                                    height={40}
-                                    data={this.state.BarDataVisitors}
-                                    options={{maintainAspectRatio: true}}>
+                                    width={45}
+                                    height={20}
+                                    data={this.state.product_conversion}
+                                    options={{
+                                        maintainAspectRatio: true,
+                                        scales: {
+                                            xAxes: [{
+                                                stacked: true,
+                                                barPercentage: 0.3
+                                            }],
+                                            yAxes: [{
+                                                stacked: true,
+                                                // ticks: {
+                                                //
+                                                //     min: 0,
+                                                //     max: 100,
+                                                //     callback: function(value){return value+ "%"}
+                                                // },
+                                                scaleLabel: {
+                                                    display: true,
+                                                    labelString: "Unique Visitors"
+                                                }
+                                            }]
+                                        }
+                                    }}>
                                 </Bar>
                             </div>
                         </CardContent>
                     </Card>
 
-                    <Card>
+                    <Divider/>
+
+                    <Card style={{margin: "2% 5%"}}>
                         <CardContent>
-                            <div style={{margin: "0% 0.5% 1% 1.5%", width: "97%"}}>
-                                <h3>
-                                    Conversion Over Time
-                                </h3>
+                            <h2>
+                                LANDING PAGE ANALYSIS
+                            </h2>
+                            <Divider/>
+                            <div style={{padding: "0.5%", margin: "0% 0% 0% 0.5%", width: "97%"}}>
+                                <p>Conversion for product B is significantly lower than others.</p>
+                                <p>RECOMMENDATION: Improve Product Page B by changing creatives or copy or price.</p>
+                            </div>
+
+                            <div style={{margin: "0% 0.5% 1% 1.5%", width: "80%"}}>
                                 <hr/>
-                                <Line
-                                    width={100}
-                                    height={40}
-                                    data={this.state.ConversionData}
-                                    options={{maintainAspectRatio: true}}>
-                                </Line>
+                                <Bar
+                                    width={45}
+                                    height={20}
+                                    data={this.state.landing_page_conversion}
+                                    options={{
+                                        maintainAspectRatio: true,
+                                        scales: {
+                                            xAxes: [{
+                                                stacked: true,
+                                                barPercentage: 0.3
+                                            }],
+                                            yAxes: [{
+                                                ticks: {
+                                                    min: 0,
+                                                    max: 20,
+                                                    callback: function(value){return value + "%"}
+                                                },
+                                                scaleLabel: {
+                                                    display: true,
+                                                    labelString: "% Conversion"
+                                                }
+                                            }]
+                                        }
+                                    }}>
+                                </Bar>
                             </div>
                         </CardContent>
                     </Card>
@@ -755,4 +727,4 @@ class Dashboard extends React.Component {
     }
 }
 
-export default withRouter(withStyles(exp_style)(Dashboard))
+export default withRouter(withStyles(exp_style)(DashboardAnother))

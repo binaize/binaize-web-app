@@ -10,6 +10,7 @@ import Dashboard from "./component/Dashboard"
 import Experiments from "./component/Experiments";
 
 import './App.css';
+import DashboardAnother from "./component/Dashboard_another";
 
 class App extends React.Component {
     render() {
@@ -23,7 +24,8 @@ class App extends React.Component {
                         {/*<Route exact={true} path={"/expi"} component={ResponsiveDrawer}/>*/}
 
                         <Route exact={true} path={"/experiment"} component={Experiments}/>
-                        <Route exact={true} path={"/dashboard"} component={Dashboard}/>
+                        <Route exact={true} path={"/ABTestingDashboard"} component={Dashboard}/>
+                        <Route exact={true} path={"/conversionDashboard"} component={DashboardAnother}/>
 
                     </Switch>
                 </Router>

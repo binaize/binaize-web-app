@@ -274,11 +274,25 @@ class Experiments extends React.Component {
                     <Divider/>
 
                     <MenuList>
-                        <MenuItem component={Link} to={"/dashboard"} style={{minHeight: "50px"}}>
+                        <MenuItem style={{minHeight: "50px"}}>
                             <ListItemIcon>
                                 <DashboardIcon/>
                             </ListItemIcon>
-                            Dashboard
+                            Analytics Dashboard
+                        </MenuItem>
+
+                        <MenuItem component={Link} to={"/conversionDashboard"} style={{minHeight: "50px",paddingLeft: "50px"}}>
+                            <ListItemIcon>
+                                <DnsIcon/>
+                            </ListItemIcon>
+                            Conversion
+                        </MenuItem>
+
+                        <MenuItem component={Link} to={"/ABTestingDashboard"} style={{minHeight: "50px", paddingLeft: "50px"}}>
+                            <ListItemIcon>
+                                <DnsIcon/>
+                            </ListItemIcon>
+                            A/B Testing
                         </MenuItem>
 
                         <MenuItem component={Link} to={"/experiment"} style={{minHeight: "50px"}}>
