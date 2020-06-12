@@ -1,48 +1,22 @@
-import Drawer from '@material-ui/core/Drawer';
 
 import React from 'react';
-import CssBaseline from '@material-ui/core/CssBaseline';
-import AppBar from '@material-ui/core/AppBar';
-import Toolbar from '@material-ui/core/Toolbar';
-
-import Divider from '@material-ui/core/Divider';
-import ListItemIcon from '@material-ui/core/ListItemIcon';
-import MailIcon from '@material-ui/icons/Mail';
-import {MenuList, MenuItem, fade} from "@material-ui/core";
-import PriorityHighIcon from '@material-ui/icons/PriorityHigh';
-import {Link} from "react-router-dom";
-import Paper from '@material-ui/core/Paper';
-import Table from '@material-ui/core/Table';
-import TableBody from '@material-ui/core/TableBody';
-import TableCell from '@material-ui/core/TableCell';
-import TableContainer from '@material-ui/core/TableContainer';
-import TableHead from '@material-ui/core/TableHead';
-import TableRow from '@material-ui/core/TableRow';
-import {withStyles} from "@material-ui/core/styles";
-import {withRouter} from "react-router-dom";
-import IconButton from "@material-ui/core/IconButton";
-import {AccountCircle} from "@material-ui/icons";
-import Badge from "@material-ui/core/Badge";
-import InputBase from '@material-ui/core/InputBase';
-import SearchIcon from '@material-ui/icons/Search';
-import NotificationsIcon from '@material-ui/icons/Notifications';
-import MoreIcon from '@material-ui/icons/MoreVert';
-import Typography from "@material-ui/core/Typography";
-import "./Experiments.css"
-import CardContent from "@material-ui/core/CardContent";
-import Card from "@material-ui/core/Card";
-import FormControl from "@material-ui/core/FormControl";
-import InputLabel from "@material-ui/core/InputLabel";
-import Select from "@material-ui/core/Select";
-import {Bar, Line} from "react-chartjs-2";
-import {ReactComponent as BinaizeWhiteLogo} from "../images/binaize-logo-white.svg";
-import DashboardIcon from "@material-ui/icons/Dashboard";
-import DnsIcon from "@material-ui/icons/Dns";
-import AddIcon from "@material-ui/icons/Add";
-
 import {
     REACT_APP_BASE_URL
 } from "../config"
+
+import CssBaseline from '@material-ui/core/CssBaseline';
+import Divider from '@material-ui/core/Divider';
+import {fade} from "@material-ui/core";
+import {withStyles} from "@material-ui/core/styles";
+import {withRouter} from "react-router-dom";
+import "./Experiments.css"
+import CardContent from "@material-ui/core/CardContent";
+import Card from "@material-ui/core/Card";
+import {Bar} from "react-chartjs-2";
+import AppToolbar from "./AppToolbar";
+import SideDrawer from "./SideDrawer";
+import Button from "@material-ui/core/Button";
+import RefreshRoundedIcon from "@material-ui/icons/RefreshRounded";
 
 const drawerWidth = 300;
 const exp_style = theme => ({
@@ -144,9 +118,21 @@ const exp_style = theme => ({
     selectEmpty: {
         marginTop: theme.spacing(2),
     },
+    button :{
+        position: 'relative',
+        left: 750,
+        backgroundColor: "#f1f1f1",
+        height: "80px",
+        width: "80px",
+        margin: "1% 5%",
+        '&:hover': {
+            backgroundColor: '#ddd !important',
+            color: "rgba(32,46,120,0.85)"
+        }
+    }
 })
 
-class DashboardAnother extends React.Component {
+class ConversionDashboard extends React.Component {
 
     constructor(props) {
         super(props);
@@ -187,9 +173,9 @@ class DashboardAnother extends React.Component {
         console.log(exp_id)
 
         this.setState({selected: this.state.selected})
-        const params = new URLSearchParams({
-            experiment_id: exp_id
-        })
+        // const params = new URLSearchParams({
+        //     experiment_id: exp_id
+        // })
 
         let access = "Bearer " + this.state.access_token;
         // const urlSession = REACT_APP_URL_SESSION_COUNT + `?${params.toString()}`
@@ -201,8 +187,8 @@ class DashboardAnother extends React.Component {
         let mainDataProduct = [];
         let mainDataLanding = [];
 
-        fetch(REACT_APP_BASE_URL + "/get_shop_funnel_analytics_for_dashboard", {
-            method: 'post',
+        fetch(REACT_APP_BASE_URL + "/api/v1/schemas/report/shop-funnel", {
+            method: 'GET',
             headers: {
                 'Access-Control-Allow-Origin': '*',
                 'Authorization': access,
@@ -275,8 +261,8 @@ class DashboardAnother extends React.Component {
         // const urlVisitor = REACT_APP_URL_VISITOR_COUNT + `?${params.toString()}`
         // console.log(urlVisitor);
 
-        fetch(REACT_APP_BASE_URL + "/get_product_conversion_analytics_for_dashboard", {
-            method: 'POST',
+        fetch(REACT_APP_BASE_URL + "/api/v1/schemas/report/product-conversion", {
+            method: 'GET',
             headers: {
                 'Access-Control-Allow-Origin': '*',
                 'Authorization': access,
@@ -331,7 +317,7 @@ class DashboardAnother extends React.Component {
         //
         // console.log(urlConvert);
 
-        fetch(REACT_APP_BASE_URL + "/get_landing_page_analytics_for_dashboard", {
+        fetch(REACT_APP_BASE_URL + "/api/v1/schemas/report/landing-page", {
             method: 'POST',
             headers: {
                 'Access-Control-Allow-Origin': '*',
@@ -411,144 +397,23 @@ class DashboardAnother extends React.Component {
         return (
             <div className={classes.root}>
                 <CssBaseline/>
-                <AppBar position="fixed" className={classes.appBar}>
-                    <Toolbar>
-                        {/* Toolbar */}
-                        <div className={classes.search} style={{color: "#1A2330"}}>
-                            <div className={classes.searchIcon}>
-                                <SearchIcon/>
-                            </div>
-                            <InputBase
-                                placeholder="Search…"
-                                classes={{
-                                    root: classes.inputRoot,
-                                    input: classes.inputInput,
-                                }}
-                                inputProps={{'aria-label': 'search'}}
-                            />
-                        </div>
-                        <div className={classes.grow}/>
-                        <div className={classes.sectionDesktop}>
-                            <IconButton aria-label="show 4 new mails" color="inherit">
-                                <Badge badgeContent={4} color="secondary">
-                                    <MailIcon/>
-                                </Badge>
-                            </IconButton>
-                            <IconButton aria-label="show 17 new notifications" color="inherit">
-                                <Badge badgeContent={17} color="secondary">
-                                    <NotificationsIcon/>
-                                </Badge>
-                            </IconButton>
-                            <IconButton
-                                edge="end"
-                                aria-label="account of current user"
-                                aria-haspopup="true"
-                                onClick={(e) => {
-                                    this.setState({anchorEl: e.currentTarget})
-                                }}
-                                color="inherit">
 
-                                <AccountCircle/>
-                            </IconButton>
+                <AppToolbar/>
 
-                            <div style={{color: "#1A2330", display: "block", marginLeft: "10px"}}>
-                                <Typography>
-                                    Sarah Elliot
-                                </Typography>
-                                <Typography style={{fontSize: '12px'}}>
-                                    sarah@gmail.com
-                                </Typography>
-                            </div>
-
-                        </div>
-
-                        <div className={classes.sectionMobile}>
-                            <IconButton
-                                aria-label="show more"
-                                aria-haspopup="true"
-                                onClick={(e) => {
-                                    this.setState({mobileMoreAnchorEl: e.currentTarget})
-                                }}
-                                color="inherit">
-                                <MoreIcon/>
-                            </IconButton>
-                        </div>
-                    </Toolbar>
-                </AppBar>
-
-                <Drawer
-                    variant="permanent"
-                    className={classes.drawer}
-                    classes={{
-                        paper: classes.drawerPaper,
-                    }}
-                    anchor="left">
-
-                    <div className={classes.toolbar}>
-                        <BinaizeWhiteLogo
-                            style={{
-                                width: "75%",
-                                margin: "10%",
-                                height: "45%"
-                            }}/>
-                    </div>
-
-                    <Divider/>
-
-                    <MenuList>
-                        <MenuItem style={{minHeight: "50px"}}>
-                            <ListItemIcon>
-                                <DashboardIcon/>
-                            </ListItemIcon>
-                            Analytics Dashboard
-                        </MenuItem>
-
-                        <MenuItem component={Link} to={"/conversionDashboard"} style={{minHeight: "50px",paddingLeft: "50px"}}>
-                            <ListItemIcon>
-                                <DnsIcon/>
-                            </ListItemIcon>
-                            Conversion
-                        </MenuItem>
-
-                        <MenuItem component={Link} to={"/ABTestingDashboard"} style={{minHeight: "50px", paddingLeft: "50px"}}>
-                            <ListItemIcon>
-                                <DnsIcon/>
-                            </ListItemIcon>
-                            A/B Testing
-                        </MenuItem>
-
-                        <MenuItem component={Link} to={"/experiment"} style={{minHeight: "50px"}}>
-                            <ListItemIcon>
-                                <DnsIcon/>
-                            </ListItemIcon>
-                            Experiments
-                        </MenuItem>
-
-                        <MenuItem component={Link} to={"/expi"} style={{minHeight: "50px"}}>
-                            <ListItemIcon>
-                                <AddIcon/>
-                            </ListItemIcon>
-                            Add Experiments
-                        </MenuItem>
-
-                        <Divider/>
-
-                        <MenuItem component={Link} to={"/"} style={{minHeight: "50px"}}>
-                            <ListItemIcon>
-                                <PriorityHighIcon/>
-                            </ListItemIcon>
-                            Logout
-                        </MenuItem>
-                    </MenuList>
-
-                </Drawer>
+                <SideDrawer/>
 
                 {/* MAIN LAYOUT */}
                 <main className={classes.content}>
                     <div className={classes.toolbar}/>
 
                     <div style={{display: "flex"}}>
-                        <h2 style={{margin: "2% 2%"}}>Conversion Dashboard</h2>
+                        <h2 style={{margin: "2% 5%"}}>Conversion Dashboard</h2>
+
+                        <Button
+                            color="primary"
+                            className={classes.button}
+                            onClick={()=>{this.getAllData()}}
+                        ><RefreshRoundedIcon/></Button>
 
                         {/*<FormControl variant="outlined" className={classes.formControl}>*/}
                         {/*    <InputLabel id="demo-simple-select-outlined-label">Experiment Name</InputLabel>*/}
@@ -574,14 +439,14 @@ class DashboardAnother extends React.Component {
                         {/*</FormControl>*/}
                     </div>
 
-                    <Divider/>
+                    <Divider style={{margin: "0% 5%"}}/>
 
                     <Card style={{margin: "2% 5%"}}>
                         <CardContent>
 
-                            <h2>
+                            <h3>
                                 SHOP FUNNEL ANALYSIS
-                            </h2>
+                            </h3>
                             <Divider/>
                             <div style={{padding: "0.5%", margin: "0% 0% 0% 0.5%", width: "97%"}}>
                                 <p>Home Page to Product Page CTR is the lowest.</p>
@@ -631,9 +496,9 @@ class DashboardAnother extends React.Component {
                     <Card style={{margin: "2% 5%"}}>
                         <CardContent>
 
-                            <h2>
+                            <h3>
                                 PRODUCT CONVERSION ANALYSIS
-                            </h2>
+                            </h3>
                             <Divider/>
                             <div style={{padding: "0.5%", margin: "0% 0% 0% 0.5%", width: "97%"}}>
                                 <p>Conversion for product B is significantly lower than others.</p>
@@ -680,9 +545,9 @@ class DashboardAnother extends React.Component {
 
                     <Card style={{margin: "2% 5%"}}>
                         <CardContent>
-                            <h2>
+                            <h3>
                                 LANDING PAGE ANALYSIS
-                            </h2>
+                            </h3>
                             <Divider/>
                             <div style={{padding: "0.5%", margin: "0% 0% 0% 0.5%", width: "97%"}}>
                                 <p>Conversion for product B is significantly lower than others.</p>
@@ -727,4 +592,4 @@ class DashboardAnother extends React.Component {
     }
 }
 
-export default withRouter(withStyles(exp_style)(DashboardAnother))
+export default withRouter(withStyles(exp_style)(ConversionDashboard))

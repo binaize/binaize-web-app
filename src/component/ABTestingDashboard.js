@@ -1,15 +1,8 @@
-import Drawer from '@material-ui/core/Drawer';
-
 import React from 'react';
 import CssBaseline from '@material-ui/core/CssBaseline';
-import AppBar from '@material-ui/core/AppBar';
-import Toolbar from '@material-ui/core/Toolbar';
 
 import Divider from '@material-ui/core/Divider';
-import ListItemIcon from '@material-ui/core/ListItemIcon';
-import MailIcon from '@material-ui/icons/Mail';
-import {MenuList, MenuItem, fade} from "@material-ui/core";
-import PriorityHighIcon from '@material-ui/icons/PriorityHigh';
+import {fade} from "@material-ui/core";
 import {Link} from "react-router-dom";
 import Paper from '@material-ui/core/Paper';
 import Table from '@material-ui/core/Table';
@@ -20,25 +13,14 @@ import TableHead from '@material-ui/core/TableHead';
 import TableRow from '@material-ui/core/TableRow';
 import {withStyles} from "@material-ui/core/styles";
 import {withRouter} from "react-router-dom";
-import IconButton from "@material-ui/core/IconButton";
-import {AccountCircle} from "@material-ui/icons";
-import Badge from "@material-ui/core/Badge";
-import InputBase from '@material-ui/core/InputBase';
-import SearchIcon from '@material-ui/icons/Search';
-import NotificationsIcon from '@material-ui/icons/Notifications';
-import MoreIcon from '@material-ui/icons/MoreVert';
-import Typography from "@material-ui/core/Typography";
 import "./Experiments.css"
 import CardContent from "@material-ui/core/CardContent";
 import Card from "@material-ui/core/Card";
-import FormControl from "@material-ui/core/FormControl";
-import InputLabel from "@material-ui/core/InputLabel";
-import Select from "@material-ui/core/Select";
 import {Bar, Line} from "react-chartjs-2";
-import {ReactComponent as BinaizeWhiteLogo} from "../images/binaize-logo-white.svg";
-import DashboardIcon from "@material-ui/icons/Dashboard";
-import DnsIcon from "@material-ui/icons/Dns";
-import AddIcon from "@material-ui/icons/Add";
+
+import Chart from "react-apexcharts";
+
+import RefreshRoundedIcon from '@material-ui/icons/RefreshRounded';
 
 import {
     REACT_APP_BASE_URL,
@@ -49,6 +31,9 @@ import {
     REACT_APP_URL_EXPERIMENTS,
     REACT_APP_EXPERIMENT_SUMMARY
 } from "../config"
+import AppToolbar from "./AppToolbar";
+import SideDrawer from "./SideDrawer";
+import Button from "@material-ui/core/Button";
 
 const drawerWidth = 300;
 const exp_style = theme => ({
@@ -150,9 +135,21 @@ const exp_style = theme => ({
     selectEmpty: {
         marginTop: theme.spacing(2),
     },
+    button: {
+        position: 'relative',
+        left: 750,
+        backgroundColor: "#f1f1f1",
+        height: "80px",
+        width: "80px",
+        margin: "1% 5%",
+        '&:hover': {
+            backgroundColor: '#ddd !important',
+            color: "rgba(32,46,120,0.85)"
+        }
+    }
 })
 
-class Dashboard extends React.Component {
+class ABTestingDashboard extends React.Component {
 
     constructor(props) {
         super(props);
@@ -179,7 +176,89 @@ class Dashboard extends React.Component {
             bar_background_hover_color: ['#006FBB', '#50B83C', '#DE3618'],
             variation_name2: ["Variation Yel", "Original", "Variation Blue"],
             experiment_names: [],
-            experiment_ids: []
+            experiment_ids: [],
+            exp_name: localStorage.getItem("experiment_name"),
+
+            // APEX CHARTS
+
+            series: [{
+                data: [44, 55, 41, 64, 22, 43, 21]
+            }, {
+                data: [53, 32, 33, 52, 13, 44, 32]
+            }],
+
+            optionss: {
+                chart: {
+                    type: 'bar',
+                    height: 430
+                },
+                plotOptions: {
+                    bar: {
+                        horizontal: false,
+                        dataLabels: {
+                            position: 'top',
+                        },
+                    }
+                },
+                dataLabels: {
+                    enabled: true,
+                    offsetX: -6,
+                    style: {
+                        fontSize: '12px',
+                        colors: ['#fff']
+                    }
+                },
+                stroke: {
+                    show: true,
+                    width: 1,
+                    colors: ['#fff']
+                },
+                xaxis: {
+                    categories: [2001, 2002, 2003, 2004, 2005, 2006, 2007],
+                },
+            },
+
+
+            seriesss: [{
+                name: 'Website Blog',
+                type: 'column',
+                data: [440, 505, 414, 671, 227, 413, 201, 352, 752, 320, 257, 160]
+            }, {
+                name: 'Social Media',
+                type: 'line',
+                data: [23, 42, 35, 27, 43, 22, 17, 31, 22, 22, 12, 16]
+            }],
+            optionssss: {
+                chart: {
+                    height: 350,
+                    type: 'line',
+                },
+                stroke: {
+                    width: [0, 4]
+                },
+                title: {
+                    text: 'Traffic Sources'
+                },
+                dataLabels: {
+                    enabledOnSeries: [1]
+                },
+                labels: ['01 Jan 2001', '02 Jan 2001', '03 Jan 2001', '04 Jan 2001', '05 Jan 2001', '06 Jan 2001', '07 Jan 2001', '08 Jan 2001', '09 Jan 2001', '10 Jan 2001', '11 Jan 2001', '12 Jan 2001'],
+                xaxis: {
+                    type: 'datetime'
+                },
+                yaxis: [{
+                    title: {
+                        text: 'Website Blog',
+                    },
+
+                }, {
+                    opposite: true,
+                    title: {
+                        text: 'Social Media'
+                    }
+                }]
+            },
+
         }
     }
 
@@ -214,7 +293,7 @@ class Dashboard extends React.Component {
                     }
 
                     this.setState({experiment_names: localExp})
-                    console.log(this.state.experiment_names);
+                    // console.log(this.state.experiment_names);
                 });
         } catch (e) {
             console.error("Error!", e);
@@ -232,15 +311,15 @@ class Dashboard extends React.Component {
         })
 
         let access = "Bearer " + this.state.access_token;
-        const urlSession = REACT_APP_URL_SESSION_COUNT + `?${params.toString()}`
+        const urlSession = '/api/v1/schemas/report/session-count' + `?${params.toString()}`
 
-        console.log(urlSession);
-        let mainDatasetSession = [];
+        // console.log(urlSession);
+
         let mainDatasetVisitors = [];
         let mainDatasetConversion = [];
 
         fetch(REACT_APP_BASE_URL + urlSession, {
-            method: 'post',
+            method: 'GET',
             headers: {
                 'Access-Control-Allow-Origin': '*',
                 'Authorization': access,
@@ -254,34 +333,57 @@ class Dashboard extends React.Component {
                 let data = []
                 let datasets = [];
 
+                let i = 0;
 
-                Object.keys(result.session_count).forEach(function (key) {
+                let mainDatasetSession = [];
+
+                Object.keys(result.session_count).forEach((key) => {
                     // console.log(key)
                     data.push(key)
                     datasets.push(result.session_count[key])
-                });
-                console.log(data);
-                console.log(datasets);
-
-                let localdata = {}
-
-                let i = 0;
-                for (i; i < data.length; i++) {
+                    let localdata = {}
 
                     localdata = {
-                        label: data[i],
+                        label: key,
                         backgroundColor: this.state.bar_background_color[i],
                         borderColor: this.state.bar_background_color[i],
                         borderWidth: 1,
                         hoverBackgroundColor: this.state.bar_background_hover_color[i],
                         hoverBorderColor: this.state.bar_background_hover_color[i],
-                        data: datasets[i]
+                        data: result.session_count[key]
                     }
-                    mainDatasetSession.push(localdata);
-                    localdata = {}
-                }
 
-                console.log(mainDatasetSession)
+                    console.log(localdata)
+                    console.log(mainDatasetSession)
+
+                    i = i + 1
+
+                    mainDatasetSession.push(localdata);
+
+
+                });
+                // console.log(data);
+                // console.log(datasets);
+
+
+
+                // let i = 0;
+                // for (i; i < data.length; i++) {
+                //
+                //     localdata = {
+                //         label: data[i],
+                //         backgroundColor: this.state.bar_background_color[i],
+                //         borderColor: this.state.bar_background_color[i],
+                //         borderWidth: 1,
+                //         hoverBackgroundColor: this.state.bar_background_hover_color[i],
+                //         hoverBorderColor: this.state.bar_background_hover_color[i],
+                //         data: datasets[i]
+                //     }
+                //     mainDatasetSession.push(localdata);
+                //     localdata = {}
+                // }
+
+                // console.log(mainDatasetSession)
                 this.setState({
                     BarDataSession: {
                         labels: result.date,
@@ -291,12 +393,12 @@ class Dashboard extends React.Component {
             });
 
 
-        const urlVisitor = REACT_APP_URL_VISITOR_COUNT + `?${params.toString()}`
+        const urlVisitor = '/api/v1/schemas/report/visitor-count' + `?${params.toString()}`
 
-        console.log(urlVisitor);
+        // console.log(urlVisitor);
 
         fetch(REACT_APP_BASE_URL + urlVisitor, {
-            method: 'POST',
+            method: 'GET',
             headers: {
                 'Access-Control-Allow-Origin': '*',
                 'Authorization': access,
@@ -308,7 +410,7 @@ class Dashboard extends React.Component {
                 let datasetsV = [];
 
                 let dataV = [];
-                console.log("Success: ", result);
+                // console.log("Success: ", result);
 
                 Object.keys(result.visitor_count).forEach(function (key) {
                     datasetsV.push(result.visitor_count[key])
@@ -317,8 +419,8 @@ class Dashboard extends React.Component {
 
                 let localdataV = {}
                 let i = 0;
-                console.log(datasetsV);
-                console.log(dataV);
+                // console.log(datasetsV);
+                // console.log(dataV);
 
                 for (i; i < dataV.length; i++) {
 
@@ -335,7 +437,9 @@ class Dashboard extends React.Component {
                     localdataV = {}
                 }
 
-                console.log(mainDatasetVisitors)
+                // console.log(mainDatasetVisitors)
+
+
                 this.setState({
                     BarDataVisitors: {
                         labels: result.date,
@@ -345,12 +449,12 @@ class Dashboard extends React.Component {
             });
 
 
-        const urlConvert = REACT_APP_URL_CONVERSION_RATE + `?${params.toString()}`
+        const urlConvert = '/api/v1/schemas/report/conversion-rate' + `?${params.toString()}`
 
-        console.log(urlConvert);
+        // console.log(urlConvert);
 
         fetch(REACT_APP_BASE_URL + urlConvert, {
-            method: 'POST',
+            method: 'GET',
             headers: {
                 'Access-Control-Allow-Origin': '*',
                 'Authorization': access,
@@ -359,7 +463,7 @@ class Dashboard extends React.Component {
         })
             .then(response => response.json())
             .then(result => {
-                console.log("Success : ", result);
+                // console.log("Success : ", result);
 
                 let dataV = [];
                 let datasetsV = [];
@@ -369,8 +473,8 @@ class Dashboard extends React.Component {
                     dataV.push(key)
                     datasetsV.push(result.conversion[key])
                 });
-                console.log(dataV);
-                console.log(datasetsV);
+                // console.log(dataV);
+                // console.log(datasetsV);
 
                 let localdataV = {}
 
@@ -390,7 +494,7 @@ class Dashboard extends React.Component {
                     localdataV = {}
                 }
 
-                console.log(mainDatasetConversion)
+                // console.log(mainDatasetConversion)
                 this.setState({
                     ConversionData: {
                         labels: result.date,
@@ -400,14 +504,14 @@ class Dashboard extends React.Component {
             });
 
 
-        const urlConversationTable = REACT_APP_URL_CONVERSION_TABLE + `?${params.toString()}`
+        const urlConversationTable = '/api/v1/schemas/report/conversion-table' + `?${params.toString()}`
 
         console.log(urlConversationTable);
 
         try {
 
             fetch(REACT_APP_BASE_URL + urlConversationTable, {
-                method: 'POST',
+                method: 'GET',
                 headers: {
                     'Access-Control-Allow-Origin': '*',
                     'Authorization': access,
@@ -442,7 +546,7 @@ class Dashboard extends React.Component {
                     }
 
                     this.setState({rows: localRows})
-                    console.log(this.state.rows);
+                    // console.log(this.state.rows);
                 });
 
 
@@ -451,12 +555,12 @@ class Dashboard extends React.Component {
         }
 
 
-        const urlSummary = REACT_APP_EXPERIMENT_SUMMARY + `?${params.toString()}`
+        const urlSummary = '/api/v1/schemas/report/experiment-summary' + `?${params.toString()}`
 
         console.log(urlSummary);
 
         fetch(REACT_APP_BASE_URL + urlSummary, {
-            method: 'POST',
+            method: 'GET',
             headers: {
                 'Access-Control-Allow-Origin': '*',
                 'Authorization': access,
@@ -481,7 +585,8 @@ class Dashboard extends React.Component {
     }
 
     componentDidMount() {
-        this.getExperimentNames();
+        // this.getExperimentNames();
+        this.getSessionData(localStorage.getItem("experiment_id"));
     }
 
     render() {
@@ -490,169 +595,52 @@ class Dashboard extends React.Component {
         return (
             <div className={classes.root}>
                 <CssBaseline/>
-                <AppBar position="fixed" className={classes.appBar}>
-                    <Toolbar>
-                        {/* Toolbar */}
-                        <div className={classes.search} style={{color: "#1A2330"}}>
-                            <div className={classes.searchIcon}>
-                                <SearchIcon/>
-                            </div>
-                            <InputBase
-                                placeholder="Search…"
-                                classes={{
-                                    root: classes.inputRoot,
-                                    input: classes.inputInput,
-                                }}
-                                inputProps={{'aria-label': 'search'}}
-                            />
-                        </div>
-                        <div className={classes.grow}/>
-                        <div className={classes.sectionDesktop}>
-                            <IconButton aria-label="show 4 new mails" color="inherit">
-                                <Badge badgeContent={4} color="secondary">
-                                    <MailIcon/>
-                                </Badge>
-                            </IconButton>
-                            <IconButton aria-label="show 17 new notifications" color="inherit">
-                                <Badge badgeContent={17} color="secondary">
-                                    <NotificationsIcon/>
-                                </Badge>
-                            </IconButton>
-                            <IconButton
-                                edge="end"
-                                aria-label="account of current user"
-                                aria-haspopup="true"
-                                onClick={(e) => {
-                                    this.setState({anchorEl: e.currentTarget})
-                                }}
-                                color="inherit">
 
-                                <AccountCircle/>
-                            </IconButton>
+                <AppToolbar/>
 
-                            <div style={{color: "#1A2330", display: "block", marginLeft: "10px"}}>
-                                <Typography>
-                                    Sarah Elliot
-                                </Typography>
-                                <Typography style={{fontSize: '12px'}}>
-                                    sarah@gmail.com
-                                </Typography>
-                            </div>
-
-                        </div>
-
-                        <div className={classes.sectionMobile}>
-                            <IconButton
-                                aria-label="show more"
-                                aria-haspopup="true"
-                                onClick={(e) => {
-                                    this.setState({mobileMoreAnchorEl: e.currentTarget})
-                                }}
-                                color="inherit">
-                                <MoreIcon/>
-                            </IconButton>
-                        </div>
-                    </Toolbar>
-                </AppBar>
-
-                <Drawer
-                    variant="permanent"
-                    className={classes.drawer}
-                    classes={{
-                        paper: classes.drawerPaper,
-                    }}
-                    anchor="left">
-
-                    <div className={classes.toolbar}>
-                        <BinaizeWhiteLogo
-                            style={{
-                                width: "75%",
-                                margin: "10%",
-                                height: "45%"
-                            }}/>
-                    </div>
-
-                    <Divider/>
-
-                    <MenuList>
-                        <MenuItem style={{minHeight: "50px"}}>
-                            <ListItemIcon>
-                                <DashboardIcon/>
-                            </ListItemIcon>
-                            Analytics Dashboard
-                        </MenuItem>
-
-                        <MenuItem component={Link} to={"/conversionDashboard"} style={{minHeight: "50px",paddingLeft: "50px"}}>
-                            <ListItemIcon>
-                                <DnsIcon/>
-                            </ListItemIcon>
-                            Conversion
-                        </MenuItem>
-
-                        <MenuItem component={Link} to={"/ABTestingDashboard"} style={{minHeight: "50px", paddingLeft: "50px"}}>
-                            <ListItemIcon>
-                                <DnsIcon/>
-                            </ListItemIcon>
-                            A/B Testing
-                        </MenuItem>
-
-                        <MenuItem component={Link} to={"/experiment"} style={{minHeight: "50px"}}>
-                            <ListItemIcon>
-                                <DnsIcon/>
-                            </ListItemIcon>
-                            Experiments
-                        </MenuItem>
-
-                        <MenuItem component={Link} to={"/expi"} style={{minHeight: "50px"}}>
-                            <ListItemIcon>
-                                <AddIcon/>
-                            </ListItemIcon>
-                            Add Experiments
-                        </MenuItem>
-
-                        <Divider/>
-
-                        <MenuItem component={Link} to={"/"} style={{minHeight: "50px"}}>
-                            <ListItemIcon>
-                                <PriorityHighIcon/>
-                            </ListItemIcon>
-                            Logout
-                        </MenuItem>
-                    </MenuList>
-
-                </Drawer>
+                <SideDrawer/>
 
                 {/* MAIN LAYOUT */}
                 <main className={classes.content}>
                     <div className={classes.toolbar}/>
 
                     <div style={{display: "flex"}}>
-                        <h2 style={{margin: "2% 2%"}}>A/B Testing  Dashboard</h2>
+                        {/*<h2 style={{margin: "2% 2%"}}>A/B Testing  Dashboard</h2>*/}
+                        <h2 style={{margin: "2% 5%"}}> {this.state.exp_name} </h2>
 
-                        <FormControl variant="outlined" className={classes.formControl}>
-                            <InputLabel id="demo-simple-select-outlined-label">Experiment Name</InputLabel>
-                            <Select
-                                labelId="demo-simple-select-outlined-label"
-                                id="demo-simple-select-outlined"
-                                value={this.state.select_val}
-                                onChange={(e) => {
-                                    this.setState({select_val: e.target.value})
-                                    this.getSessionData(e.target.value);
-                                }}
-                                label="Experiment Name">
+                        <Button
+                            color="primary"
+                            className={classes.button}
+                            onClick={() => {
+                                this.getSessionData(localStorage.getItem("experiment_id"))
+                            }}
+                        ><RefreshRoundedIcon/></Button>
 
-                                {this.state.experiment_names.map((exp_name) => (
-                                    <MenuItem className={classes.expMenu} value={exp_name[1]}>{exp_name[0]}</MenuItem>
-                                ))}
 
-                                {/*<MenuItem value={"13e6f65bacbf4d74b8561e940287e604"} style={{color: "black"}}>Product*/}
-                                {/*    page design</MenuItem>*/}
-                                {/*<MenuItem value={"66f5d1fc432d47b994250688fd728ff7"} style={{color: "black"}}>Home page*/}
-                                {/*    messaging</MenuItem>*/}
-                            </Select>
-                        </FormControl>
+                        {/*<FormControl variant="outlined" className={classes.formControl}>*/}
+                        {/*    <InputLabel id="demo-simple-select-outlined-label">Experiment Name</InputLabel>*/}
+                        {/*    <Select*/}
+                        {/*        labelId="demo-simple-select-outlined-label"*/}
+                        {/*        id="demo-simple-select-outlined"*/}
+                        {/*        value={this.state.select_val}*/}
+                        {/*        onChange={(e) => {*/}
+                        {/*            this.setState({select_val: e.target.value})*/}
+                        {/*            this.getSessionData(e.target.value);*/}
+                        {/*        }}*/}
+                        {/*        label="Experiment Name">*/}
+
+                        {/*        {this.state.experiment_names.map((exp_name) => (*/}
+                        {/*            <MenuItem className={classes.expMenu} value={exp_name[1]}>{exp_name[0]}</MenuItem>*/}
+                        {/*        ))}*/}
+
+                        {/*        /!*<MenuItem value={"13e6f65bacbf4d74b8561e940287e604"} style={{color: "black"}}>Product*!/*/}
+                        {/*        /!*    page design</MenuItem>*!/*/}
+                        {/*        /!*<MenuItem value={"66f5d1fc432d47b994250688fd728ff7"} style={{color: "black"}}>Home page*!/*/}
+                        {/*        /!*    messaging</MenuItem>*!/*/}
+                        {/*    </Select>*/}
+                        {/*</FormControl>*/}
                     </div>
-                    <Card>
+                    <Card style={{margin: "1% 5%"}}>
                         <CardContent>
                             <div style={{padding: "0.5%", margin: "0% 0% 0% 0.5%", width: "97%"}}>
                                 <p>{this.state.SummaryDetails.summary_status}</p>
@@ -662,9 +650,9 @@ class Dashboard extends React.Component {
                         </CardContent>
                     </Card>
 
-                    <Divider style={{margin: "1%"}}/>
+                    <Divider style={{margin: "1% 5%"}}/>
 
-                    <TableContainer component={Paper} style={{margin: "0% 0.5% 1% 1.5%", width: "97%"}}>
+                    <TableContainer component={Paper} style={{margin: "2% 5%", width: "90%"}}>
                         <Table className={classes.table} aria-label="simple table">
                             <TableHead>
                                 <TableRow>
@@ -691,9 +679,9 @@ class Dashboard extends React.Component {
                         </Table>
                     </TableContainer>
 
-                    <Divider/>
+                    <Divider style={{margin: "1% 5%"}}/>
 
-                    <Card>
+                    <Card style={{margin: "2% 5%"}}>
                         <CardContent>
                             <div style={{margin: "0% 0.5% 1% 1.5%", width: "97%"}}>
                                 <h3>
@@ -704,15 +692,16 @@ class Dashboard extends React.Component {
                                     width={100}
                                     height={40}
                                     data={this.state.BarDataSession}
-                                    options={{maintainAspectRatio: true,
+                                    options={{
+                                        maintainAspectRatio: true,
                                         scales: {}
                                     }}>
                                 </Bar>
                             </div>
                         </CardContent>
                     </Card>
-
-                    <Card>
+                    <Divider style={{margin: "1% 5%"}}/>
+                    <Card style={{margin: "2% 5%"}}>
                         <CardContent>
                             <div style={{margin: "0% 0.5% 1% 1.5%", width: "97%"}}>
                                 <h3>
@@ -730,8 +719,8 @@ class Dashboard extends React.Component {
                             </div>
                         </CardContent>
                     </Card>
-
-                    <Card>
+                    <Divider style={{margin: "1% 5%"}}/>
+                    <Card style={{margin: "2% 5%"}}>
                         <CardContent>
                             <div style={{margin: "0% 0.5% 1% 1.5%", width: "97%"}}>
                                 <h3>
@@ -748,11 +737,43 @@ class Dashboard extends React.Component {
                         </CardContent>
                     </Card>
 
+                    {/*/!*  APEX CHARTS TESTING  *!/*/}
+
+                    {/*<Divider style={{margin: "1% 5%"}}/>*/}
+                    {/*<Card style={{margin: "2% 5%"}}>*/}
+                    {/*    <CardContent>*/}
+                    {/*        <div className="mixed-chart" style={{margin: "0% 0.5% 1% 1.5%", width: "97%"}}>*/}
+                    {/*            <Chart*/}
+                    {/*                options={this.state.optionss}*/}
+                    {/*                series={this.state.series}*/}
+                    {/*                type="bar"*/}
+                    {/*                height={430}*/}
+                    {/*            />*/}
+                    {/*        </div>*/}
+                    {/*    </CardContent>*/}
+                    {/*</Card>*/}
+
+
+                    {/*<Divider style={{margin: "1% 5%"}}/>*/}
+                    {/*<Card style={{margin: "2% 5%"}}>*/}
+                    {/*    <CardContent>*/}
+                    {/*        <div className="mixed-chart" style={{margin: "0% 0.5% 1% 1.5%", width: "97%"}}>*/}
+                    {/*            <Chart*/}
+                    {/*                options={this.state.optionssss}*/}
+                    {/*                series={this.state.seriesss}*/}
+                    {/*                type="line"*/}
+                    {/*                height={430}*/}
+                    {/*            />*/}
+                    {/*        </div>*/}
+                    {/*    </CardContent>*/}
+                    {/*</Card>*/}
+
 
                 </main>
+
             </div>
         )
     }
 }
 
-export default withRouter(withStyles(exp_style)(Dashboard))
+export default withRouter(withStyles(exp_style)(ABTestingDashboard))

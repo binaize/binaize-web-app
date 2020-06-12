@@ -1,16 +1,14 @@
 
 import React from 'react';
 
+import './App.css';
 import {AppProvider} from '@shopify/polaris';
 import enTranslations from '@shopify/polaris/locales/en.json';
 import { BrowserRouter as Router, Switch, Route} from "react-router-dom";
 import Login from "./component/Login";
-
-import Dashboard from "./component/Dashboard"
 import Experiments from "./component/Experiments";
-
-import './App.css';
-import DashboardAnother from "./component/Dashboard_another";
+import ConversionDashboard from "./component/ConversionDashboard";
+import ABTestingDashboard from "./component/ABTestingDashboard";
 
 class App extends React.Component {
     render() {
@@ -24,8 +22,8 @@ class App extends React.Component {
                         {/*<Route exact={true} path={"/expi"} component={ResponsiveDrawer}/>*/}
 
                         <Route exact={true} path={"/experiment"} component={Experiments}/>
-                        <Route exact={true} path={"/ABTestingDashboard"} component={Dashboard}/>
-                        <Route exact={true} path={"/conversionDashboard"} component={DashboardAnother}/>
+                        <Route exact={true} path={"/ABTestingDashboard"} component={ABTestingDashboard}/>
+                        <Route exact={true} path={"/conversionDashboard"} component={ConversionDashboard}/>
 
                     </Switch>
                 </Router>

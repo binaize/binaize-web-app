@@ -1,15 +1,9 @@
 import React from 'react';
 
-import Drawer from '@material-ui/core/Drawer';
 import CssBaseline from '@material-ui/core/CssBaseline';
-import AppBar from '@material-ui/core/AppBar';
-import Toolbar from '@material-ui/core/Toolbar';
 
 import Divider from '@material-ui/core/Divider';
-import ListItemIcon from '@material-ui/core/ListItemIcon';
-import MailIcon from '@material-ui/icons/Mail';
-import {MenuList, MenuItem, fade} from "@material-ui/core";
-import PriorityHighIcon from '@material-ui/icons/PriorityHigh';
+import {fade} from "@material-ui/core";
 import {Link} from "react-router-dom";
 import Paper from '@material-ui/core/Paper';
 import Table from '@material-ui/core/Table';
@@ -20,21 +14,11 @@ import TableHead from '@material-ui/core/TableHead';
 import TableRow from '@material-ui/core/TableRow';
 import {withStyles} from "@material-ui/core/styles";
 import {withRouter} from "react-router-dom";
-import IconButton from "@material-ui/core/IconButton";
-import {AccountCircle} from "@material-ui/icons";
-import AddIcon from '@material-ui/icons/Add';
-import DnsIcon from '@material-ui/icons/Dns';
-import DashboardIcon from '@material-ui/icons/Dashboard';
-import Badge from "@material-ui/core/Badge";
-import InputBase from '@material-ui/core/InputBase';
-import SearchIcon from '@material-ui/icons/Search';
-import NotificationsIcon from '@material-ui/icons/Notifications';
-import MoreIcon from '@material-ui/icons/MoreVert';
-import {ReactComponent as BinaizeWhiteLogo} from "../images/binaize-logo-white.svg";
-import Typography from "@material-ui/core/Typography";
 import "./Experiments.css"
 
 import {REACT_APP_BASE_URL, REACT_APP_URL_EXPERIMENTS} from "../config"
+import AppToolbar from "./AppToolbar";
+import SideDrawer from "./SideDrawer";
 
 const drawerWidth = 300;
 const exp_style = theme => ({
@@ -146,7 +130,7 @@ class Experiments extends React.Component {
 
         let access = "Bearer " + localStorage.getItem("access_token");
         try {
-            fetch(REACT_APP_BASE_URL + REACT_APP_URL_EXPERIMENTS, {
+            fetch(REACT_APP_BASE_URL + "/api/v1/schemas/experiment/list", {
                 method: 'GET',
                 headers: {
                     'Access-Control-Allow-Origin': '*',
@@ -160,10 +144,15 @@ class Experiments extends React.Component {
                     let result = res;
 
                     let i = 0;
-                    let url = "www.smth.com"
 
                     for (i; i < result.length; i++) {
-                        localData.push(this.createData(<Link url={url}>{result[i].experiment_name}</Link>,
+                        let jj = i
+                        localData.push(this.createData(
+                            <Link to={"ABTestingDashboard"} onClick={(e) => {
+                                localStorage.setItem("experiment_id", result[jj].experiment_id)
+                                localStorage.setItem("experiment_name", result[jj].experiment_name)
+                                // console.log(result[jj]);
+                            }}>{result[i].experiment_name}</Link>,
                             result[i].experiment_type,
                             result[i].status,
                             result[i].page_type,
@@ -190,147 +179,21 @@ class Experiments extends React.Component {
         return (
             <div className={classes.root}>
                 <CssBaseline/>
-                <AppBar position="fixed" className={classes.appBar}>
-                    <Toolbar>
-                        <div className={classes.search} style={{color: "#1A2330"}}>
-                            <div className={classes.searchIcon}>
-                                <SearchIcon/>
-                            </div>
-                            <InputBase
-                                placeholder="Search…"
-                                classes={{
-                                    root: classes.inputRoot,
-                                    input: classes.inputInput,
-                                }}
-                                inputProps={{'aria-label': 'search'}}
-                            />
-                        </div>
-                        <div className={classes.grow}/>
-                        <div className={classes.sectionDesktop}>
-                            <IconButton aria-label="show 4 new mails" color="inherit">
-                                <Badge badgeContent={4} color="secondary">
-                                    <MailIcon/>
-                                </Badge>
-                            </IconButton>
-                            <IconButton aria-label="show 17 new notifications" color="inherit">
-                                <Badge badgeContent={17} color="secondary">
-                                    <NotificationsIcon/>
-                                </Badge>
-                            </IconButton>
-                            <IconButton
-                                edge="end"
-                                aria-label="account of current user"
-                                aria-haspopup="true"
-                                onClick={(e) => {
-                                    this.setState({anchorEl: e.currentTarget})
-                                }}
-                                color="inherit">
 
-                                <AccountCircle/>
-                            </IconButton>
+                <AppToolbar/>
 
-                            <div style={{color: "#1A2330", display: "block", marginLeft: "10px"}}>
-                                <Typography>
-                                    Sarah Elliot
-                                </Typography>
-                                <Typography style={{fontSize: '12px'}}>
-                                    sarah@gmail.com
-                                </Typography>
-                            </div>
-
-                        </div>
-
-                        <div className={classes.sectionMobile}>
-                            <IconButton
-                                aria-label="show more"
-                                aria-haspopup="true"
-                                onClick={(e) => {
-                                    this.setState({mobileMoreAnchorEl: e.currentTarget})
-                                }}
-                                color="inherit">
-                                <MoreIcon/>
-                            </IconButton>
-                        </div>
-                    </Toolbar>
-                </AppBar>
-
-                <Drawer
-                    className={classes.drawer}
-                    variant="permanent"
-                    classes={{
-                        paper: classes.drawerPaper,
-                    }}
-                    anchor="left">
-
-                    <div className={classes.toolbar}>
-                        <BinaizeWhiteLogo
-                            style={{
-                                width: "75%",
-                                margin: "10%",
-                                height: "45%"
-                            }}/>
-                    </div>
-
-                    <Divider/>
-
-                    <MenuList>
-                        <MenuItem style={{minHeight: "50px"}}>
-                            <ListItemIcon>
-                                <DashboardIcon/>
-                            </ListItemIcon>
-                            Analytics Dashboard
-                        </MenuItem>
-
-                        <MenuItem component={Link} to={"/conversionDashboard"} style={{minHeight: "50px",paddingLeft: "50px"}}>
-                            <ListItemIcon>
-                                <DnsIcon/>
-                            </ListItemIcon>
-                            Conversion
-                        </MenuItem>
-
-                        <MenuItem component={Link} to={"/ABTestingDashboard"} style={{minHeight: "50px", paddingLeft: "50px"}}>
-                            <ListItemIcon>
-                                <DnsIcon/>
-                            </ListItemIcon>
-                            A/B Testing
-                        </MenuItem>
-
-                        <MenuItem component={Link} to={"/experiment"} style={{minHeight: "50px"}}>
-                            <ListItemIcon>
-                                <DnsIcon/>
-                            </ListItemIcon>
-                            Experiments
-                        </MenuItem>
-
-                        <MenuItem component={Link} to={"/expi"} style={{minHeight: "50px"}}>
-                            <ListItemIcon>
-                                <AddIcon/>
-                            </ListItemIcon>
-                            Add Experiments
-                        </MenuItem>
-
-                        <Divider/>
-
-                        <MenuItem component={Link} to={"/"} style={{minHeight: "50px"}}>
-                            <ListItemIcon>
-                                <PriorityHighIcon/>
-                            </ListItemIcon>
-                            Logout
-                        </MenuItem>
-                    </MenuList>
-
-                </Drawer>
+                <SideDrawer/>
 
                 <main className={classes.content}>
                     <div className={classes.toolbar}/>
 
-                    <div style={{margin: "0% 0.5%"}}>
+                    <div style={{margin: "1% 5%"}}>
                         <h3>Experiments Overview</h3>
                     </div>
 
-                    <Divider style={{margin: "1%"}}/>
+                    <Divider style={{margin: "0% 5%"}}/>
 
-                    <TableContainer component={Paper} style={{margin: "0% 0.5% 1% 1.5%", width: "97%"}}>
+                    <TableContainer component={Paper} style={{margin: "1% 5%", width: "90%"}}>
                         <Table className={classes.table} aria-label="simple table">
                             <TableHead>
                                 <TableRow>
