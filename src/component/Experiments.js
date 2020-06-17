@@ -125,12 +125,11 @@ class Experiments extends React.Component {
 
     getExperiments() {
 
-        let localData = [];
         console.log(localStorage.getItem("access_token"));
-
         let access = "Bearer " + localStorage.getItem("access_token");
+
         try {
-            fetch(REACT_APP_BASE_URL + "/api/v1/schemas/experiment/list", {
+            fetch(REACT_APP_BASE_URL + REACT_APP_URL_EXPERIMENTS, {
                 method: 'GET',
                 headers: {
                     'Access-Control-Allow-Origin': '*',
@@ -142,22 +141,22 @@ class Experiments extends React.Component {
                 .then(res => {
 
                     let result = res;
-
                     let i = 0;
+                    let localData = [];
 
                     for (i; i < result.length; i++) {
                         let jj = i
                         localData.push(this.createData(
                             <Link to={"ABTestingDashboard"} onClick={(e) => {
-                                localStorage.setItem("experiment_id", result[jj].experiment_id)
-                                localStorage.setItem("experiment_name", result[jj].experiment_name)
+                                localStorage.setItem("experiment_id", result[jj]["experiment_id"])
+                                localStorage.setItem("experiment_name", result[jj]["experiment_name"])
                                 // console.log(result[jj]);
-                            }}>{result[i].experiment_name}</Link>,
-                            result[i].experiment_type,
-                            result[i].status,
-                            result[i].page_type,
-                            result[i].creation_time,
-                            result[i].last_updation_time
+                            }}>{result[i]["experiment_name"]}</Link>,
+                            result[i]["experiment_type"],
+                            result[i]["status"],
+                            result[i]["page_type"],
+                            result[i]["creation_time"],
+                            result[i]["last_updation_time"]
                         ))
                     }
 

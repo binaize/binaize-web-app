@@ -462,11 +462,12 @@ class ConversionDashboard extends React.Component {
                                     height={20}
                                     type={'bar'}
                                     data={this.state.shop_funnels}
+                                    redraw={this.state.shop_funnels}
                                     options={{
                                         maintainAspectRatio: true,
                                         scales: {
                                             xAxes: [{
-                                                barPercentage: 0.3
+                                                barPercentage: 0.4
                                             }],
                                             yAxes: [{
                                                 type: "linear", // only linear but allow scale type registration. This allows extensions to exist solely for log scale for instance
@@ -514,12 +515,13 @@ class ConversionDashboard extends React.Component {
                                     width={45}
                                     height={20}
                                     data={this.state.product_conversion}
+                                    redraw={this.state.product_conversion}
                                     options={{
                                         maintainAspectRatio: true,
                                         scales: {
                                             xAxes: [{
                                                 stacked: true,
-                                                barPercentage: 0.3
+                                                barPercentage: 0.4
                                             }],
                                             yAxes: [{
                                                 stacked: true,
@@ -560,12 +562,13 @@ class ConversionDashboard extends React.Component {
                                     width={45}
                                     height={20}
                                     data={this.state.landing_page_conversion}
+                                    redraw={this.state.landing_page_conversion}
                                     options={{
                                         maintainAspectRatio: true,
                                         scales: {
                                             xAxes: [{
                                                 stacked: true,
-                                                barPercentage: 0.3
+                                                barPercentage: 0.4
                                             }],
                                             yAxes: [{
                                                 ticks: {
