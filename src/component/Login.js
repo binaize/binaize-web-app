@@ -74,7 +74,7 @@ function InputAdornments() {
                 .then(result => {
                     console.log("Success:", result);
 
-                    if (result.detail === "Incorrect email or password") {
+                    if (result.detail === "Not Found") {
                         alert(result.detail);
                         return false;
                     } else {
