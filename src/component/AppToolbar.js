@@ -186,7 +186,7 @@ class AppToolbar extends React.Component {
 
                     <div style={{color: "#1A2330", display: "block", marginLeft: "10px"}}>
                         <Typography style={{marginTop: "10px"}}>
-                            {this.state.client}@gmail.com
+                            {this.state.client}
                         </Typography>
                         {/*<Typography style={{fontSize: '12px'}}>*/}
                         {/*</Typography>*/}

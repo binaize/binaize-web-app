@@ -344,7 +344,10 @@ class ABTestingDashboard extends React.Component {
                             borderWidth: 1,
                             hoverBackgroundColor: this.state.bar_background_hover_color[i],
                             hoverBorderColor: this.state.bar_background_hover_color[i],
-                            data: result["session_count"][key]
+                            data: result["session_count"][key],
+                            datalabels: {
+                                display: false,
+                            }
                         }
                         i = i + 1;
                         mainDatasetSession.push(localData);
@@ -402,7 +405,10 @@ class ABTestingDashboard extends React.Component {
                             borderWidth: 1,
                             hoverBackgroundColor: this.state.bar_background_hover_color[i],
                             hoverBorderColor: this.state.bar_background_hover_color[i],
-                            data: result["visitor_count"][key]
+                            data: result["visitor_count"][key],
+                            datalabels: {
+                                display: false,
+                            }
                         }
                         i = i + 1
                         mainDatasetVisitors.push(localDataVisitor);
@@ -454,7 +460,10 @@ class ABTestingDashboard extends React.Component {
                             fill: false,
                             hoverBackgroundColor: this.state.bar_background_hover_color[i],
                             hoverBorderColor: this.state.bar_background_hover_color[i],
-                            data: result["conversion"][key]
+                            data: result["conversion"][key],
+                            datalabels: {
+                                display: false,
+                            }
                         }
                         i = i + 1;
                         mainDatasetConversion.push(localData);

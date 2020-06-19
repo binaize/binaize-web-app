@@ -20,6 +20,8 @@ import SideDrawer from "./SideDrawer";
 import Button from "@material-ui/core/Button";
 import RefreshRoundedIcon from "@material-ui/icons/RefreshRounded";
 
+import ChartDataLabels from 'chartjs-plugin-datalabels';
+
 const drawerWidth = 300;
 const exp_style = theme => ({
     root: {
@@ -172,6 +174,11 @@ class ConversionDashboard extends React.Component {
             landing_page_conversion: {},
             landing_page_conversion_summary: '',
             landing_page_conversion_conclusion: '',
+
+            conv_per: [],
+            product_visit_max_val : '',
+            landing_page_max_val:'',
+            landing_per: []
         }
 
         if (this.state.access_token === "") {
@@ -220,14 +227,17 @@ class ConversionDashboard extends React.Component {
                             label: key,
                             type: 'line',
                             fill: false,
+                            borderWidth: 2,
                             backgroundColor: this.state.bar_background_color[i],
                             borderColor: this.state.bar_background_color[i],
-                            borderWidth: 1,
                             labelString: '123123',
                             hoverBackgroundColor: this.state.bar_background_hover_color[i],
                             hoverBorderColor: this.state.bar_background_hover_color[i],
                             data: result["shop_funnel"][key],
                             yAxisID: "y-axis-1",
+                            datalabels: {
+                                display: false
+                            }
                         };
                     } else {
                         localData = {
@@ -238,7 +248,10 @@ class ConversionDashboard extends React.Component {
                             hoverBackgroundColor: this.state.bar_background_hover_color[i],
                             hoverBorderColor: this.state.bar_background_hover_color[i],
                             data: result["shop_funnel"][key],
-                            yAxisID: "y-axis-2"
+                            yAxisID: "y-axis-2",
+                            datalabels: {
+                                display: false
+                            }
                         }
                     }
                     i = i + 1;
@@ -275,23 +288,86 @@ class ConversionDashboard extends React.Component {
             .then(response => response.json())
             .then(result => {
 
+                console.log("HELLLLLLLLLLOOOOOOOOOOO");
+                console.log(result);
+
+
                 let mainDataProduct = [];
                 let i = 0;
+
+                let per_data = [];
+                let max_visitor_count
+
+                Object.keys(result["product_conversion"]).forEach((key) => {
+                    if (key === "conversion_percentage") {
+
+                        per_data.push(result["product_conversion"][key])
+                    }
+                    else if (key === "visitor_count") {
+                        max_visitor_count = result["product_conversion"][key]
+                    }
+                })
+
+                // console.log(max_visitor_count.sort())
+                // console.log(Math.max.apply(null, max_visitor_count))
+
+                this.setState({
+                    conv_per: per_data,
+                    product_visit_max_val: Math.max.apply(null, max_visitor_count)
+                })
 
                 Object.keys(result["product_conversion"]).forEach((key) => {
 
                     let localData;
-                    localData = {
-                        label: key,
-                        backgroundColor: this.state.bar_background_color[i],
-                        borderColor: this.state.bar_background_color[i],
-                        borderWidth: 1,
-                        hoverBackgroundColor: this.state.bar_background_hover_color[i],
-                        hoverBorderColor: this.state.bar_background_hover_color[i],
-                        data: result.product_conversion[key]
+
+                    if (key === "visitor_count") {
+                        localData = {
+                            label: key,
+                            backgroundColor: this.state.bar_background_color[i],
+                            borderColor: this.state.bar_background_color[i],
+                            borderWidth: 1,
+                            hoverBackgroundColor: this.state.bar_background_hover_color[i],
+                            hoverBorderColor: this.state.bar_background_hover_color[i],
+                            data: result["product_conversion"][key],
+                            datalabels: {
+                                display: false,
+                            }
+                        }
+
+                        i = i + 1
+                        mainDataProduct.push(localData);
+
+                    } else if (key === "conversion_count") {
+
+                        localData = {
+                            label: key,
+                            backgroundColor: this.state.bar_background_color[i],
+                            borderColor: this.state.bar_background_color[i],
+                            borderWidth: 1,
+                            hoverBackgroundColor: this.state.bar_background_hover_color[i],
+                            hoverBorderColor: this.state.bar_background_hover_color[i],
+                            data: result["product_conversion"][key],
+
+                            datalabels: {
+                                display: true,
+                                formatter: (value, context) => {
+                                    return this.state.conv_per[0][context.dataIndex] + "%";
+                                },
+                                align: "top",
+                                anchor: "end",
+                                clip: true,
+                                font: {
+                                    size: "16",
+                                    weight: "bold"
+                                }
+                            }
+                        }
+
+                        i = i + 1
+                        mainDataProduct.push(localData);
+
                     }
-                    i = i + 1
-                    mainDataProduct.push(localData);
+
 
                 });
 
@@ -325,46 +401,102 @@ class ConversionDashboard extends React.Component {
 
                 let mainDataLanding = [];
 
-                let data3 = {
-                    pages: [
-                        "Home Page",
-                        "Product Page",
-                        "Blog Page"
-                    ],
-                    landing_conversion: {
-                        conversion_percentage: [
-                            10.3,
-                            14.3,
-                            6.2
-                        ]
-                    }
-                }
-                //
-                // let data = []
-                // let datasets = [];
-                //
-
-
                 let i = 0;
+                let landing_per_data = [];
+                let lading_max_visitor_count
+
+                Object.keys(result["landing_conversion"]).forEach((key) => {
+                    if (key === "conversion_percentage") {
+                        landing_per_data.push(result["landing_conversion"][key])
+                    }
+                    else if (key === "visitor_count") {
+                        lading_max_visitor_count = result["landing_conversion"][key]
+                    }
+                })
+
+                this.setState({
+                    landing_per: landing_per_data,
+                    landing_page_max_val: Math.max.apply(null, lading_max_visitor_count)
+                })
+
 
                 Object.keys(result["landing_conversion"]).forEach((key) => {
 
                     let localData = {}
-                    localData = {
-                        label: key,
-                        backgroundColor: this.state.bar_background_color[i],
-                        borderColor: this.state.bar_background_color[i],
-                        borderWidth: 1,
-                        hoverBackgroundColor: this.state.bar_background_hover_color[i],
-                        hoverBorderColor: this.state.bar_background_hover_color[i],
-                        data: result["landing_conversion"][key]
+                    // localData = {
+                    //     label: key,
+                    //     backgroundColor: this.state.bar_background_color[i],
+                    //     borderColor: this.state.bar_background_color[i],
+                    //     borderWidth: 1,
+                    //     hoverBackgroundColor: this.state.bar_background_hover_color[i],
+                    //     hoverBorderColor: this.state.bar_background_hover_color[i],
+                    //     data: result["landing_conversion"][key]
+                    // }
+                    // i = i + 1
+                    // mainDataLanding.push(localData);
+
+
+                    if (key === "visitor_count") {
+                        localData = {
+                            label: key,
+                            backgroundColor: this.state.bar_background_color[i],
+                            borderColor: this.state.bar_background_color[i],
+                            borderWidth: 1,
+                            hoverBackgroundColor: this.state.bar_background_hover_color[i],
+                            hoverBorderColor: this.state.bar_background_hover_color[i],
+                            data: result["landing_conversion"][key],
+                            datalabels: {
+                                display: false,
+                            }
+                        }
+
+                        i = i + 1
+                        mainDataLanding.push(localData);
+
+                    } else if (key === "conversion_count") {
+
+                        localData = {
+                            label: key,
+                            backgroundColor: this.state.bar_background_color[i],
+                            borderColor: this.state.bar_background_color[i],
+                            borderWidth: 1,
+                            hoverBackgroundColor: this.state.bar_background_hover_color[i],
+                            hoverBorderColor: this.state.bar_background_hover_color[i],
+                            data: result["landing_conversion"][key],
+
+                            datalabels: {
+                                display: true,
+                                formatter: (value, context) => {
+                                    return this.state.landing_per[0][context.dataIndex] + "%";
+                                },
+                                align: "top",
+                                anchor: "end",
+                                clip: true,
+                                font: {
+                                    size: "16",
+                                    weight: "bold"
+                                }
+                            }
+                        }
+
+                        i = i + 1
+                        mainDataLanding.push(localData);
+
                     }
-                    i = i + 1
-                    mainDataLanding.push(localData);
+
+
+
+
+
+
+
+
+
+
+
+
 
                 });
-
-
 
 
                 //
@@ -492,7 +624,8 @@ class ConversionDashboard extends React.Component {
                                         maintainAspectRatio: true,
                                         scales: {
                                             xAxes: [{
-                                                barPercentage: 0.4
+                                                barPercentage: 0.5,
+                                                linePercentage: 0.5
                                             }],
                                             yAxes: [{
                                                 type: "linear", // only linear but allow scale type registration. This allows extensions to exist solely for log scale for instance
@@ -538,6 +671,8 @@ class ConversionDashboard extends React.Component {
                             <div style={{margin: "0% 0.5% 1% 1.5%", width: "85%"}}>
 
                                 <hr/>
+
+                                {this.state.product_visit_max_val}
                                 <Bar
                                     yAxisID="Unique Visitors"
                                     width={45}
@@ -549,22 +684,22 @@ class ConversionDashboard extends React.Component {
                                         scales: {
                                             xAxes: [{
                                                 stacked: true,
-                                                barPercentage: 0.4
+                                                barPercentage: 0.5
                                             }],
                                             yAxes: [{
                                                 stacked: true,
-                                                // ticks: {
-                                                //
-                                                //     min: 0,
-                                                //     max: 100,
-                                                //     callback: function(value){return value+ "%"}
-                                                // },
+                                                ticks: {
+                                                    min: 0,
+                                                    max: this.state.product_visit_max_val + 20,
+                                                    callback: function(value){return value}
+                                                },
                                                 scaleLabel: {
                                                     display: true,
                                                     labelString: "Unique Visitors"
                                                 }
                                             }]
-                                        }
+                                        },
+
                                     }}>
                                 </Bar>
                             </div>
@@ -596,16 +731,15 @@ class ConversionDashboard extends React.Component {
                                         scales: {
                                             xAxes: [{
                                                 stacked: true,
-                                                barPercentage: 0.4
+                                                barPercentage: 0.3
                                             }],
                                             yAxes: [{
                                                 stacked: true,
-                                                // ticks: {
-                                                //     min: 0,
-                                                //     callback: function (value) {
-                                                //         return value + "%"
-                                                //     }
-                                                // },
+                                                ticks: {
+                                                    min: 0,
+                                                    max: this.state.landing_page_max_val + 95,
+                                                    callback: function(value){return value}
+                                                },
                                                 scaleLabel: {
                                                     display: true,
                                                     labelString: "Unique Visitors"
