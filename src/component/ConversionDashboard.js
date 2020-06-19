@@ -672,7 +672,6 @@ class ConversionDashboard extends React.Component {
 
                                 <hr/>
 
-                                {this.state.product_visit_max_val}
                                 <Bar
                                     yAxisID="Unique Visitors"
                                     width={45}
