@@ -113,10 +113,16 @@ class Experiments extends React.Component {
         super(props);
 
         this.state = {
+            access_token: localStorage.getItem("access_token"),
             rows: [],
             anchorEl: null,
             mobileMoreAnchorEl: null,
-        };
+        }
+
+        if (this.state.access_token === "") {
+            this.props.history.push("/");
+        }
+
     }
 
     createData(experiment_name, experiment_type, status, page_type, creation_time, last_updation_time) {
@@ -147,7 +153,7 @@ class Experiments extends React.Component {
                     for (i; i < result.length; i++) {
                         let jj = i
                         localData.push(this.createData(
-                            <Link to={"ABTestingDashboard"} onClick={(e) => {
+                            <Link to={"ABTestingDashboard"} onClick={() => {
                                 localStorage.setItem("experiment_id", result[jj]["experiment_id"])
                                 localStorage.setItem("experiment_name", result[jj]["experiment_name"])
                                 // console.log(result[jj]);

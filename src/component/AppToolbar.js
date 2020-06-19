@@ -13,6 +13,8 @@ import Typography from "@material-ui/core/Typography";
 import MoreIcon from "@material-ui/icons/MoreVert";
 import {fade} from "@material-ui/core";
 import {withStyles} from "@material-ui/core/styles";
+import {withRouter} from "react-router-dom";
+import {useHistory} from "react-router-dom";
 import AppBar from "@material-ui/core/AppBar";
 
 
@@ -122,6 +124,22 @@ const exp_style = theme => ({
 
 class AppToolbar extends React.Component {
 
+    constructor(props) {
+        super(props);
+
+
+        this.state = {
+            client : localStorage.getItem("client"),
+            access_token : localStorage.getItem("access_token")
+        }
+
+        if (this.state.access_token === "") {
+            this.props.history.push("/");
+        }
+
+    }
+
+
     render() {
 
         const {classes} = this.props;
@@ -144,16 +162,16 @@ class AppToolbar extends React.Component {
                 </div>
                 <div className={classes.grow}/>
                 <div className={classes.sectionDesktop}>
-                    <IconButton aria-label="show 4 new mails" color="inherit">
-                        <Badge badgeContent={4} color="secondary">
-                            <MailIcon/>
-                        </Badge>
-                    </IconButton>
-                    <IconButton aria-label="show 17 new notifications" color="inherit">
-                        <Badge badgeContent={17} color="secondary">
-                            <NotificationsIcon/>
-                        </Badge>
-                    </IconButton>
+                    {/*<IconButton aria-label="show 4 new mails" color="inherit">*/}
+                    {/*    <Badge badgeContent={4} color="secondary">*/}
+                    {/*        <MailIcon/>*/}
+                    {/*    </Badge>*/}
+                    {/*</IconButton>*/}
+                    {/*<IconButton aria-label="show 17 new notifications" color="inherit">*/}
+                    {/*    <Badge badgeContent={17} color="secondary">*/}
+                    {/*        <NotificationsIcon/>*/}
+                    {/*    </Badge>*/}
+                    {/*</IconButton>*/}
                     <IconButton
                         edge="end"
                         aria-label="account of current user"
@@ -167,12 +185,11 @@ class AppToolbar extends React.Component {
                     </IconButton>
 
                     <div style={{color: "#1A2330", display: "block", marginLeft: "10px"}}>
-                        <Typography>
-                            Sarah Elliot
+                        <Typography style={{marginTop: "10px"}}>
+                            {this.state.client}@gmail.com
                         </Typography>
-                        <Typography style={{fontSize: '12px'}}>
-                            sarah@gmail.com
-                        </Typography>
+                        {/*<Typography style={{fontSize: '12px'}}>*/}
+                        {/*</Typography>*/}
                     </div>
 
                 </div>
@@ -193,4 +210,4 @@ class AppToolbar extends React.Component {
     }
 }
 
-export default withStyles(exp_style)(AppToolbar);
+export default withRouter(withStyles(exp_style)(AppToolbar));

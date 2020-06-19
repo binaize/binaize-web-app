@@ -1,5 +1,5 @@
 import React from "react";
-
+// noinspection NpmUsedModulesInstalled
 import clsx from "clsx";
 import {withRouter} from "react-router-dom";
 import {useHistory} from "react-router-dom";
@@ -50,6 +50,7 @@ const useStyles = makeStyles(theme => ({
 function InputAdornments() {
     const classes = useStyles();
     let history = useHistory();
+
     const [values, setValues] = React.useState({
         password: "",
         showPassword: false,
@@ -69,20 +70,27 @@ function InputAdornments() {
             fetch(REACT_APP_BASE_URL + REACT_APP_TOKEN, {
                 method: "post",
                 body: formData
-            })
-                .then(response => response.json())
-                .then(result => {
-                    console.log("Success:", result);
+            }).then(response => {
+                console.log(response.status)
+                if (response.status === 200) {
+                    response.json()
+                        .then(result => {
 
-                    if (result.detail === "Not Found") {
-                        alert(result.detail);
-                        return false;
-                    } else {
-                        values.access_token = result.access_token
-                        localStorage.setItem("access_token", result.access_token);
-                        history.push("/experiment");
-                    }
-                });
+                            console.log("Success:", result);
+                            values.access_token = result.access_token
+                            localStorage.setItem("access_token", result.access_token);
+                            localStorage.setItem("client", values.email);
+                            history.push("/experiment");
+
+                        }).catch(err => {
+                        console.log(err);
+                    });
+                } else {
+                    alert("Wrong Password! Try again!");
+                }
+            }).catch(err => {
+                console.log(err);
+            })
         } catch (e) {
             console.error("Error!", e);
         }
@@ -107,66 +115,81 @@ function InputAdornments() {
                 <LoginImage style={{width: "33.32%", marginLeft: '8.33%', marginRight: '58.31%'}}/>
             </div>
 
-
-            <Card className={classes.right_side} style={{width: "49.98%", marginLeft: '24.99%', marginRight: '24.99%', backgroundColor: "#F7F9FC"}}>
+            <Card className={classes.right_side}
+                  style={{width: "49.98%", marginLeft: '24.99%', marginRight: '24.99%', backgroundColor: "#F7F9FC"}}>
                 <CardContent>
-                <div >
                     <div>
-                        <BinaizeSVG style={{width: "49.98%", marginLeft: '24.99%', marginRight: '24.99%'}}/>
-                    </div>
-                    <div>
-                        <FormControl
-                            className={clsx(classes.margin, classes.textField)}
-                            variant="outlined" style={{backgroundColor: "white", width: "66.64%", marginLeft: '16.33%', marginRight: '16.33%'}}>
-                            <InputLabel htmlFor="outlined-adornment-email">Email</InputLabel>
-                            <OutlinedInput
-                                id="outlined-adornment-email"
-                                value={values.email}
-                                onChange={handleChange("email")}
-                                labelWidth={100}
-                            />
-                        </FormControl>
-                    </div>
-                    <div>
-                        <FormControl
-                            className={clsx(classes.margin, classes.textField)}
-                            variant="outlined" style={{backgroundColor: "white", width: "66.64%", marginLeft: '16.33%', marginRight: '16.33%'}}>
-                            <InputLabel htmlFor="outlined-adornment-password">
-                                Password
-                            </InputLabel>
-                            <OutlinedInput
-                                id="outlined-adornment-password"
-                                type={values.showPassword ? "text" : "password"}
-                                value={values.password}
-                                onChange={handleChange("password")}
-                                endAdornment={
-                                    <InputAdornment position="end">
-                                        <IconButton
-                                            aria-label="toggle password visibility"
-                                            onClick={handleClickShowPassword}
-                                            onMouseDown={handleMouseDownPassword}
-                                            edge="end">
-                                            {values.showPassword ? <Visibility/> : <VisibilityOff/>}
-                                        </IconButton>
-                                    </InputAdornment>
-                                }
-                                labelWidth={100}
-                            />
-                        </FormControl>
-                    </div>
-                    <center>
-                        <Button className={clsx(classes.margin, classes.textField)}
-                                variant="contained"  style={{marginTop: "15px", width: "49.98%", marginLeft: '24.99%', marginRight: '24.99%'}}
-                                onClick={loginUser} color="primary">
-                            Login
-                        </Button>
-                    </center>
+                        <div>
+                            <BinaizeSVG style={{width: "49.98%", marginLeft: '24.99%', marginRight: '24.99%'}}/>
+                        </div>
+                        <div>
+                            <FormControl
+                                className={clsx(classes.margin, classes.textField)}
+                                variant="outlined" style={{
+                                backgroundColor: "white",
+                                width: "66.64%",
+                                marginLeft: '16.33%',
+                                marginRight: '16.33%'
+                            }}>
+                                <InputLabel htmlFor="outlined-adornment-email">Email</InputLabel>
+                                <OutlinedInput
+                                    id="outlined-adornment-email"
+                                    value={values.email}
+                                    onChange={handleChange("email")}
+                                    labelWidth={100}
+                                />
+                            </FormControl>
+                        </div>
+                        <div>
+                            <FormControl
+                                className={clsx(classes.margin, classes.textField)}
+                                variant="outlined" style={{
+                                backgroundColor: "white",
+                                width: "66.64%",
+                                marginLeft: '16.33%',
+                                marginRight: '16.33%'
+                            }}>
+                                <InputLabel htmlFor="outlined-adornment-password">
+                                    Password
+                                </InputLabel>
+                                <OutlinedInput
+                                    id="outlined-adornment-password"
+                                    type={values.showPassword ? "text" : "password"}
+                                    value={values.password}
+                                    onChange={handleChange("password")}
+                                    endAdornment={
+                                        <InputAdornment position="end">
+                                            <IconButton
+                                                aria-label="toggle password visibility"
+                                                onClick={handleClickShowPassword}
+                                                onMouseDown={handleMouseDownPassword}
+                                                edge="end">
+                                                {values.showPassword ? <Visibility/> : <VisibilityOff/>}
+                                            </IconButton>
+                                        </InputAdornment>
+                                    }
+                                    labelWidth={100}
+                                />
+                            </FormControl>
+                        </div>
+                        <center>
+                            <Button className={clsx(classes.margin, classes.textField)}
+                                    variant="contained" style={{
+                                marginTop: "15px",
+                                width: "49.98%",
+                                marginLeft: '24.99%',
+                                marginRight: '24.99%'
+                            }}
+                                    onClick={loginUser} color="primary">
+                                Login
+                            </Button>
+                        </center>
 
-                </div>
+                    </div>
                 </CardContent>
             </Card>
         </div>
-    );
+    )
 }
 
 export default withRouter(InputAdornments)

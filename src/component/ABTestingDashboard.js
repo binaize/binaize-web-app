@@ -18,7 +18,6 @@ import CardContent from "@material-ui/core/CardContent";
 import Card from "@material-ui/core/Card";
 import {Bar, Line} from "react-chartjs-2";
 
-import Chart from "react-apexcharts";
 
 import RefreshRoundedIcon from '@material-ui/icons/RefreshRounded';
 
@@ -34,6 +33,7 @@ import {
 import AppToolbar from "./AppToolbar";
 import SideDrawer from "./SideDrawer";
 import Button from "@material-ui/core/Button";
+// import Chart from "react-apexcharts";
 
 const drawerWidth = 300;
 const exp_style = theme => ({
@@ -136,11 +136,11 @@ const exp_style = theme => ({
         marginTop: theme.spacing(2),
     },
     button: {
-        position: 'relative',
-        left: 750,
+        position: 'absolute',
+        right: "0%",
         backgroundColor: "#f1f1f1",
-        height: "80px",
-        width: "80px",
+        height: "70px",
+        width: "70px",
         margin: "1% 5%",
         '&:hover': {
             backgroundColor: '#ddd !important',
@@ -153,8 +153,6 @@ class ABTestingDashboard extends React.Component {
 
     constructor(props) {
         super(props);
-
-        console.log(process)
 
         this.state = {
             access_token: localStorage.getItem("access_token"),
@@ -258,14 +256,20 @@ class ABTestingDashboard extends React.Component {
                     }
                 }]
             },
-
         }
+
+
+        if (this.state.access_token === "") {
+            this.props.history.push("/");
+        }
+
+
+
     }
 
     createExpList(experiment_name, experiment_id) {
         return [experiment_name, experiment_id];
     }
-
 
     getExperimentNames() {
 
@@ -289,7 +293,7 @@ class ABTestingDashboard extends React.Component {
                     let i = 0;
 
                     for (i; i < result.length; i++) {
-                        localExp.push(this.createExpList(result[i].experiment_name, result[i].experiment_id))
+                        localExp.push(this.createExpList(result[i]["experiment_name"], result[i]["experiment_id"]))
                     }
 
                     this.setState({experiment_names: localExp})
@@ -300,7 +304,6 @@ class ABTestingDashboard extends React.Component {
         }
     }
 
-
     getSessionData(exp_id) {
 
         console.log(exp_id)
@@ -309,14 +312,10 @@ class ABTestingDashboard extends React.Component {
         const params = new URLSearchParams({
             experiment_id: exp_id
         })
-
         let access = "Bearer " + this.state.access_token;
+
+        // SESSION COUNT API CALL
         const urlSession = REACT_APP_URL_SESSION_COUNT + `?${params.toString()}`
-
-        // console.log(urlSession);
-
-
-
 
         fetch(REACT_APP_BASE_URL + urlSession, {
             method: 'GET',
@@ -330,42 +329,36 @@ class ABTestingDashboard extends React.Component {
             .then(result => {
                 console.log("Success:", result);
 
-                let data = []
-                let datasets = [];
-
                 let i = 0;
-
                 let mainDatasetSession = [];
 
-                Object.keys(result.session_count).forEach((key) => {
-                    // console.log(key)
-                    // data.push(key)
-                    // datasets.push(result.session_count[key])
+                try {
 
-                    let localdata = {}
+                    Object.keys(result["session_count"]).sort().forEach((key) => {
 
-                    localdata = {
-                        label: key,
-                        backgroundColor: this.state.bar_background_color[i],
-                        borderColor: this.state.bar_background_color[i],
-                        borderWidth: 1,
-                        hoverBackgroundColor: this.state.bar_background_hover_color[i],
-                        hoverBorderColor: this.state.bar_background_hover_color[i],
-                        data: result.session_count[key]
-                    }
-
-                    i = i + 1
-
-                    console.log(localdata)
-                    console.log(mainDatasetSession)
-
-                    mainDatasetSession.push(localdata);
+                        let localData;
+                        localData = {
+                            label: key,
+                            backgroundColor: this.state.bar_background_color[i],
+                            borderColor: this.state.bar_background_color[i],
+                            borderWidth: 1,
+                            hoverBackgroundColor: this.state.bar_background_hover_color[i],
+                            hoverBorderColor: this.state.bar_background_hover_color[i],
+                            data: result["session_count"][key]
+                        }
+                        i = i + 1;
+                        mainDatasetSession.push(localData);
+                    })
 
 
-                });
-                // console.log(data);
-                // console.log(datasets)
-                // console.log(mainDatasetSession)
+                } catch (e) {
+                    console.log(e)
+                    this.setState({
+                        SummaryDetails: {
+                            summary_status: "Error in fetching data"
+                        }
+                    })
+                }
 
                 this.setState({
                     BarDataSession: {
@@ -373,9 +366,13 @@ class ABTestingDashboard extends React.Component {
                         datasets: mainDatasetSession
                     }
                 })
-            });
+            })
+            .catch(err => {
+                console.log(err)
+            })
 
 
+        // VISITOR COUNT API CALL
         const urlVisitor = REACT_APP_URL_VISITOR_COUNT + `?${params.toString()}`
 
         fetch(REACT_APP_BASE_URL + urlVisitor, {
@@ -388,33 +385,32 @@ class ABTestingDashboard extends React.Component {
         })
             .then(response => response.json())
             .then(result => {
-                // let datasetsV = [];
-                //
-                // let dataV = [];
-                // console.log("Success: ", result);
+                console.log("Success URL Visitor Count: ", result);
 
                 let i = 0;
-
                 let mainDatasetVisitors = [];
 
-                Object.keys(result.visitor_count).forEach((key) => {
-                    // datasetsV.push(result.visitor_count[key])
-                    // dataV.push(key)
+                try {
 
-                    let localdataV = {}
-                    localdataV = {
-                        label: key,
-                        backgroundColor: this.state.bar_background_color[i],
-                        borderColor: this.state.bar_background_color[i],
-                        borderWidth: 1,
-                        hoverBackgroundColor: this.state.bar_background_hover_color[i],
-                        hoverBorderColor: this.state.bar_background_hover_color[i],
-                        data: result.visitor_count[key]
-                    }
-                    i= i+1
-                    mainDatasetVisitors.push(localdataV);
+                    Object.keys(result["visitor_count"]).sort().forEach((key) => {
 
-                });
+                        let localDataVisitor
+                        localDataVisitor = {
+                            label: key,
+                            backgroundColor: this.state.bar_background_color[i],
+                            borderColor: this.state.bar_background_color[i],
+                            borderWidth: 1,
+                            hoverBackgroundColor: this.state.bar_background_hover_color[i],
+                            hoverBorderColor: this.state.bar_background_hover_color[i],
+                            data: result["visitor_count"][key]
+                        }
+                        i = i + 1
+                        mainDatasetVisitors.push(localDataVisitor);
+
+                    })
+                } catch (e) {
+                    console.log(e);
+                }
 
                 this.setState({
                     BarDataVisitors: {
@@ -423,12 +419,14 @@ class ABTestingDashboard extends React.Component {
                     }
                 })
 
-            });
+            })
+            .catch(err => {
+                console.log(err)
+            })
 
 
+        // CONVERSION RATE API CALL
         const urlConvert = REACT_APP_URL_CONVERSION_RATE + `?${params.toString()}`
-
-        // console.log(urlConvert);
 
         fetch(REACT_APP_BASE_URL + urlConvert, {
             method: 'GET',
@@ -440,49 +438,46 @@ class ABTestingDashboard extends React.Component {
         })
             .then(response => response.json())
             .then(result => {
-                // console.log("Success : ", result);
+                console.log("Success : ", result);
 
-                // let dataV = [];
-                // let datasetsV = [];
                 let mainDatasetConversion = [];
                 let i = 0;
 
-                Object.keys(result.conversion).forEach((key)=> {
-                    // console.log(key)
-                    // dataV.push(key)
-                    // datasetsV.push(result.conversion[key])
+                try {
+                    Object.keys(result["conversion"]).sort().forEach((key) => {
 
-                    let localData = {}
+                        let localData
+                        localData = {
+                            label: key,
+                            borderColor: this.state.bar_background_color[i],
+                            borderWidth: 3,
+                            fill: false,
+                            hoverBackgroundColor: this.state.bar_background_hover_color[i],
+                            hoverBorderColor: this.state.bar_background_hover_color[i],
+                            data: result["conversion"][key]
+                        }
+                        i = i + 1;
+                        mainDatasetConversion.push(localData);
 
-                    localData = {
-                        label: key,
-                        borderColor: this.state.bar_background_color[i],
-                        borderWidth: 3,
-                        fill: false,
-                        hoverBackgroundColor: this.state.bar_background_hover_color[i],
-                        hoverBorderColor: this.state.bar_background_hover_color[i],
-                        data: result.conversion[key]
-                    }
+                    })
+                } catch (e) {
+                    console.log(e);
+                }
 
-                    i = i+1
-
-                    mainDatasetConversion.push(localData);
-
-                });
-
-                // console.log(mainDatasetConversion)
                 this.setState({
                     ConversionData: {
                         labels: result.date,
                         datasets: mainDatasetConversion
                     }
                 })
-            });
+            })
+            .catch(err => {
+                console.log(err)
+            })
 
 
+        // CONVERSION TABLE API CALL
         const urlConversationTable = REACT_APP_URL_CONVERSION_TABLE + `?${params.toString()}`
-
-        console.log(urlConversationTable);
 
         try {
 
@@ -503,17 +498,17 @@ class ABTestingDashboard extends React.Component {
                     console.log("Success: TABLE ", result);
 
                     let i = 0;
-                    console.log("Success: TABLE " + result[i].variation_name)
+                    console.log("Success: TABLE " + result[i]["variation_name"])
 
                     let url = "www.smth.com"
 
                     for (i; i < result.length; i++) {
 
                         localData.push(<Link url={url}>{result[i].variation_name}</Link>);
-                        localData.push(result[i].num_session);
-                        localData.push(result[i].num_visitor);
-                        localData.push(result[i].visitor_converted);
-                        localData.push(result[i].conversion);
+                        localData.push(result[i]["num_session"]);
+                        localData.push(result[i]["num_visitor"]);
+                        localData.push(result[i]["visitor_converted"]);
+                        localData.push(result[i]["conversion"]);
 
                         localRows.push(localData);
                         localData = [];
@@ -521,16 +516,18 @@ class ABTestingDashboard extends React.Component {
                     }
 
                     this.setState({rows: localRows})
-                    // console.log(this.state.rows);
-                });
 
+                }).catch(err => {
+                console.log(err);
+            })
 
         } catch (e) {
             console.error("Error!", e);
         }
 
 
-        const urlSummary = REACT_APP_EXPERIMENT_SUMMARY + `?${params.toString()}`
+        // EXPERIMENT SUMMARY API CALL
+        const urlSummary = REACT_APP_EXPERIMENT_SUMMARY + `?${params.toString()}`;
         fetch(REACT_APP_BASE_URL + urlSummary, {
             method: 'GET',
             headers: {
@@ -550,7 +547,10 @@ class ABTestingDashboard extends React.Component {
                         summary_recommendation: result["recommendation"]
                     }
                 })
-            });
+            })
+            .catch(err => {
+                console.log(err)
+            })
 
 
     }

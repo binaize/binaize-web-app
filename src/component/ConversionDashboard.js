@@ -1,7 +1,9 @@
-
 import React from 'react';
 import {
-    REACT_APP_BASE_URL
+    REACT_APP_BASE_URL,
+    REACT_APP_URL_SHOP_FUNNEL,
+    REACT_APP_URL_PRODUCT_CONVERSION,
+    REACT_APP_URL_LANDING_PAGE
 } from "../config"
 
 import CssBaseline from '@material-ui/core/CssBaseline';
@@ -118,12 +120,12 @@ const exp_style = theme => ({
     selectEmpty: {
         marginTop: theme.spacing(2),
     },
-    button :{
-        position: 'relative',
-        left: 750,
+    button: {
+        position: 'absolute',
+        right: "0%",
         backgroundColor: "#f1f1f1",
-        height: "80px",
-        width: "80px",
+        height: "70px",
+        width: "70px",
         margin: "1% 5%",
         '&:hover': {
             backgroundColor: '#ddd !important',
@@ -136,8 +138,6 @@ class ConversionDashboard extends React.Component {
 
     constructor(props) {
         super(props);
-
-        // console.log(process)
 
         this.state = {
             access_token: localStorage.getItem("access_token"),
@@ -162,9 +162,22 @@ class ConversionDashboard extends React.Component {
             experiment_ids: [],
 
             shop_funnels: {},
+            shop_funnels_summary: '',
+            shop_funnels_conclusion: '',
+
             product_conversion: {},
-            landing_page_conversion: {}
+            product_conversion_summary: '',
+            product_conversion_conclusion: '',
+
+            landing_page_conversion: {},
+            landing_page_conversion_summary: '',
+            landing_page_conversion_conclusion: '',
         }
+
+        if (this.state.access_token === "") {
+            this.props.history.push("/");
+        }
+
     }
 
 
@@ -182,12 +195,9 @@ class ConversionDashboard extends React.Component {
         //
         // console.log(urlSession);
 
-        let mainDataFunnel = [];
 
-        let mainDataProduct = [];
-        let mainDataLanding = [];
-
-        fetch(REACT_APP_BASE_URL + "/api/v1/schemas/report/shop-funnel", {
+        // SHOP FUNNEL API CALL
+        fetch(REACT_APP_BASE_URL + REACT_APP_URL_SHOP_FUNNEL, {
             method: 'GET',
             headers: {
                 'Access-Control-Allow-Origin': '*',
@@ -199,69 +209,62 @@ class ConversionDashboard extends React.Component {
             .then(result => {
                 console.log("Success:", result);
 
-
-                let data = []
-                let datasets = [];
-
-
-                Object.keys(result.shop_funnel).forEach(function (key) {
-                    data.push(key)
-                    datasets.push(result.shop_funnel[key])
-                });
-                // console.log(data);
-                // console.log(datasets);
-
-                let localdata = {}
-
+                let mainDataFunnel = [];
                 let i = 0;
-                for (i; i < data.length; i++) {
 
-                    if (data[i] === "percentage") {
-                        localdata = {
-                            label: data[i],
+                Object.keys(result["shop_funnel"]).sort().forEach((key) => {
+
+                    let localData;
+                    if (key === "percentage") {
+                        localData = {
+                            label: key,
                             type: 'line',
                             fill: false,
                             backgroundColor: this.state.bar_background_color[i],
                             borderColor: this.state.bar_background_color[i],
                             borderWidth: 1,
+                            labelString: '123123',
                             hoverBackgroundColor: this.state.bar_background_hover_color[i],
                             hoverBorderColor: this.state.bar_background_hover_color[i],
-                            data: datasets[i],
+                            data: result["shop_funnel"][key],
                             yAxisID: "y-axis-1",
                         };
                     } else {
-                        localdata = {
-                            label: data[i],
+                        localData = {
+                            label: key,
                             backgroundColor: this.state.bar_background_color[i],
                             borderColor: this.state.bar_background_color[i],
                             borderWidth: 1,
                             hoverBackgroundColor: this.state.bar_background_hover_color[i],
                             hoverBorderColor: this.state.bar_background_hover_color[i],
-                            data: datasets[i],
+                            data: result["shop_funnel"][key],
                             yAxisID: "y-axis-2"
                         }
                     }
-                    mainDataFunnel.push(localdata);
-                    localdata = {}
-                }
+                    i = i + 1;
+                    mainDataFunnel.push(localData);
+
+                });
 
                 console.log(mainDataFunnel)
+
                 this.setState({
                     shop_funnels: {
                         labels: result.pages,
                         datasets: mainDataFunnel
-                    }
+                    },
+                    shop_funnels_summary: result["summary"],
+                    shop_funnels_conclusion: result["conclusion"]
                 })
 
-
-
+            })
+            .catch(err => {
+                console.log(err);
             });
 
 
-        // const urlVisitor = REACT_APP_URL_VISITOR_COUNT + `?${params.toString()}`
-        // console.log(urlVisitor);
-
-        fetch(REACT_APP_BASE_URL + "/api/v1/schemas/report/product-conversion", {
+        // PRODUCT CONVERSION API CALL
+        fetch(REACT_APP_BASE_URL + REACT_APP_URL_PRODUCT_CONVERSION, {
             method: 'GET',
             headers: {
                 'Access-Control-Allow-Origin': '*',
@@ -272,53 +275,44 @@ class ConversionDashboard extends React.Component {
             .then(response => response.json())
             .then(result => {
 
-                let data = []
-                let datasets = [];
-
-
-                Object.keys(result.product_conversion).forEach(function (key) {
-                    data.push(key)
-                    datasets.push(result.product_conversion[key])
-                });
-                // console.log(data);
-                // console.log(datasets);
-
-                let localdata = {}
-
+                let mainDataProduct = [];
                 let i = 0;
-                for (i; i < data.length; i++) {
 
-                    localdata = {
-                        label: data[i],
+                Object.keys(result["product_conversion"]).forEach((key) => {
+
+                    let localData;
+                    localData = {
+                        label: key,
                         backgroundColor: this.state.bar_background_color[i],
                         borderColor: this.state.bar_background_color[i],
                         borderWidth: 1,
                         hoverBackgroundColor: this.state.bar_background_hover_color[i],
                         hoverBorderColor: this.state.bar_background_hover_color[i],
-                        data: datasets[i]
+                        data: result.product_conversion[key]
                     }
-                    mainDataProduct.push(localdata);
-                    localdata = {}
-                }
+                    i = i + 1
+                    mainDataProduct.push(localData);
 
-                console.log(mainDataProduct)
+                });
+
                 this.setState({
                     product_conversion: {
                         labels: result.products,
                         datasets: mainDataProduct
-                    }
+                    },
+                    product_conversion_summary: result["summary"],
+                    product_conversion_conclusion: result["conclusion"]
                 })
 
+            })
+            .catch(err => {
+                console.log(err);
+            })
 
-            });
 
-        //
-        // const urlConvert = REACT_APP_URL_CONVERSION_RATE + `?${params.toString()}`
-        //
-        // console.log(urlConvert);
-
-        fetch(REACT_APP_BASE_URL + "/api/v1/schemas/report/landing-page", {
-            method: 'POST',
+        // LANDING PAGE API CALL
+        fetch(REACT_APP_BASE_URL + REACT_APP_URL_LANDING_PAGE, {
+            method: 'GET',
             headers: {
                 'Access-Control-Allow-Origin': '*',
                 'Authorization': access,
@@ -329,6 +323,7 @@ class ConversionDashboard extends React.Component {
             .then(result => {
                 console.log("Success : ", result);
 
+                let mainDataLanding = [];
 
                 let data3 = {
                     pages: [
@@ -344,42 +339,70 @@ class ConversionDashboard extends React.Component {
                         ]
                     }
                 }
+                //
+                // let data = []
+                // let datasets = [];
+                //
 
-                let data = []
-                let datasets = [];
-
-
-                Object.keys(data3.landing_conversion).forEach(function (key) {
-                    data.push(key)
-                    datasets.push(data3.landing_conversion[key])
-                });
-                // console.log(data);
-                // console.log(datasets);
-
-                let localdata = {}
 
                 let i = 0;
-                for (i; i < data.length; i++) {
 
-                    localdata = {
-                        label: data[i],
+                Object.keys(result["landing_conversion"]).forEach((key) => {
+
+                    let localData = {}
+                    localData = {
+                        label: key,
                         backgroundColor: this.state.bar_background_color[i],
                         borderColor: this.state.bar_background_color[i],
                         borderWidth: 1,
                         hoverBackgroundColor: this.state.bar_background_hover_color[i],
                         hoverBorderColor: this.state.bar_background_hover_color[i],
-                        data: datasets[i]
+                        data: result["landing_conversion"][key]
                     }
-                    mainDataLanding.push(localdata);
-                    localdata = {}
-                }
+                    i = i + 1
+                    mainDataLanding.push(localData);
+
+                });
+
+
+
+
+                //
+                //
+                //
+                // Object.keys(data3.landing_conversion).forEach(function (key) {
+                //     data.push(key)
+                //     datasets.push(data3.landing_conversion[key])
+                // });
+                // // console.log(data);
+                // // console.log(datasets);
+                //
+                // let localdata = {}
+                //
+                // let i = 0;
+                // for (i; i < data.length; i++) {
+                //
+                //     localdata = {
+                //         label: data[i],
+                //         backgroundColor: this.state.bar_background_color[i],
+                //         borderColor: this.state.bar_background_color[i],
+                //         borderWidth: 1,
+                //         hoverBackgroundColor: this.state.bar_background_hover_color[i],
+                //         hoverBorderColor: this.state.bar_background_hover_color[i],
+                //         data: datasets[i]
+                //     }
+                //     mainDataLanding.push(localdata);
+                //     localdata = {}
+                // }
 
                 console.log(mainDataLanding)
                 this.setState({
                     landing_page_conversion: {
-                        labels: data3.pages,
+                        labels: result["pages"],
                         datasets: mainDataLanding
-                    }
+                    },
+                    landing_page_conversion_summary: result["summary"],
+                    landing_page_conversion_conclusion: result["conclusion"]
                 })
 
 
@@ -412,7 +435,9 @@ class ConversionDashboard extends React.Component {
                         <Button
                             color="primary"
                             className={classes.button}
-                            onClick={()=>{this.getAllData()}}
+                            onClick={() => {
+                                this.getAllData()
+                            }}
                         ><RefreshRoundedIcon/></Button>
 
                         {/*<FormControl variant="outlined" className={classes.formControl}>*/}
@@ -444,13 +469,13 @@ class ConversionDashboard extends React.Component {
                     <Card style={{margin: "2% 5%"}}>
                         <CardContent>
 
-                            <h3>
+                            <h3 style={{margin: "0.5% 0% 0% 2%"}}>
                                 SHOP FUNNEL ANALYSIS
                             </h3>
                             <Divider/>
-                            <div style={{padding: "0.5%", margin: "0% 0% 0% 0.5%", width: "97%"}}>
-                                <p>Home Page to Product Page CTR is the lowest.</p>
-                                <p>RECOMMENDATION: Improve Home Page by changing creatives of copy.</p>
+                            <div style={{padding: "0.5%", margin: "1% 0% 0% 2%", width: "97%"}}>
+                                <p>{this.state.shop_funnels_summary}</p>
+                                <p><strong>CONCLUSION:</strong> {this.state.shop_funnels_conclusion}</p>
                             </div>
 
 
@@ -484,6 +509,10 @@ class ConversionDashboard extends React.Component {
                                                 gridLines: {
                                                     drawOnChartArea: false, // only want the grid lines for one axis to show up
                                                 },
+                                                scaleLabel: {
+                                                    display: true,
+                                                    labelString: "Count"
+                                                }
                                             }]
                                         }
                                     }}>
@@ -492,26 +521,25 @@ class ConversionDashboard extends React.Component {
                         </CardContent>
                     </Card>
 
-                    <Divider/>
+                    <Divider style={{margin: "1% 5%"}}/>
 
                     <Card style={{margin: "2% 5%"}}>
                         <CardContent>
 
-                            <h3>
+                            <h3 style={{margin: "0.5% 0% 0% 2%"}}>
                                 PRODUCT CONVERSION ANALYSIS
                             </h3>
                             <Divider/>
-                            <div style={{padding: "0.5%", margin: "0% 0% 0% 0.5%", width: "97%"}}>
-                                <p>Conversion for product B is significantly lower than others.</p>
-                                <p>RECOMMENDATION: Improve Product Page B by changing creatives or copy or price.</p>
+                            <div style={{padding: "0.5%", margin: "1% 0% 0% 2%", width: "97%"}}>
+                                <p>{this.state.product_conversion_summary}</p>
+                                <p><strong>CONCLUSION:</strong> {this.state.product_conversion_conclusion}</p>
                             </div>
 
-                            <div style={{margin: "0% 0.5% 1% 1.5%", width: "80%"}}>
+                            <div style={{margin: "0% 0.5% 1% 1.5%", width: "85%"}}>
 
                                 <hr/>
                                 <Bar
-
-                                    yAxisID="% Conversion"
+                                    yAxisID="Unique Visitors"
                                     width={45}
                                     height={20}
                                     data={this.state.product_conversion}
@@ -543,23 +571,23 @@ class ConversionDashboard extends React.Component {
                         </CardContent>
                     </Card>
 
-                    <Divider/>
+                    <Divider style={{margin: "1% 5%"}}/>
 
                     <Card style={{margin: "2% 5%"}}>
                         <CardContent>
-                            <h3>
+                            <h3 style={{margin: "0.5% 0% 0% 2%"}}>
                                 LANDING PAGE ANALYSIS
                             </h3>
                             <Divider/>
-                            <div style={{padding: "0.5%", margin: "0% 0% 0% 0.5%", width: "97%"}}>
-                                <p>Conversion for product B is significantly lower than others.</p>
-                                <p>RECOMMENDATION: Improve Product Page B by changing creatives or copy or price.</p>
+                            <div style={{padding: "0.5%", margin: "1% 0% 0% 2%", width: "97%"}}>
+                                <p>{this.state.landing_page_conversion_summary}</p>
+                                <p><strong>CONCLUSION:</strong> {this.state.landing_page_conversion_conclusion}</p>
                             </div>
 
                             <div style={{margin: "0% 0.5% 1% 1.5%", width: "80%"}}>
                                 <hr/>
                                 <Bar
-                                    width={45}
+                                    width={50}
                                     height={20}
                                     data={this.state.landing_page_conversion}
                                     redraw={this.state.landing_page_conversion}
@@ -571,14 +599,16 @@ class ConversionDashboard extends React.Component {
                                                 barPercentage: 0.4
                                             }],
                                             yAxes: [{
-                                                ticks: {
-                                                    min: 0,
-                                                    max: 20,
-                                                    callback: function(value){return value + "%"}
-                                                },
+                                                stacked: true,
+                                                // ticks: {
+                                                //     min: 0,
+                                                //     callback: function (value) {
+                                                //         return value + "%"
+                                                //     }
+                                                // },
                                                 scaleLabel: {
                                                     display: true,
-                                                    labelString: "% Conversion"
+                                                    labelString: "Unique Visitors"
                                                 }
                                             }]
                                         }
