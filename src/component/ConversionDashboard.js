@@ -21,6 +21,9 @@ import Button from "@material-ui/core/Button";
 import RefreshRoundedIcon from "@material-ui/icons/RefreshRounded";
 
 import ChartDataLabels from 'chartjs-plugin-datalabels';
+import {DatePicker, DateRangePicker} from "rsuite";
+
+const {allowedRange} = DateRangePicker;
 
 const drawerWidth = 300;
 const exp_style = theme => ({
@@ -143,6 +146,9 @@ class ConversionDashboard extends React.Component {
 
         this.state = {
             access_token: localStorage.getItem("access_token"),
+            creation_time: localStorage.getItem("creation_time"),
+            start_yearMonthDate: '',
+            end_yearMonthDate: '',
             select_val: "",
             options: [
                 {label: 'exp_2', value: '13e6f65bacbf4d74b8561e940287e604'},
@@ -162,6 +168,8 @@ class ConversionDashboard extends React.Component {
             variation_name2: ["Variation Yel", "Original", "Variation Blue"],
             experiment_names: [],
             experiment_ids: [],
+            startDate: '',
+            endDate: '',
 
             shop_funnels: {},
             shop_funnels_summary: '',
@@ -176,8 +184,8 @@ class ConversionDashboard extends React.Component {
             landing_page_conversion_conclusion: '',
 
             conv_per: [],
-            product_visit_max_val : '',
-            landing_page_max_val:'',
+            product_visit_max_val: '',
+            landing_page_max_val: '',
             landing_per: []
         }
 
@@ -188,23 +196,20 @@ class ConversionDashboard extends React.Component {
     }
 
 
-    getAllData(exp_id) {
-
-        console.log(exp_id)
+    getAllData(start, end) {
 
         this.setState({selected: this.state.selected})
-        // const params = new URLSearchParams({
-        //     experiment_id: exp_id
-        // })
+        const params = new URLSearchParams({
+            start_date: start || this.state.creation_time,
+            end_date: end || this.state.creation_time
+        })
+
+        console.log(params.toString())
 
         let access = "Bearer " + this.state.access_token;
-        // const urlSession = REACT_APP_URL_SESSION_COUNT + `?${params.toString()}`
-        //
-        // console.log(urlSession);
-
 
         // SHOP FUNNEL API CALL
-        fetch(REACT_APP_BASE_URL + REACT_APP_URL_SHOP_FUNNEL, {
+        fetch(REACT_APP_BASE_URL + REACT_APP_URL_SHOP_FUNNEL + `?${params.toString()}`, {
             method: 'GET',
             headers: {
                 'Access-Control-Allow-Origin': '*',
@@ -277,7 +282,7 @@ class ConversionDashboard extends React.Component {
 
 
         // PRODUCT CONVERSION API CALL
-        fetch(REACT_APP_BASE_URL + REACT_APP_URL_PRODUCT_CONVERSION, {
+        fetch(REACT_APP_BASE_URL + REACT_APP_URL_PRODUCT_CONVERSION + `?${params.toString()}`, {
             method: 'GET',
             headers: {
                 'Access-Control-Allow-Origin': '*',
@@ -302,8 +307,7 @@ class ConversionDashboard extends React.Component {
                     if (key === "conversion_percentage") {
 
                         per_data.push(result["product_conversion"][key])
-                    }
-                    else if (key === "visitor_count") {
+                    } else if (key === "visitor_count") {
                         max_visitor_count = result["product_conversion"][key]
                     }
                 })
@@ -387,7 +391,7 @@ class ConversionDashboard extends React.Component {
 
 
         // LANDING PAGE API CALL
-        fetch(REACT_APP_BASE_URL + REACT_APP_URL_LANDING_PAGE, {
+        fetch(REACT_APP_BASE_URL + REACT_APP_URL_LANDING_PAGE + `?${params.toString()}`, {
             method: 'GET',
             headers: {
                 'Access-Control-Allow-Origin': '*',
@@ -408,8 +412,7 @@ class ConversionDashboard extends React.Component {
                 Object.keys(result["landing_conversion"]).forEach((key) => {
                     if (key === "conversion_percentage") {
                         landing_per_data.push(result["landing_conversion"][key])
-                    }
-                    else if (key === "visitor_count") {
+                    } else if (key === "visitor_count") {
                         lading_max_visitor_count = result["landing_conversion"][key]
                     }
                 })
@@ -485,17 +488,6 @@ class ConversionDashboard extends React.Component {
                     }
 
 
-
-
-
-
-
-
-
-
-
-
-
                 });
 
 
@@ -538,7 +530,10 @@ class ConversionDashboard extends React.Component {
                 })
 
 
-            });
+            })
+            .catch(err => {
+            console.log(err);
+        });
 
     }
 
@@ -562,13 +557,14 @@ class ConversionDashboard extends React.Component {
                     <div className={classes.toolbar}/>
 
                     <div style={{display: "flex"}}>
-                        <h2 style={{margin: "2% 5%"}}>Conversion Dashboard</h2>
+                        <h2 style={{margin: "2% 1% 1% 5%"}}>Conversion Dashboard</h2>
+
 
                         <Button
                             color="primary"
                             className={classes.button}
                             onClick={() => {
-                                this.getAllData()
+                                this.getAllData(this.state.start_yearMonthDate, this.state.end_yearMonthDate)
                             }}
                         ><RefreshRoundedIcon/></Button>
 
@@ -596,7 +592,50 @@ class ConversionDashboard extends React.Component {
                         {/*</FormControl>*/}
                     </div>
 
+                    <DateRangePicker
+                        placeholder="Till Today"
+                        size="lg"
+                        style={{ width: 280, margin: "0% 0% 1% 5%", color: "#111"}}
+                        disabledDate={allowedRange(this.state.creation_time, '2022-10-01')}
+                        onChange={(selectedStartEndDate) => {
+
+                            function pad(n) {
+                                return n < 10 ? '0' + n : n
+                            }
+
+                            try{
+                                let startDate = selectedStartEndDate[0]
+                                let endDate = selectedStartEndDate[1]
+
+                                let s_date = startDate.getDate();
+                                let s_month = startDate.getMonth();
+                                let s_year = startDate.getFullYear();
+                                let s_yearMonthDate = s_year + '-' + pad(s_month + 1) + "-" + pad(s_date);
+
+
+                                let e_date = endDate.getDate();
+                                let e_month = endDate.getMonth();
+                                let e_year = endDate.getFullYear();
+                                let e_yearMonthDate = e_year + '-' + pad(e_month + 1) + "-" + pad(e_date);
+
+                                // Takes sometime to set the state
+                                this.setState({
+                                    start_yearMonthDate: s_yearMonthDate,
+                                    end_yearMonthDate: e_yearMonthDate,
+                                })
+
+                                this.getAllData(s_yearMonthDate, e_yearMonthDate)
+
+                            }catch (e) {
+                                console.log(e)
+                            }
+
+                        }}
+                    />
+
+
                     <Divider style={{margin: "0% 5%"}}/>
+
 
                     <Card style={{margin: "2% 5%"}}>
                         <CardContent>
@@ -689,8 +728,10 @@ class ConversionDashboard extends React.Component {
                                                 stacked: true,
                                                 ticks: {
                                                     min: 0,
-                                                    max: this.state.product_visit_max_val + 20,
-                                                    callback: function(value){return value}
+                                                    max: (Math.round(this.state.product_visit_max_val / 10) * 10) + 40,
+                                                    callback: function (value) {
+                                                        return value
+                                                    }
                                                 },
                                                 scaleLabel: {
                                                     display: true,
@@ -736,8 +777,10 @@ class ConversionDashboard extends React.Component {
                                                 stacked: true,
                                                 ticks: {
                                                     min: 0,
-                                                    max: this.state.landing_page_max_val + 95,
-                                                    callback: function(value){return value}
+                                                    max: (Math.round(this.state.landing_page_max_val / 10) * 10) + 200,
+                                                    callback: function (value) {
+                                                        return value
+                                                    }
                                                 },
                                                 scaleLabel: {
                                                     display: true,

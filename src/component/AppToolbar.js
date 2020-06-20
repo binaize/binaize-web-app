@@ -16,6 +16,8 @@ import {withStyles} from "@material-ui/core/styles";
 import {withRouter} from "react-router-dom";
 import {useHistory} from "react-router-dom";
 import AppBar from "@material-ui/core/AppBar";
+import {REACT_APP_BASE_URL, REACT_APP_CLIENT_DETAILS} from "../config";
+import $ from "jquery";
 
 
 const drawerWidth = 300;
@@ -129,6 +131,7 @@ class AppToolbar extends React.Component {
 
 
         this.state = {
+            full_name : '',
             client : localStorage.getItem("client"),
             access_token : localStorage.getItem("access_token")
         }
@@ -137,6 +140,42 @@ class AppToolbar extends React.Component {
             this.props.history.push("/");
         }
 
+    }
+
+
+    getClientData(){
+
+        let access = "Bearer " + this.state.access_token;
+
+        fetch(REACT_APP_BASE_URL + REACT_APP_CLIENT_DETAILS, {
+            method: 'GET',
+            headers: {
+                'Access-Control-Allow-Origin': '*',
+                'Authorization': access,
+                'Accept': 'application/json'
+            }
+        })
+            .then(response => response.json())
+            .then(result => {
+                console.log("Success : ", result);
+
+                localStorage.setItem("creation_time", result["creation_time"])
+
+                this.setState({
+                    full_name: result["full_name"]
+                })
+
+
+            })
+            .catch(err => {
+                console.log(err)
+            })
+
+
+    }
+
+    componentDidMount() {
+        this.getClientData()
     }
 
 
@@ -186,7 +225,7 @@ class AppToolbar extends React.Component {
 
                     <div style={{color: "#1A2330", display: "block", marginLeft: "10px"}}>
                         <Typography style={{marginTop: "10px"}}>
-                            {this.state.client}
+                            {this.state.full_name}
                         </Typography>
                         {/*<Typography style={{fontSize: '12px'}}>*/}
                         {/*</Typography>*/}

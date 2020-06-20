@@ -17,7 +17,7 @@ import "./Experiments.css"
 import CardContent from "@material-ui/core/CardContent";
 import Card from "@material-ui/core/Card";
 import {Bar, Line} from "react-chartjs-2";
-
+import $ from 'jquery';
 
 import RefreshRoundedIcon from '@material-ui/icons/RefreshRounded';
 
@@ -164,14 +164,20 @@ class ABTestingDashboard extends React.Component {
             BarDataSession: {},
             BarDataVisitors: {},
             ConversionData: {},
+
+            session_max_value:'',
+            visitor_max_value: '',
+            conversion_max_value: '',
+
+
             rows: [],
             SummaryDetails: {
                 summary_status: '',
                 summary_conclusion: '',
                 summary_recommendation: '',
             },
-            bar_background_color: ['#2196f3', '#4caf50', '#ef6c00'],
-            bar_background_hover_color: ['#006FBB', '#50B83C', '#DE3618'],
+            bar_background_color: ['#2196f3', '#50B83C', '#ef6c00'],
+            bar_background_hover_color: ['#1976d2', '#43a047', '#e65100'],
             variation_name2: ["Variation Yel", "Original", "Variation Blue"],
             experiment_names: [],
             experiment_ids: [],
@@ -215,7 +221,6 @@ class ABTestingDashboard extends React.Component {
                     categories: [2001, 2002, 2003, 2004, 2005, 2006, 2007],
                 },
             },
-
 
             seriesss: [{
                 name: 'Website Blog',
@@ -334,6 +339,16 @@ class ABTestingDashboard extends React.Component {
 
                 try {
 
+                    let max = []
+
+                    Object.keys(result["session_count"]).forEach((key) => {
+                        max.push(Math.max.apply(null, result["session_count"][key]))
+                    })
+
+                    this.setState({
+                        session_max_value: Math.max.apply(null, max)
+                    })
+
                     Object.keys(result["session_count"]).sort().forEach((key) => {
 
                         let localData;
@@ -395,6 +410,16 @@ class ABTestingDashboard extends React.Component {
 
                 try {
 
+                    let max = [];
+
+                    Object.keys(result["visitor_count"]).forEach((key) => {
+                        max.push(Math.max.apply(null, result["visitor_count"][key]))
+                    })
+
+                    this.setState({
+                        visitor_max_value: Math.max.apply(null, max)
+                    })
+
                     Object.keys(result["visitor_count"]).sort().forEach((key) => {
 
                         let localDataVisitor
@@ -450,6 +475,17 @@ class ABTestingDashboard extends React.Component {
                 let i = 0;
 
                 try {
+
+                    let max = [];
+                    Object.keys(result["conversion"]).sort().forEach((key) => {
+                        max.push(Math.max.apply(null, result["conversion"][key]))
+                    })
+
+                    this.setState({
+                        conversion_max_value: Math.max.apply(null, max)
+                    })
+
+
                     Object.keys(result["conversion"]).sort().forEach((key) => {
 
                         let localData
@@ -517,7 +553,8 @@ class ABTestingDashboard extends React.Component {
                         localData.push(result[i]["num_session"]);
                         localData.push(result[i]["num_visitor"]);
                         localData.push(result[i]["visitor_converted"]);
-                        localData.push(result[i]["conversion"]);
+                        localData.push(result[i]["goal_conversion"]);
+                        localData.push(result[i]["sales_conversion"]);
 
                         localRows.push(localData);
                         localData = [];
@@ -549,13 +586,22 @@ class ABTestingDashboard extends React.Component {
             .then(result => {
                 console.log("Success: ", result);
 
-                this.setState({
-                    SummaryDetails: {
-                        summary_status: result["status"],
-                        summary_conclusion: result["conclusion"],
-                        summary_recommendation: result["recommendation"]
-                    }
-                })
+                let $summary = $("#summary"),
+                    summary_str = result["status"],
+                    summary_html = $.parseHTML(summary_str)
+
+                $summary.html(summary_html);
+
+                let $summary_conclusion = $("#summary_conclusion"),
+                    summary_conclusion_str = result["conclusion"],
+                    summary_conclusion_html = $.parseHTML(summary_conclusion_str)
+                $summary_conclusion.html(summary_conclusion_html);
+
+                let $summary_recommendation = $("#summary_recommendation"),
+                    summary_recommendation_str = result["recommendation"],
+                    summary_recommendation_html = $.parseHTML(summary_recommendation_str)
+                $summary_recommendation.html(summary_recommendation_html);
+
             })
             .catch(err => {
                 console.log(err)
@@ -622,10 +668,10 @@ class ABTestingDashboard extends React.Component {
                     </div>
                     <Card style={{margin: "1% 5%"}}>
                         <CardContent>
-                            <div style={{padding: "0.5%", margin: "0% 0% 0% 0.5%", width: "97%"}}>
-                                <p>{this.state.SummaryDetails.summary_status}</p>
-                                <p>{this.state.SummaryDetails.summary_conclusion}</p>
-                                <p>{this.state.SummaryDetails.summary_recommendation}</p>
+                            <div style={{padding: "0.5%", margin: "0% 0% 0% 0.5%", width: "97%", fontSize: "16px"}}>
+                                <p id="summary"/>
+                                <p id="summary_conclusion"/>
+                                <p id="summary_recommendation"/>
                             </div>
                         </CardContent>
                     </Card>
@@ -640,7 +686,8 @@ class ABTestingDashboard extends React.Component {
                                     <TableCell align="left">Sessions</TableCell>
                                     <TableCell align="left">Visitors</TableCell>
                                     <TableCell align="left">Visitors Converted</TableCell>
-                                    <TableCell align="left">Conversion Rate (%)</TableCell>
+                                    <TableCell align="left">Goal Conversion (%)</TableCell>
+                                    <TableCell align="left">Sales Conversion (%)</TableCell>
                                 </TableRow>
                             </TableHead>
                             <TableBody>
@@ -653,6 +700,7 @@ class ABTestingDashboard extends React.Component {
                                         <TableCell align="left">{row[2]}</TableCell>
                                         <TableCell align="left">{row[3]}</TableCell>
                                         <TableCell align="left">{row[4]}</TableCell>
+                                        <TableCell align="left">{row[5]}</TableCell>
                                     </TableRow>
                                 ))}
                             </TableBody>
@@ -668,6 +716,7 @@ class ABTestingDashboard extends React.Component {
                                     Session Over Time
                                 </h3>
                                 <hr/>
+
                                 <Bar
                                     width={100}
                                     height={40}
@@ -675,7 +724,18 @@ class ABTestingDashboard extends React.Component {
                                     redraw={this.state.BarDataSession}
                                     options={{
                                         maintainAspectRatio: true,
-                                        scales: {}
+                                        scales: {
+                                            yAxes: [{
+                                                ticks: {
+                                                    min: 0,
+                                                    max: (Math.round(this.state.session_max_value / 10) * 10) + 20,
+                                                },
+                                                scaleLabel: {
+                                                    display: true,
+                                                    labelString: "Count"
+                                                }
+                                            }]
+                                        }
                                     }}>
                                 </Bar>
                             </div>
@@ -696,7 +756,21 @@ class ABTestingDashboard extends React.Component {
                                     height={40}
                                     data={this.state.BarDataVisitors}
                                     redraw={this.state.BarDataVisitors}
-                                    options={{maintainAspectRatio: true}}>
+                                    options={{
+                                        maintainAspectRatio: true,
+                                        scales: {
+                                            yAxes: [{
+                                                ticks: {
+                                                    min: 0,
+                                                    max: (Math.round(this.state.visitor_max_value / 10) * 10) + 10,
+                                                },
+                                                scaleLabel: {
+                                                    display: true,
+                                                    labelString: "Count"
+                                                }
+                                            }]
+                                        }
+                                    }}>
                                 </Bar>
                             </div>
                         </CardContent>

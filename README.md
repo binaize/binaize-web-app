@@ -27,9 +27,9 @@ sudo apt -y install docker-compose
 git clone https://github.com/binaize/binaize-ui.git
 cd binaize-ui
 git checkout development
+sudo docker-compose -f docker-compose-theia.yaml down
 git pull
 scp -i "binaize-optimize.pem" ./config.env ubuntu@app.binaize.com:~/binaize-ui/
-sudo docker-compose -f docker-compose-theia.yaml down
 sudo docker-compose -f docker-compose-theia.yaml build
 nohup sudo docker-compose -f docker-compose-theia.yaml up --build --remove-orphans >> ~/theia.out&
 ```
