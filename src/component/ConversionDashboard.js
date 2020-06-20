@@ -183,6 +183,9 @@ class ConversionDashboard extends React.Component {
             landing_page_conversion_summary: '',
             landing_page_conversion_conclusion: '',
 
+            shop_funnel_per: [],
+            shop_funnel_count_per: [],
+            shop_funnel_max_val: '',
             conv_per: [],
             product_visit_max_val: '',
             landing_page_max_val: '',
@@ -223,25 +226,63 @@ class ConversionDashboard extends React.Component {
 
                 let mainDataFunnel = [];
                 let i = 0;
+                let shop_funnel_per_data = []
+                let shop_funnel_count_data = ''
+
+                Object.keys(result["shop_funnel"]).sort().forEach((key) => {
+                    if (key === "count") {
+                        shop_funnel_count_data = result["shop_funnel"][key];
+                    } else if (key === "percentage") {
+                        shop_funnel_per_data.push(result["shop_funnel"][key])
+                    }
+                })
+
+                this.setState({
+                    shop_funnel_per: shop_funnel_per_data,
+                    shop_funnel_count_per: shop_funnel_count_data,
+                    shop_funnel_max_val: Math.max.apply(null, shop_funnel_count_data)
+                })
+
+                console.log("blah" + this.state.shop_funnel_max_value)
+
+                // alert("asdasd")
+
+                console.log(shop_funnel_per_data)
 
                 Object.keys(result["shop_funnel"]).sort().forEach((key) => {
 
                     let localData;
                     if (key === "percentage") {
+                        console.log("something.............")
+                        console.log(result["shop_funnel"][key])
+                        console.log(shop_funnel_per_data)
                         localData = {
                             label: key,
                             type: 'line',
                             fill: false,
+                            tooltips: {
+                                enabled: false
+                            },
                             borderWidth: 2,
                             backgroundColor: this.state.bar_background_color[i],
                             borderColor: this.state.bar_background_color[i],
-                            labelString: '123123',
                             hoverBackgroundColor: this.state.bar_background_hover_color[i],
                             hoverBorderColor: this.state.bar_background_hover_color[i],
-                            data: result["shop_funnel"][key],
+                            data: shop_funnel_count_data,
                             yAxisID: "y-axis-1",
                             datalabels: {
-                                display: false
+                                display: true,
+                                formatter: (value, context) => {
+                                    console.log("asdasdasdasdasdddddddddddddddddddddddddddddddddd")
+                                    return this.state.shop_funnel_per[0][context.dataIndex]  + " %";
+                                },
+                                align: "top",
+                                anchor: "end",
+                                clip: true,
+                                font: {
+                                    size: "16",
+                                    weight: "bold"
+                                }
                             }
                         };
                     } else {
@@ -305,7 +346,6 @@ class ConversionDashboard extends React.Component {
 
                 Object.keys(result["product_conversion"]).forEach((key) => {
                     if (key === "conversion_percentage") {
-
                         per_data.push(result["product_conversion"][key])
                     } else if (key === "visitor_count") {
                         max_visitor_count = result["product_conversion"][key]
@@ -661,17 +701,24 @@ class ConversionDashboard extends React.Component {
                                     redraw={this.state.shop_funnels}
                                     options={{
                                         maintainAspectRatio: true,
+                                        tooltips: {
+                                            callbacks: {
+                                                title: function(tooltipItem, data) {
+                                                    return data['labels'][tooltipItem[0]['index']];
+                                                },
+                                                label: function(tooltipItem, data) {
+                                                    return data['datasets'][0]['data'][tooltipItem['index']];
+                                                }
+                                            },
+                                            displayColors: false
+                                        },
+
                                         scales: {
                                             xAxes: [{
                                                 barPercentage: 0.5,
                                                 linePercentage: 0.5
                                             }],
                                             yAxes: [{
-                                                type: "linear", // only linear but allow scale type registration. This allows extensions to exist solely for log scale for instance
-                                                display: false,
-                                                position: "left",
-                                                id: "y-axis-1",
-                                            }, {
                                                 type: "linear", // only linear but allow scale type registration. This allows extensions to exist solely for log scale for instance
                                                 display: true,
                                                 position: "left",
@@ -684,7 +731,25 @@ class ConversionDashboard extends React.Component {
                                                 scaleLabel: {
                                                     display: true,
                                                     labelString: "Count"
-                                                }
+                                                },
+                                                ticks: {
+                                                    min: 0,
+                                                    max: (Math.round(this.state.shop_funnel_max_val / 10) * 10) + 250,
+                                                    callback: function (value) {
+                                                        return value
+                                                    }
+                                                },
+                                            },{
+                                                type: "linear", // only linear but allow scale type registration. This allows extensions to exist solely for log scale for instance
+                                                display: false,
+                                                position: "left",
+                                                id: "y-axis-1",
+                                                ticks: {
+                                                    max: (Math.round(this.state.shop_funnel_max_val / 10) * 10) + 250,
+                                                    callback: function (value) {
+                                                        return value
+                                                    }
+                                                },
                                             }]
                                         }
                                     }}>
