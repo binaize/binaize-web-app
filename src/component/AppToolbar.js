@@ -157,7 +157,7 @@ class AppToolbar extends React.Component {
         })
             .then(response => response.json())
             .then(result => {
-                console.log("Success : ", result);
+                // console.log("Success : ", result);
 
                 localStorage.setItem("creation_time", result["creation_time"])
 

@@ -280,7 +280,7 @@ class ABTestingDashboard extends React.Component {
 
         try {
             let localExp = [];
-            console.log(localStorage.getItem("access_token"));
+            // console.log(localStorage.getItem("access_token"));
 
             let access = "Bearer " + this.state.access_token;
 
@@ -311,7 +311,7 @@ class ABTestingDashboard extends React.Component {
 
     getSessionData(exp_id) {
 
-        console.log(exp_id)
+        // console.log(exp_id)
 
         this.setState({selected: this.state.selected})
         const params = new URLSearchParams({
@@ -332,7 +332,7 @@ class ABTestingDashboard extends React.Component {
         })
             .then(response => response.json())
             .then(result => {
-                console.log("Success:", result);
+                // console.log("Success:", result);
 
                 let i = 0;
                 let mainDatasetSession = [];
@@ -403,7 +403,7 @@ class ABTestingDashboard extends React.Component {
         })
             .then(response => response.json())
             .then(result => {
-                console.log("Success URL Visitor Count: ", result);
+                // console.log("Success URL Visitor Count: ", result);
 
                 let i = 0;
                 let mainDatasetVisitors = [];
@@ -469,7 +469,7 @@ class ABTestingDashboard extends React.Component {
         })
             .then(response => response.json())
             .then(result => {
-                console.log("Success : ", result);
+                // console.log("Success : ", result);
 
                 let mainDatasetConversion = [];
                 let i = 0;
@@ -540,10 +540,10 @@ class ABTestingDashboard extends React.Component {
                     let localData = [];
                     let localRows = [];
 
-                    console.log("Success: TABLE ", result);
+                    // console.log("Success: TABLE ", result);
 
                     let i = 0;
-                    console.log("Success: TABLE " + result[i]["variation_name"])
+                    // console.log("Success: TABLE " + result[i]["variation_name"])
 
                     let url = "www.smth.com"
 
@@ -584,7 +584,7 @@ class ABTestingDashboard extends React.Component {
         })
             .then(response => response.json())
             .then(result => {
-                console.log("Success: ", result);
+                // console.log("Success: ", result);
 
                 let $summary = $("#summary"),
                     summary_str = result["status"],
@@ -728,11 +728,11 @@ class ABTestingDashboard extends React.Component {
                                             yAxes: [{
                                                 ticks: {
                                                     min: 0,
-                                                    max: (Math.round(this.state.session_max_value / 10) * 10) + 20,
+                                                    max: (Math.round(this.state.session_max_value / 20) + 2) * 20,
                                                 },
                                                 scaleLabel: {
                                                     display: true,
-                                                    labelString: "Count"
+                                                    labelString: "# Sessions"
                                                 }
                                             }]
                                         }
@@ -762,11 +762,11 @@ class ABTestingDashboard extends React.Component {
                                             yAxes: [{
                                                 ticks: {
                                                     min: 0,
-                                                    max: (Math.round(this.state.visitor_max_value / 10) * 10) + 10,
+                                                    max: (Math.round(this.state.visitor_max_value / 10) + 2) * 10,
                                                 },
                                                 scaleLabel: {
                                                     display: true,
-                                                    labelString: "Count"
+                                                    labelString: "# Visitors"
                                                 }
                                             }]
                                         }
@@ -780,7 +780,7 @@ class ABTestingDashboard extends React.Component {
                         <CardContent>
                             <div style={{margin: "0% 0.5% 1% 1.5%", width: "97%"}}>
                                 <h3>
-                                    Conversion Over Time
+                                    Goal Conversion Over Time
                                 </h3>
                                 <hr/>
                                 <Line

@@ -22,6 +22,7 @@ import RefreshRoundedIcon from "@material-ui/icons/RefreshRounded";
 
 import ChartDataLabels from 'chartjs-plugin-datalabels';
 import {DatePicker, DateRangePicker} from "rsuite";
+import $ from "jquery";
 
 const {allowedRange} = DateRangePicker;
 
@@ -198,14 +199,34 @@ class ConversionDashboard extends React.Component {
 
     }
 
+    pad(n) {
+        return n < 10 ? '0' + n : n
+    }
+
+
+
 
     getAllData(start, end) {
 
+        let startDate = new Date();
+
+        let today_date = startDate.getDate();
+        let today_month = startDate.getMonth();
+        let today_year = startDate.getFullYear();
+        let today_yearMonthDate = today_year + '-' + this.pad(today_month + 1) + "-" + this.pad(today_date);
+
         this.setState({selected: this.state.selected})
         const params = new URLSearchParams({
-            start_date: start || this.state.creation_time,
-            end_date: end || this.state.creation_time
+            start_date: start || this.state.creation_time + 'T00-00-00',
+            end_date: end || today_yearMonthDate + 'T23-59-59'
         })
+
+
+
+
+        // console.log(today_yearMonthDate + 'T23-59-59')
+
+
 
         console.log(params.toString())
 
@@ -222,7 +243,7 @@ class ConversionDashboard extends React.Component {
         })
             .then(response => response.json())
             .then(result => {
-                console.log("Success:", result);
+                // console.log("Success:", result);
 
                 let mainDataFunnel = [];
                 let i = 0;
@@ -243,19 +264,19 @@ class ConversionDashboard extends React.Component {
                     shop_funnel_max_val: Math.max.apply(null, shop_funnel_count_data)
                 })
 
-                console.log("blah" + this.state.shop_funnel_max_value)
+                // console.log("blah" + this.state.shop_funnel_max_value)
 
                 // alert("asdasd")
 
-                console.log(shop_funnel_per_data)
+                // console.log(shop_funnel_per_data)
 
                 Object.keys(result["shop_funnel"]).sort().forEach((key) => {
 
                     let localData;
                     if (key === "percentage") {
-                        console.log("something.............")
-                        console.log(result["shop_funnel"][key])
-                        console.log(shop_funnel_per_data)
+                        // console.log("something.............")
+                        // console.log(result["shop_funnel"][key])
+                        // console.log(shop_funnel_per_data)
                         localData = {
                             label: key,
                             type: 'line',
@@ -273,7 +294,7 @@ class ConversionDashboard extends React.Component {
                             datalabels: {
                                 display: true,
                                 formatter: (value, context) => {
-                                    console.log("asdasdasdasdasdddddddddddddddddddddddddddddddddd")
+                                    // console.log("asdasdasdasdasdddddddddddddddddddddddddddddddddd")
                                     return this.state.shop_funnel_per[0][context.dataIndex]  + " %";
                                 },
                                 align: "top",
@@ -305,15 +326,28 @@ class ConversionDashboard extends React.Component {
 
                 });
 
-                console.log(mainDataFunnel)
+                console.log("summary")
+                console.log(result["summary"])
+
+                let $shop_funnels_summary = $("#shop_funnels_summary"),
+                    shop_funnels_summary_str = result["summary"],
+                    shop_funnels_summary_html = $.parseHTML(shop_funnels_summary_str)
+
+                $shop_funnels_summary.html(shop_funnels_summary_html);
+
+                let $shop_funnels_conclusion = $("#shop_funnels_conclusion"),
+                    shop_funnels_summary_conclusion_str = result["conclusion"],
+                    shop_funnels_summary_conclusion_html = $.parseHTML(shop_funnels_summary_conclusion_str)
+
+                $shop_funnels_conclusion.html(shop_funnels_summary_conclusion_html);
+
+
 
                 this.setState({
                     shop_funnels: {
                         labels: result.pages,
                         datasets: mainDataFunnel
-                    },
-                    shop_funnels_summary: result["summary"],
-                    shop_funnels_conclusion: result["conclusion"]
+                    }
                 })
 
             })
@@ -334,8 +368,8 @@ class ConversionDashboard extends React.Component {
             .then(response => response.json())
             .then(result => {
 
-                console.log("HELLLLLLLLLLOOOOOOOOOOO");
-                console.log(result);
+                // console.log("HELLLLLLLLLLOOOOOOOOOOO");
+                // console.log(result);
 
 
                 let mainDataProduct = [];
@@ -352,8 +386,8 @@ class ConversionDashboard extends React.Component {
                     }
                 })
 
-                // console.log(max_visitor_count.sort())
-                // console.log(Math.max.apply(null, max_visitor_count))
+                // // console.log(max_visitor_count.sort())
+                // // console.log(Math.max.apply(null, max_visitor_count))
 
                 this.setState({
                     conv_per: per_data,
@@ -415,13 +449,26 @@ class ConversionDashboard extends React.Component {
 
                 });
 
+
+                let $product_conversion_summary = $("#product_conversion_summary"),
+                    product_conversion_summary_str = result["summary"],
+                    product_conversion_summary_html = $.parseHTML(product_conversion_summary_str)
+
+                $product_conversion_summary.html(product_conversion_summary_html);
+
+                let $product_conversion_conclusion = $("#product_conversion_conclusion"),
+                    product_conversion_conclusion_str = result["conclusion"],
+                    product_conversion_conclusion_html = $.parseHTML(product_conversion_conclusion_str)
+
+                $product_conversion_conclusion.html(product_conversion_conclusion_html);
+
+
+
                 this.setState({
                     product_conversion: {
                         labels: result.products,
                         datasets: mainDataProduct
-                    },
-                    product_conversion_summary: result["summary"],
-                    product_conversion_conclusion: result["conclusion"]
+                    }
                 })
 
             })
@@ -441,7 +488,7 @@ class ConversionDashboard extends React.Component {
         })
             .then(response => response.json())
             .then(result => {
-                console.log("Success : ", result);
+                // console.log("Success : ", result);
 
                 let mainDataLanding = [];
 
@@ -538,8 +585,8 @@ class ConversionDashboard extends React.Component {
                 //     data.push(key)
                 //     datasets.push(data3.landing_conversion[key])
                 // });
-                // // console.log(data);
-                // // console.log(datasets);
+                // // // console.log(data);
+                // // // console.log(datasets);
                 //
                 // let localdata = {}
                 //
@@ -559,14 +606,24 @@ class ConversionDashboard extends React.Component {
                 //     localdata = {}
                 // }
 
-                console.log(mainDataLanding)
+                let $landing_page_conversion_summary = $("#landing_page_conversion_summary"),
+                    landing_page_conversion_summary_str = result["summary"],
+                    landing_page_conversion_summary_html = $.parseHTML(landing_page_conversion_summary_str)
+
+                $landing_page_conversion_summary.html(landing_page_conversion_summary_html);
+
+                let $landing_page_conversion_conclusion = $("#landing_page_conversion_conclusion"),
+                    landing_page_conversion_conclusion_str = result["conclusion"],
+                    landing_page_conversion_conclusion_html = $.parseHTML(landing_page_conversion_conclusion_str)
+
+                $landing_page_conversion_conclusion.html(landing_page_conversion_conclusion_html);
+
+
                 this.setState({
                     landing_page_conversion: {
                         labels: result["pages"],
                         datasets: mainDataLanding
-                    },
-                    landing_page_conversion_summary: result["summary"],
-                    landing_page_conversion_conclusion: result["conclusion"]
+                    }
                 })
 
 
@@ -604,7 +661,12 @@ class ConversionDashboard extends React.Component {
                             color="primary"
                             className={classes.button}
                             onClick={() => {
-                                this.getAllData(this.state.start_yearMonthDate, this.state.end_yearMonthDate)
+                                if (this.state.start_yearMonthDate !== "") {
+                                    this.getAllData(this.state.start_yearMonthDate + 'T00-00-00', this.state.end_yearMonthDate + 'T23-59-59');
+                                } else {
+                                    this.getAllData(this.state.creation_time + 'T00-00-00', this.state.creation_time + 'T23-59-59');
+
+                                }
                             }}
                         ><RefreshRoundedIcon/></Button>
 
@@ -664,7 +726,7 @@ class ConversionDashboard extends React.Component {
                                     end_yearMonthDate: e_yearMonthDate,
                                 })
 
-                                this.getAllData(s_yearMonthDate, e_yearMonthDate)
+                                this.getAllData(s_yearMonthDate + 'T00-00-00', e_yearMonthDate + 'T23-59-59')
 
                             }catch (e) {
                                 console.log(e)
@@ -685,8 +747,8 @@ class ConversionDashboard extends React.Component {
                             </h3>
                             <Divider/>
                             <div style={{padding: "0.5%", margin: "1% 0% 0% 2%", width: "97%"}}>
-                                <p>{this.state.shop_funnels_summary}</p>
-                                <p><strong>CONCLUSION:</strong> {this.state.shop_funnels_conclusion}</p>
+                                <p id={"shop_funnels_summary"}/>
+                                <p id={"shop_funnels_conclusion"}/>
                             </div>
 
 
@@ -730,11 +792,11 @@ class ConversionDashboard extends React.Component {
                                                 },
                                                 scaleLabel: {
                                                     display: true,
-                                                    labelString: "Count"
+                                                    labelString: "# Visitors"
                                                 },
                                                 ticks: {
                                                     min: 0,
-                                                    max: (Math.round(this.state.shop_funnel_max_val / 10) * 10) + 250,
+                                                    max: (Math.round(this.state.shop_funnel_max_val / 100) + 2)  * 100,
                                                     callback: function (value) {
                                                         return value
                                                     }
@@ -745,7 +807,7 @@ class ConversionDashboard extends React.Component {
                                                 position: "left",
                                                 id: "y-axis-1",
                                                 ticks: {
-                                                    max: (Math.round(this.state.shop_funnel_max_val / 10) * 10) + 250,
+                                                    max: (Math.round(this.state.shop_funnel_max_val / 100) + 2)  * 100,
                                                     callback: function (value) {
                                                         return value
                                                     }
@@ -768,8 +830,8 @@ class ConversionDashboard extends React.Component {
                             </h3>
                             <Divider/>
                             <div style={{padding: "0.5%", margin: "1% 0% 0% 2%", width: "97%"}}>
-                                <p>{this.state.product_conversion_summary}</p>
-                                <p><strong>CONCLUSION:</strong> {this.state.product_conversion_conclusion}</p>
+                                <p id={"product_conversion_summary"}/>
+                                <p id={"product_conversion_conclusion"}/>
                             </div>
 
                             <div style={{margin: "0% 0.5% 1% 1.5%", width: "85%"}}>
@@ -793,7 +855,7 @@ class ConversionDashboard extends React.Component {
                                                 stacked: true,
                                                 ticks: {
                                                     min: 0,
-                                                    max: (Math.round(this.state.product_visit_max_val / 10) * 10) + 40,
+                                                    max: (Math.round(this.state.product_visit_max_val / 10) + 2) * 10,
                                                     callback: function (value) {
                                                         return value
                                                     }
@@ -820,8 +882,8 @@ class ConversionDashboard extends React.Component {
                             </h3>
                             <Divider/>
                             <div style={{padding: "0.5%", margin: "1% 0% 0% 2%", width: "97%"}}>
-                                <p>{this.state.landing_page_conversion_summary}</p>
-                                <p><strong>CONCLUSION:</strong> {this.state.landing_page_conversion_conclusion}</p>
+                                <p id={"landing_page_conversion_summary"}/>
+                                <p id={"landing_page_conversion_conclusion"}/>
                             </div>
 
                             <div style={{margin: "0% 0.5% 1% 1.5%", width: "80%"}}>
@@ -842,7 +904,7 @@ class ConversionDashboard extends React.Component {
                                                 stacked: true,
                                                 ticks: {
                                                     min: 0,
-                                                    max: (Math.round(this.state.landing_page_max_val / 10) * 10) + 200,
+                                                    max: (Math.round(this.state.landing_page_max_val / 100) + 2) * 100,
                                                     callback: function (value) {
                                                         return value
                                                     }
