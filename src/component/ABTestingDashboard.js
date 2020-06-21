@@ -788,7 +788,27 @@ class ABTestingDashboard extends React.Component {
                                     height={40}
                                     data={this.state.ConversionData}
                                     redraw={this.state.ConversionData}
-                                    options={{maintainAspectRatio: true}}>
+                                    options={{
+                                        tooltips: {
+                                            intersect: false,
+                                        },
+                                        hover: {
+                                            intersect: false
+                                        },
+                                        maintainAspectRatio: true,
+                                        scales: {
+                                            yAxes: [{
+                                                ticks: {
+                                                    min: 0,
+                                                    max: 100,
+                                                },
+                                                scaleLabel: {
+                                                    display: true,
+                                                    labelString: "% Goal Conversion"
+                                                }
+                                            }]
+                                        }
+                                    }}>
                                 </Line>
                             </div>
                         </CardContent>

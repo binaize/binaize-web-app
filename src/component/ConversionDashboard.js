@@ -251,7 +251,7 @@ class ConversionDashboard extends React.Component {
                 let shop_funnel_count_data = ''
 
                 Object.keys(result["shop_funnel"]).sort().forEach((key) => {
-                    if (key === "count") {
+                    if (key === "visitor_count") {
                         shop_funnel_count_data = result["shop_funnel"][key];
                     } else if (key === "percentage") {
                         shop_funnel_per_data.push(result["shop_funnel"][key])
@@ -270,7 +270,7 @@ class ConversionDashboard extends React.Component {
 
                 // console.log(shop_funnel_per_data)
 
-                Object.keys(result["shop_funnel"]).sort().forEach((key) => {
+                Object.keys(result["shop_funnel"]).forEach((key) => {
 
                     let localData;
                     if (key === "percentage") {
@@ -777,7 +777,7 @@ class ConversionDashboard extends React.Component {
                                                     return data['datasets'][0]['data'][tooltipItem['index']];
                                                 }
                                             },
-                                            displayColors: false
+                                            displayColors: false,
                                         },
 
                                         scales: {
@@ -867,7 +867,7 @@ class ConversionDashboard extends React.Component {
                                                 },
                                                 scaleLabel: {
                                                     display: true,
-                                                    labelString: "Unique Visitors"
+                                                    labelString: "# Unique Visitors"
                                                 }
                                             }]
                                         },
@@ -916,7 +916,7 @@ class ConversionDashboard extends React.Component {
                                                 },
                                                 scaleLabel: {
                                                     display: true,
-                                                    labelString: "Unique Visitors"
+                                                    labelString: "# Unique Visitors"
                                                 }
                                             }]
                                         }
