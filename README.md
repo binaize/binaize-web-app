@@ -38,4 +38,3 @@ nohup sudo docker-compose -f docker-compose-theia.yaml up --build --remove-orpha
 ```bash
 nohup sudo docker-compose -f docker-compose-theia.yaml up --build --remove-orphans theia >> ~/theia.out&
 ```
-

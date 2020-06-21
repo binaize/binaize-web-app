@@ -17,8 +17,7 @@ import "./Experiments.css"
 import CardContent from "@material-ui/core/CardContent";
 import Card from "@material-ui/core/Card";
 import {Bar, Line} from "react-chartjs-2";
-
-import Chart from "react-apexcharts";
+import $ from 'jquery';
 
 import RefreshRoundedIcon from '@material-ui/icons/RefreshRounded';
 
@@ -34,6 +33,7 @@ import {
 import AppToolbar from "./AppToolbar";
 import SideDrawer from "./SideDrawer";
 import Button from "@material-ui/core/Button";
+// import Chart from "react-apexcharts";
 
 const drawerWidth = 300;
 const exp_style = theme => ({
@@ -136,11 +136,11 @@ const exp_style = theme => ({
         marginTop: theme.spacing(2),
     },
     button: {
-        position: 'relative',
-        left: 750,
+        position: 'absolute',
+        right: "0%",
         backgroundColor: "#f1f1f1",
-        height: "80px",
-        width: "80px",
+        height: "70px",
+        width: "70px",
         margin: "1% 5%",
         '&:hover': {
             backgroundColor: '#ddd !important',
@@ -154,8 +154,6 @@ class ABTestingDashboard extends React.Component {
     constructor(props) {
         super(props);
 
-        console.log(process)
-
         this.state = {
             access_token: localStorage.getItem("access_token"),
             select_val: "",
@@ -166,14 +164,20 @@ class ABTestingDashboard extends React.Component {
             BarDataSession: {},
             BarDataVisitors: {},
             ConversionData: {},
+
+            session_max_value:'',
+            visitor_max_value: '',
+            conversion_max_value: '',
+
+
             rows: [],
             SummaryDetails: {
                 summary_status: '',
                 summary_conclusion: '',
                 summary_recommendation: '',
             },
-            bar_background_color: ['#2196f3', '#4caf50', '#ef6c00'],
-            bar_background_hover_color: ['#006FBB', '#50B83C', '#DE3618'],
+            bar_background_color: ['#2196f3', '#50B83C', '#ef6c00'],
+            bar_background_hover_color: ['#1976d2', '#43a047', '#e65100'],
             variation_name2: ["Variation Yel", "Original", "Variation Blue"],
             experiment_names: [],
             experiment_ids: [],
@@ -218,7 +222,6 @@ class ABTestingDashboard extends React.Component {
                 },
             },
 
-
             seriesss: [{
                 name: 'Website Blog',
                 type: 'column',
@@ -258,14 +261,20 @@ class ABTestingDashboard extends React.Component {
                     }
                 }]
             },
-
         }
+
+
+        if (this.state.access_token === "") {
+            this.props.history.push("/");
+        }
+
+
+
     }
 
     createExpList(experiment_name, experiment_id) {
         return [experiment_name, experiment_id];
     }
-
 
     getExperimentNames() {
 
@@ -289,7 +298,7 @@ class ABTestingDashboard extends React.Component {
                     let i = 0;
 
                     for (i; i < result.length; i++) {
-                        localExp.push(this.createExpList(result[i].experiment_name, result[i].experiment_id))
+                        localExp.push(this.createExpList(result[i]["experiment_name"], result[i]["experiment_id"]))
                     }
 
                     this.setState({experiment_names: localExp})
@@ -300,7 +309,6 @@ class ABTestingDashboard extends React.Component {
         }
     }
 
-
     getSessionData(exp_id) {
 
         console.log(exp_id)
@@ -309,14 +317,10 @@ class ABTestingDashboard extends React.Component {
         const params = new URLSearchParams({
             experiment_id: exp_id
         })
-
         let access = "Bearer " + this.state.access_token;
+
+        // SESSION COUNT API CALL
         const urlSession = REACT_APP_URL_SESSION_COUNT + `?${params.toString()}`
-
-        // console.log(urlSession);
-
-
-
 
         fetch(REACT_APP_BASE_URL + urlSession, {
             method: 'GET',
@@ -330,42 +334,49 @@ class ABTestingDashboard extends React.Component {
             .then(result => {
                 console.log("Success:", result);
 
-                let data = []
-                let datasets = [];
-
                 let i = 0;
-
                 let mainDatasetSession = [];
 
-                Object.keys(result.session_count).forEach((key) => {
-                    // console.log(key)
-                    // data.push(key)
-                    // datasets.push(result.session_count[key])
+                try {
 
-                    let localdata = {}
+                    let max = []
 
-                    localdata = {
-                        label: key,
-                        backgroundColor: this.state.bar_background_color[i],
-                        borderColor: this.state.bar_background_color[i],
-                        borderWidth: 1,
-                        hoverBackgroundColor: this.state.bar_background_hover_color[i],
-                        hoverBorderColor: this.state.bar_background_hover_color[i],
-                        data: result.session_count[key]
-                    }
+                    Object.keys(result["session_count"]).forEach((key) => {
+                        max.push(Math.max.apply(null, result["session_count"][key]))
+                    })
 
-                    i = i + 1
+                    this.setState({
+                        session_max_value: Math.max.apply(null, max)
+                    })
 
-                    console.log(localdata)
-                    console.log(mainDatasetSession)
+                    Object.keys(result["session_count"]).sort().forEach((key) => {
 
-                    mainDatasetSession.push(localdata);
+                        let localData;
+                        localData = {
+                            label: key,
+                            backgroundColor: this.state.bar_background_color[i],
+                            borderColor: this.state.bar_background_color[i],
+                            borderWidth: 1,
+                            hoverBackgroundColor: this.state.bar_background_hover_color[i],
+                            hoverBorderColor: this.state.bar_background_hover_color[i],
+                            data: result["session_count"][key],
+                            datalabels: {
+                                display: false,
+                            }
+                        }
+                        i = i + 1;
+                        mainDatasetSession.push(localData);
+                    })
 
 
-                });
-                // console.log(data);
-                // console.log(datasets)
-                // console.log(mainDatasetSession)
+                } catch (e) {
+                    console.log(e)
+                    this.setState({
+                        SummaryDetails: {
+                            summary_status: "Error in fetching data"
+                        }
+                    })
+                }
 
                 this.setState({
                     BarDataSession: {
@@ -373,9 +384,13 @@ class ABTestingDashboard extends React.Component {
                         datasets: mainDatasetSession
                     }
                 })
-            });
+            })
+            .catch(err => {
+                console.log(err)
+            })
 
 
+        // VISITOR COUNT API CALL
         const urlVisitor = REACT_APP_URL_VISITOR_COUNT + `?${params.toString()}`
 
         fetch(REACT_APP_BASE_URL + urlVisitor, {
@@ -388,33 +403,45 @@ class ABTestingDashboard extends React.Component {
         })
             .then(response => response.json())
             .then(result => {
-                // let datasetsV = [];
-                //
-                // let dataV = [];
-                // console.log("Success: ", result);
+                console.log("Success URL Visitor Count: ", result);
 
                 let i = 0;
-
                 let mainDatasetVisitors = [];
 
-                Object.keys(result.visitor_count).forEach((key) => {
-                    // datasetsV.push(result.visitor_count[key])
-                    // dataV.push(key)
+                try {
 
-                    let localdataV = {}
-                    localdataV = {
-                        label: key,
-                        backgroundColor: this.state.bar_background_color[i],
-                        borderColor: this.state.bar_background_color[i],
-                        borderWidth: 1,
-                        hoverBackgroundColor: this.state.bar_background_hover_color[i],
-                        hoverBorderColor: this.state.bar_background_hover_color[i],
-                        data: result.visitor_count[key]
-                    }
-                    i= i+1
-                    mainDatasetVisitors.push(localdataV);
+                    let max = [];
 
-                });
+                    Object.keys(result["visitor_count"]).forEach((key) => {
+                        max.push(Math.max.apply(null, result["visitor_count"][key]))
+                    })
+
+                    this.setState({
+                        visitor_max_value: Math.max.apply(null, max)
+                    })
+
+                    Object.keys(result["visitor_count"]).sort().forEach((key) => {
+
+                        let localDataVisitor
+                        localDataVisitor = {
+                            label: key,
+                            backgroundColor: this.state.bar_background_color[i],
+                            borderColor: this.state.bar_background_color[i],
+                            borderWidth: 1,
+                            hoverBackgroundColor: this.state.bar_background_hover_color[i],
+                            hoverBorderColor: this.state.bar_background_hover_color[i],
+                            data: result["visitor_count"][key],
+                            datalabels: {
+                                display: false,
+                            }
+                        }
+                        i = i + 1
+                        mainDatasetVisitors.push(localDataVisitor);
+
+                    })
+                } catch (e) {
+                    console.log(e);
+                }
 
                 this.setState({
                     BarDataVisitors: {
@@ -423,12 +450,14 @@ class ABTestingDashboard extends React.Component {
                     }
                 })
 
-            });
+            })
+            .catch(err => {
+                console.log(err)
+            })
 
 
+        // CONVERSION RATE API CALL
         const urlConvert = REACT_APP_URL_CONVERSION_RATE + `?${params.toString()}`
-
-        // console.log(urlConvert);
 
         fetch(REACT_APP_BASE_URL + urlConvert, {
             method: 'GET',
@@ -440,49 +469,60 @@ class ABTestingDashboard extends React.Component {
         })
             .then(response => response.json())
             .then(result => {
-                // console.log("Success : ", result);
+                console.log("Success : ", result);
 
-                // let dataV = [];
-                // let datasetsV = [];
                 let mainDatasetConversion = [];
                 let i = 0;
 
-                Object.keys(result.conversion).forEach((key)=> {
-                    // console.log(key)
-                    // dataV.push(key)
-                    // datasetsV.push(result.conversion[key])
+                try {
 
-                    let localData = {}
+                    let max = [];
+                    Object.keys(result["conversion"]).sort().forEach((key) => {
+                        max.push(Math.max.apply(null, result["conversion"][key]))
+                    })
 
-                    localData = {
-                        label: key,
-                        borderColor: this.state.bar_background_color[i],
-                        borderWidth: 3,
-                        fill: false,
-                        hoverBackgroundColor: this.state.bar_background_hover_color[i],
-                        hoverBorderColor: this.state.bar_background_hover_color[i],
-                        data: result.conversion[key]
-                    }
+                    this.setState({
+                        conversion_max_value: Math.max.apply(null, max)
+                    })
 
-                    i = i+1
 
-                    mainDatasetConversion.push(localData);
+                    Object.keys(result["conversion"]).sort().forEach((key) => {
 
-                });
+                        let localData
+                        localData = {
+                            label: key,
+                            borderColor: this.state.bar_background_color[i],
+                            borderWidth: 3,
+                            fill: false,
+                            hoverBackgroundColor: this.state.bar_background_hover_color[i],
+                            hoverBorderColor: this.state.bar_background_hover_color[i],
+                            data: result["conversion"][key],
+                            datalabels: {
+                                display: false,
+                            }
+                        }
+                        i = i + 1;
+                        mainDatasetConversion.push(localData);
 
-                // console.log(mainDatasetConversion)
+                    })
+                } catch (e) {
+                    console.log(e);
+                }
+
                 this.setState({
                     ConversionData: {
                         labels: result.date,
                         datasets: mainDatasetConversion
                     }
                 })
-            });
+            })
+            .catch(err => {
+                console.log(err)
+            })
 
 
+        // CONVERSION TABLE API CALL
         const urlConversationTable = REACT_APP_URL_CONVERSION_TABLE + `?${params.toString()}`
-
-        console.log(urlConversationTable);
 
         try {
 
@@ -503,17 +543,18 @@ class ABTestingDashboard extends React.Component {
                     console.log("Success: TABLE ", result);
 
                     let i = 0;
-                    console.log("Success: TABLE " + result[i].variation_name)
+                    console.log("Success: TABLE " + result[i]["variation_name"])
 
                     let url = "www.smth.com"
 
                     for (i; i < result.length; i++) {
 
                         localData.push(<Link url={url}>{result[i].variation_name}</Link>);
-                        localData.push(result[i].num_session);
-                        localData.push(result[i].num_visitor);
-                        localData.push(result[i].visitor_converted);
-                        localData.push(result[i].conversion);
+                        localData.push(result[i]["num_session"]);
+                        localData.push(result[i]["num_visitor"]);
+                        localData.push(result[i]["visitor_converted"]);
+                        localData.push(result[i]["goal_conversion"]);
+                        localData.push(result[i]["sales_conversion"]);
 
                         localRows.push(localData);
                         localData = [];
@@ -521,16 +562,18 @@ class ABTestingDashboard extends React.Component {
                     }
 
                     this.setState({rows: localRows})
-                    // console.log(this.state.rows);
-                });
 
+                }).catch(err => {
+                console.log(err);
+            })
 
         } catch (e) {
             console.error("Error!", e);
         }
 
 
-        const urlSummary = REACT_APP_EXPERIMENT_SUMMARY + `?${params.toString()}`
+        // EXPERIMENT SUMMARY API CALL
+        const urlSummary = REACT_APP_EXPERIMENT_SUMMARY + `?${params.toString()}`;
         fetch(REACT_APP_BASE_URL + urlSummary, {
             method: 'GET',
             headers: {
@@ -543,14 +586,26 @@ class ABTestingDashboard extends React.Component {
             .then(result => {
                 console.log("Success: ", result);
 
-                this.setState({
-                    SummaryDetails: {
-                        summary_status: result["status"],
-                        summary_conclusion: result["conclusion"],
-                        summary_recommendation: result["recommendation"]
-                    }
-                })
-            });
+                let $summary = $("#summary"),
+                    summary_str = result["status"],
+                    summary_html = $.parseHTML(summary_str)
+
+                $summary.html(summary_html);
+
+                let $summary_conclusion = $("#summary_conclusion"),
+                    summary_conclusion_str = result["conclusion"],
+                    summary_conclusion_html = $.parseHTML(summary_conclusion_str)
+                $summary_conclusion.html(summary_conclusion_html);
+
+                let $summary_recommendation = $("#summary_recommendation"),
+                    summary_recommendation_str = result["recommendation"],
+                    summary_recommendation_html = $.parseHTML(summary_recommendation_str)
+                $summary_recommendation.html(summary_recommendation_html);
+
+            })
+            .catch(err => {
+                console.log(err)
+            })
 
 
     }
@@ -613,10 +668,10 @@ class ABTestingDashboard extends React.Component {
                     </div>
                     <Card style={{margin: "1% 5%"}}>
                         <CardContent>
-                            <div style={{padding: "0.5%", margin: "0% 0% 0% 0.5%", width: "97%"}}>
-                                <p>{this.state.SummaryDetails.summary_status}</p>
-                                <p>{this.state.SummaryDetails.summary_conclusion}</p>
-                                <p>{this.state.SummaryDetails.summary_recommendation}</p>
+                            <div style={{padding: "0.5%", margin: "0% 0% 0% 0.5%", width: "97%", fontSize: "16px"}}>
+                                <p id="summary"/>
+                                <p id="summary_conclusion"/>
+                                <p id="summary_recommendation"/>
                             </div>
                         </CardContent>
                     </Card>
@@ -631,7 +686,8 @@ class ABTestingDashboard extends React.Component {
                                     <TableCell align="left">Sessions</TableCell>
                                     <TableCell align="left">Visitors</TableCell>
                                     <TableCell align="left">Visitors Converted</TableCell>
-                                    <TableCell align="left">Conversion Rate (%)</TableCell>
+                                    <TableCell align="left">Goal Conversion (%)</TableCell>
+                                    <TableCell align="left">Sales Conversion (%)</TableCell>
                                 </TableRow>
                             </TableHead>
                             <TableBody>
@@ -644,6 +700,7 @@ class ABTestingDashboard extends React.Component {
                                         <TableCell align="left">{row[2]}</TableCell>
                                         <TableCell align="left">{row[3]}</TableCell>
                                         <TableCell align="left">{row[4]}</TableCell>
+                                        <TableCell align="left">{row[5]}</TableCell>
                                     </TableRow>
                                 ))}
                             </TableBody>
@@ -659,6 +716,7 @@ class ABTestingDashboard extends React.Component {
                                     Session Over Time
                                 </h3>
                                 <hr/>
+
                                 <Bar
                                     width={100}
                                     height={40}
@@ -666,7 +724,18 @@ class ABTestingDashboard extends React.Component {
                                     redraw={this.state.BarDataSession}
                                     options={{
                                         maintainAspectRatio: true,
-                                        scales: {}
+                                        scales: {
+                                            yAxes: [{
+                                                ticks: {
+                                                    min: 0,
+                                                    max: (Math.round(this.state.session_max_value / 10) * 10) + 20,
+                                                },
+                                                scaleLabel: {
+                                                    display: true,
+                                                    labelString: "Count"
+                                                }
+                                            }]
+                                        }
                                     }}>
                                 </Bar>
                             </div>
@@ -687,7 +756,21 @@ class ABTestingDashboard extends React.Component {
                                     height={40}
                                     data={this.state.BarDataVisitors}
                                     redraw={this.state.BarDataVisitors}
-                                    options={{maintainAspectRatio: true}}>
+                                    options={{
+                                        maintainAspectRatio: true,
+                                        scales: {
+                                            yAxes: [{
+                                                ticks: {
+                                                    min: 0,
+                                                    max: (Math.round(this.state.visitor_max_value / 10) * 10) + 10,
+                                                },
+                                                scaleLabel: {
+                                                    display: true,
+                                                    labelString: "Count"
+                                                }
+                                            }]
+                                        }
+                                    }}>
                                 </Bar>
                             </div>
                         </CardContent>

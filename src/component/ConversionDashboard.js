@@ -1,7 +1,9 @@
-
 import React from 'react';
 import {
-    REACT_APP_BASE_URL
+    REACT_APP_BASE_URL,
+    REACT_APP_URL_SHOP_FUNNEL,
+    REACT_APP_URL_PRODUCT_CONVERSION,
+    REACT_APP_URL_LANDING_PAGE
 } from "../config"
 
 import CssBaseline from '@material-ui/core/CssBaseline';
@@ -17,6 +19,11 @@ import AppToolbar from "./AppToolbar";
 import SideDrawer from "./SideDrawer";
 import Button from "@material-ui/core/Button";
 import RefreshRoundedIcon from "@material-ui/icons/RefreshRounded";
+
+import ChartDataLabels from 'chartjs-plugin-datalabels';
+import {DatePicker, DateRangePicker} from "rsuite";
+
+const {allowedRange} = DateRangePicker;
 
 const drawerWidth = 300;
 const exp_style = theme => ({
@@ -118,12 +125,12 @@ const exp_style = theme => ({
     selectEmpty: {
         marginTop: theme.spacing(2),
     },
-    button :{
-        position: 'relative',
-        left: 750,
+    button: {
+        position: 'absolute',
+        right: "0%",
         backgroundColor: "#f1f1f1",
-        height: "80px",
-        width: "80px",
+        height: "70px",
+        width: "70px",
         margin: "1% 5%",
         '&:hover': {
             backgroundColor: '#ddd !important',
@@ -137,10 +144,11 @@ class ConversionDashboard extends React.Component {
     constructor(props) {
         super(props);
 
-        // console.log(process)
-
         this.state = {
             access_token: localStorage.getItem("access_token"),
+            creation_time: localStorage.getItem("creation_time"),
+            start_yearMonthDate: '',
+            end_yearMonthDate: '',
             select_val: "",
             options: [
                 {label: 'exp_2', value: '13e6f65bacbf4d74b8561e940287e604'},
@@ -160,34 +168,51 @@ class ConversionDashboard extends React.Component {
             variation_name2: ["Variation Yel", "Original", "Variation Blue"],
             experiment_names: [],
             experiment_ids: [],
+            startDate: '',
+            endDate: '',
 
             shop_funnels: {},
+            shop_funnels_summary: '',
+            shop_funnels_conclusion: '',
+
             product_conversion: {},
-            landing_page_conversion: {}
+            product_conversion_summary: '',
+            product_conversion_conclusion: '',
+
+            landing_page_conversion: {},
+            landing_page_conversion_summary: '',
+            landing_page_conversion_conclusion: '',
+
+            shop_funnel_per: [],
+            shop_funnel_count_per: [],
+            shop_funnel_max_val: '',
+            conv_per: [],
+            product_visit_max_val: '',
+            landing_page_max_val: '',
+            landing_per: []
         }
+
+        if (this.state.access_token === "") {
+            this.props.history.push("/");
+        }
+
     }
 
 
-    getAllData(exp_id) {
-
-        console.log(exp_id)
+    getAllData(start, end) {
 
         this.setState({selected: this.state.selected})
-        // const params = new URLSearchParams({
-        //     experiment_id: exp_id
-        // })
+        const params = new URLSearchParams({
+            start_date: start || this.state.creation_time,
+            end_date: end || this.state.creation_time
+        })
+
+        console.log(params.toString())
 
         let access = "Bearer " + this.state.access_token;
-        // const urlSession = REACT_APP_URL_SESSION_COUNT + `?${params.toString()}`
-        //
-        // console.log(urlSession);
 
-        let mainDataFunnel = [];
-
-        let mainDataProduct = [];
-        let mainDataLanding = [];
-
-        fetch(REACT_APP_BASE_URL + "/api/v1/schemas/report/shop-funnel", {
+        // SHOP FUNNEL API CALL
+        fetch(REACT_APP_BASE_URL + REACT_APP_URL_SHOP_FUNNEL + `?${params.toString()}`, {
             method: 'GET',
             headers: {
                 'Access-Control-Allow-Origin': '*',
@@ -199,69 +224,106 @@ class ConversionDashboard extends React.Component {
             .then(result => {
                 console.log("Success:", result);
 
-
-                let data = []
-                let datasets = [];
-
-
-                Object.keys(result.shop_funnel).forEach(function (key) {
-                    data.push(key)
-                    datasets.push(result.shop_funnel[key])
-                });
-                // console.log(data);
-                // console.log(datasets);
-
-                let localdata = {}
-
+                let mainDataFunnel = [];
                 let i = 0;
-                for (i; i < data.length; i++) {
+                let shop_funnel_per_data = []
+                let shop_funnel_count_data = ''
 
-                    if (data[i] === "percentage") {
-                        localdata = {
-                            label: data[i],
+                Object.keys(result["shop_funnel"]).sort().forEach((key) => {
+                    if (key === "count") {
+                        shop_funnel_count_data = result["shop_funnel"][key];
+                    } else if (key === "percentage") {
+                        shop_funnel_per_data.push(result["shop_funnel"][key])
+                    }
+                })
+
+                this.setState({
+                    shop_funnel_per: shop_funnel_per_data,
+                    shop_funnel_count_per: shop_funnel_count_data,
+                    shop_funnel_max_val: Math.max.apply(null, shop_funnel_count_data)
+                })
+
+                console.log("blah" + this.state.shop_funnel_max_value)
+
+                // alert("asdasd")
+
+                console.log(shop_funnel_per_data)
+
+                Object.keys(result["shop_funnel"]).sort().forEach((key) => {
+
+                    let localData;
+                    if (key === "percentage") {
+                        console.log("something.............")
+                        console.log(result["shop_funnel"][key])
+                        console.log(shop_funnel_per_data)
+                        localData = {
+                            label: key,
                             type: 'line',
                             fill: false,
+                            tooltips: {
+                                enabled: false
+                            },
+                            borderWidth: 2,
                             backgroundColor: this.state.bar_background_color[i],
                             borderColor: this.state.bar_background_color[i],
-                            borderWidth: 1,
                             hoverBackgroundColor: this.state.bar_background_hover_color[i],
                             hoverBorderColor: this.state.bar_background_hover_color[i],
-                            data: datasets[i],
+                            data: shop_funnel_count_data,
                             yAxisID: "y-axis-1",
+                            datalabels: {
+                                display: true,
+                                formatter: (value, context) => {
+                                    console.log("asdasdasdasdasdddddddddddddddddddddddddddddddddd")
+                                    return this.state.shop_funnel_per[0][context.dataIndex]  + " %";
+                                },
+                                align: "top",
+                                anchor: "end",
+                                clip: true,
+                                font: {
+                                    size: "16",
+                                    weight: "bold"
+                                }
+                            }
                         };
                     } else {
-                        localdata = {
-                            label: data[i],
+                        localData = {
+                            label: key,
                             backgroundColor: this.state.bar_background_color[i],
                             borderColor: this.state.bar_background_color[i],
                             borderWidth: 1,
                             hoverBackgroundColor: this.state.bar_background_hover_color[i],
                             hoverBorderColor: this.state.bar_background_hover_color[i],
-                            data: datasets[i],
-                            yAxisID: "y-axis-2"
+                            data: result["shop_funnel"][key],
+                            yAxisID: "y-axis-2",
+                            datalabels: {
+                                display: false
+                            }
                         }
                     }
-                    mainDataFunnel.push(localdata);
-                    localdata = {}
-                }
+                    i = i + 1;
+                    mainDataFunnel.push(localData);
+
+                });
 
                 console.log(mainDataFunnel)
+
                 this.setState({
                     shop_funnels: {
                         labels: result.pages,
                         datasets: mainDataFunnel
-                    }
+                    },
+                    shop_funnels_summary: result["summary"],
+                    shop_funnels_conclusion: result["conclusion"]
                 })
 
-
-
+            })
+            .catch(err => {
+                console.log(err);
             });
 
 
-        // const urlVisitor = REACT_APP_URL_VISITOR_COUNT + `?${params.toString()}`
-        // console.log(urlVisitor);
-
-        fetch(REACT_APP_BASE_URL + "/api/v1/schemas/report/product-conversion", {
+        // PRODUCT CONVERSION API CALL
+        fetch(REACT_APP_BASE_URL + REACT_APP_URL_PRODUCT_CONVERSION + `?${params.toString()}`, {
             method: 'GET',
             headers: {
                 'Access-Control-Allow-Origin': '*',
@@ -272,53 +334,105 @@ class ConversionDashboard extends React.Component {
             .then(response => response.json())
             .then(result => {
 
-                let data = []
-                let datasets = [];
+                console.log("HELLLLLLLLLLOOOOOOOOOOO");
+                console.log(result);
 
 
-                Object.keys(result.product_conversion).forEach(function (key) {
-                    data.push(key)
-                    datasets.push(result.product_conversion[key])
-                });
-                // console.log(data);
-                // console.log(datasets);
-
-                let localdata = {}
-
+                let mainDataProduct = [];
                 let i = 0;
-                for (i; i < data.length; i++) {
 
-                    localdata = {
-                        label: data[i],
-                        backgroundColor: this.state.bar_background_color[i],
-                        borderColor: this.state.bar_background_color[i],
-                        borderWidth: 1,
-                        hoverBackgroundColor: this.state.bar_background_hover_color[i],
-                        hoverBorderColor: this.state.bar_background_hover_color[i],
-                        data: datasets[i]
+                let per_data = [];
+                let max_visitor_count
+
+                Object.keys(result["product_conversion"]).forEach((key) => {
+                    if (key === "conversion_percentage") {
+                        per_data.push(result["product_conversion"][key])
+                    } else if (key === "visitor_count") {
+                        max_visitor_count = result["product_conversion"][key]
                     }
-                    mainDataProduct.push(localdata);
-                    localdata = {}
-                }
+                })
 
-                console.log(mainDataProduct)
+                // console.log(max_visitor_count.sort())
+                // console.log(Math.max.apply(null, max_visitor_count))
+
+                this.setState({
+                    conv_per: per_data,
+                    product_visit_max_val: Math.max.apply(null, max_visitor_count)
+                })
+
+                Object.keys(result["product_conversion"]).forEach((key) => {
+
+                    let localData;
+
+                    if (key === "visitor_count") {
+                        localData = {
+                            label: key,
+                            backgroundColor: this.state.bar_background_color[i],
+                            borderColor: this.state.bar_background_color[i],
+                            borderWidth: 1,
+                            hoverBackgroundColor: this.state.bar_background_hover_color[i],
+                            hoverBorderColor: this.state.bar_background_hover_color[i],
+                            data: result["product_conversion"][key],
+                            datalabels: {
+                                display: false,
+                            }
+                        }
+
+                        i = i + 1
+                        mainDataProduct.push(localData);
+
+                    } else if (key === "conversion_count") {
+
+                        localData = {
+                            label: key,
+                            backgroundColor: this.state.bar_background_color[i],
+                            borderColor: this.state.bar_background_color[i],
+                            borderWidth: 1,
+                            hoverBackgroundColor: this.state.bar_background_hover_color[i],
+                            hoverBorderColor: this.state.bar_background_hover_color[i],
+                            data: result["product_conversion"][key],
+
+                            datalabels: {
+                                display: true,
+                                formatter: (value, context) => {
+                                    return this.state.conv_per[0][context.dataIndex] + "%";
+                                },
+                                align: "top",
+                                anchor: "end",
+                                clip: true,
+                                font: {
+                                    size: "16",
+                                    weight: "bold"
+                                }
+                            }
+                        }
+
+                        i = i + 1
+                        mainDataProduct.push(localData);
+
+                    }
+
+
+                });
+
                 this.setState({
                     product_conversion: {
                         labels: result.products,
                         datasets: mainDataProduct
-                    }
+                    },
+                    product_conversion_summary: result["summary"],
+                    product_conversion_conclusion: result["conclusion"]
                 })
 
+            })
+            .catch(err => {
+                console.log(err);
+            })
 
-            });
 
-        //
-        // const urlConvert = REACT_APP_URL_CONVERSION_RATE + `?${params.toString()}`
-        //
-        // console.log(urlConvert);
-
-        fetch(REACT_APP_BASE_URL + "/api/v1/schemas/report/landing-page", {
-            method: 'POST',
+        // LANDING PAGE API CALL
+        fetch(REACT_APP_BASE_URL + REACT_APP_URL_LANDING_PAGE + `?${params.toString()}`, {
+            method: 'GET',
             headers: {
                 'Access-Control-Allow-Origin': '*',
                 'Authorization': access,
@@ -329,61 +443,137 @@ class ConversionDashboard extends React.Component {
             .then(result => {
                 console.log("Success : ", result);
 
-
-                let data3 = {
-                    pages: [
-                        "Home Page",
-                        "Product Page",
-                        "Blog Page"
-                    ],
-                    landing_conversion: {
-                        conversion_percentage: [
-                            10.3,
-                            14.3,
-                            6.2
-                        ]
-                    }
-                }
-
-                let data = []
-                let datasets = [];
-
-
-                Object.keys(data3.landing_conversion).forEach(function (key) {
-                    data.push(key)
-                    datasets.push(data3.landing_conversion[key])
-                });
-                // console.log(data);
-                // console.log(datasets);
-
-                let localdata = {}
+                let mainDataLanding = [];
 
                 let i = 0;
-                for (i; i < data.length; i++) {
+                let landing_per_data = [];
+                let lading_max_visitor_count
 
-                    localdata = {
-                        label: data[i],
-                        backgroundColor: this.state.bar_background_color[i],
-                        borderColor: this.state.bar_background_color[i],
-                        borderWidth: 1,
-                        hoverBackgroundColor: this.state.bar_background_hover_color[i],
-                        hoverBorderColor: this.state.bar_background_hover_color[i],
-                        data: datasets[i]
+                Object.keys(result["landing_conversion"]).forEach((key) => {
+                    if (key === "conversion_percentage") {
+                        landing_per_data.push(result["landing_conversion"][key])
+                    } else if (key === "visitor_count") {
+                        lading_max_visitor_count = result["landing_conversion"][key]
                     }
-                    mainDataLanding.push(localdata);
-                    localdata = {}
-                }
+                })
+
+                this.setState({
+                    landing_per: landing_per_data,
+                    landing_page_max_val: Math.max.apply(null, lading_max_visitor_count)
+                })
+
+
+                Object.keys(result["landing_conversion"]).forEach((key) => {
+
+                    let localData = {}
+                    // localData = {
+                    //     label: key,
+                    //     backgroundColor: this.state.bar_background_color[i],
+                    //     borderColor: this.state.bar_background_color[i],
+                    //     borderWidth: 1,
+                    //     hoverBackgroundColor: this.state.bar_background_hover_color[i],
+                    //     hoverBorderColor: this.state.bar_background_hover_color[i],
+                    //     data: result["landing_conversion"][key]
+                    // }
+                    // i = i + 1
+                    // mainDataLanding.push(localData);
+
+
+                    if (key === "visitor_count") {
+                        localData = {
+                            label: key,
+                            backgroundColor: this.state.bar_background_color[i],
+                            borderColor: this.state.bar_background_color[i],
+                            borderWidth: 1,
+                            hoverBackgroundColor: this.state.bar_background_hover_color[i],
+                            hoverBorderColor: this.state.bar_background_hover_color[i],
+                            data: result["landing_conversion"][key],
+                            datalabels: {
+                                display: false,
+                            }
+                        }
+
+                        i = i + 1
+                        mainDataLanding.push(localData);
+
+                    } else if (key === "conversion_count") {
+
+                        localData = {
+                            label: key,
+                            backgroundColor: this.state.bar_background_color[i],
+                            borderColor: this.state.bar_background_color[i],
+                            borderWidth: 1,
+                            hoverBackgroundColor: this.state.bar_background_hover_color[i],
+                            hoverBorderColor: this.state.bar_background_hover_color[i],
+                            data: result["landing_conversion"][key],
+
+                            datalabels: {
+                                display: true,
+                                formatter: (value, context) => {
+                                    return this.state.landing_per[0][context.dataIndex] + "%";
+                                },
+                                align: "top",
+                                anchor: "end",
+                                clip: true,
+                                font: {
+                                    size: "16",
+                                    weight: "bold"
+                                }
+                            }
+                        }
+
+                        i = i + 1
+                        mainDataLanding.push(localData);
+
+                    }
+
+
+                });
+
+
+                //
+                //
+                //
+                // Object.keys(data3.landing_conversion).forEach(function (key) {
+                //     data.push(key)
+                //     datasets.push(data3.landing_conversion[key])
+                // });
+                // // console.log(data);
+                // // console.log(datasets);
+                //
+                // let localdata = {}
+                //
+                // let i = 0;
+                // for (i; i < data.length; i++) {
+                //
+                //     localdata = {
+                //         label: data[i],
+                //         backgroundColor: this.state.bar_background_color[i],
+                //         borderColor: this.state.bar_background_color[i],
+                //         borderWidth: 1,
+                //         hoverBackgroundColor: this.state.bar_background_hover_color[i],
+                //         hoverBorderColor: this.state.bar_background_hover_color[i],
+                //         data: datasets[i]
+                //     }
+                //     mainDataLanding.push(localdata);
+                //     localdata = {}
+                // }
 
                 console.log(mainDataLanding)
                 this.setState({
                     landing_page_conversion: {
-                        labels: data3.pages,
+                        labels: result["pages"],
                         datasets: mainDataLanding
-                    }
+                    },
+                    landing_page_conversion_summary: result["summary"],
+                    landing_page_conversion_conclusion: result["conclusion"]
                 })
 
 
-            });
+            })
+            .catch(err => {
+            console.log(err);
+        });
 
     }
 
@@ -407,12 +597,15 @@ class ConversionDashboard extends React.Component {
                     <div className={classes.toolbar}/>
 
                     <div style={{display: "flex"}}>
-                        <h2 style={{margin: "2% 5%"}}>Conversion Dashboard</h2>
+                        <h2 style={{margin: "2% 1% 1% 5%"}}>Conversion Dashboard</h2>
+
 
                         <Button
                             color="primary"
                             className={classes.button}
-                            onClick={()=>{this.getAllData()}}
+                            onClick={() => {
+                                this.getAllData(this.state.start_yearMonthDate, this.state.end_yearMonthDate)
+                            }}
                         ><RefreshRoundedIcon/></Button>
 
                         {/*<FormControl variant="outlined" className={classes.formControl}>*/}
@@ -439,18 +632,61 @@ class ConversionDashboard extends React.Component {
                         {/*</FormControl>*/}
                     </div>
 
+                    <DateRangePicker
+                        placeholder="Till Today"
+                        size="lg"
+                        style={{ width: 280, margin: "0% 0% 1% 5%", color: "#111"}}
+                        disabledDate={allowedRange(this.state.creation_time, '2022-10-01')}
+                        onChange={(selectedStartEndDate) => {
+
+                            function pad(n) {
+                                return n < 10 ? '0' + n : n
+                            }
+
+                            try{
+                                let startDate = selectedStartEndDate[0]
+                                let endDate = selectedStartEndDate[1]
+
+                                let s_date = startDate.getDate();
+                                let s_month = startDate.getMonth();
+                                let s_year = startDate.getFullYear();
+                                let s_yearMonthDate = s_year + '-' + pad(s_month + 1) + "-" + pad(s_date);
+
+
+                                let e_date = endDate.getDate();
+                                let e_month = endDate.getMonth();
+                                let e_year = endDate.getFullYear();
+                                let e_yearMonthDate = e_year + '-' + pad(e_month + 1) + "-" + pad(e_date);
+
+                                // Takes sometime to set the state
+                                this.setState({
+                                    start_yearMonthDate: s_yearMonthDate,
+                                    end_yearMonthDate: e_yearMonthDate,
+                                })
+
+                                this.getAllData(s_yearMonthDate, e_yearMonthDate)
+
+                            }catch (e) {
+                                console.log(e)
+                            }
+
+                        }}
+                    />
+
+
                     <Divider style={{margin: "0% 5%"}}/>
+
 
                     <Card style={{margin: "2% 5%"}}>
                         <CardContent>
 
-                            <h3>
+                            <h3 style={{margin: "0.5% 0% 0% 2%"}}>
                                 SHOP FUNNEL ANALYSIS
                             </h3>
                             <Divider/>
-                            <div style={{padding: "0.5%", margin: "0% 0% 0% 0.5%", width: "97%"}}>
-                                <p>Home Page to Product Page CTR is the lowest.</p>
-                                <p>RECOMMENDATION: Improve Home Page by changing creatives of copy.</p>
+                            <div style={{padding: "0.5%", margin: "1% 0% 0% 2%", width: "97%"}}>
+                                <p>{this.state.shop_funnels_summary}</p>
+                                <p><strong>CONCLUSION:</strong> {this.state.shop_funnels_conclusion}</p>
                             </div>
 
 
@@ -465,16 +701,24 @@ class ConversionDashboard extends React.Component {
                                     redraw={this.state.shop_funnels}
                                     options={{
                                         maintainAspectRatio: true,
+                                        tooltips: {
+                                            callbacks: {
+                                                title: function(tooltipItem, data) {
+                                                    return data['labels'][tooltipItem[0]['index']];
+                                                },
+                                                label: function(tooltipItem, data) {
+                                                    return data['datasets'][0]['data'][tooltipItem['index']];
+                                                }
+                                            },
+                                            displayColors: false
+                                        },
+
                                         scales: {
                                             xAxes: [{
-                                                barPercentage: 0.4
+                                                barPercentage: 0.5,
+                                                linePercentage: 0.5
                                             }],
                                             yAxes: [{
-                                                type: "linear", // only linear but allow scale type registration. This allows extensions to exist solely for log scale for instance
-                                                display: false,
-                                                position: "left",
-                                                id: "y-axis-1",
-                                            }, {
                                                 type: "linear", // only linear but allow scale type registration. This allows extensions to exist solely for log scale for instance
                                                 display: true,
                                                 position: "left",
@@ -484,6 +728,28 @@ class ConversionDashboard extends React.Component {
                                                 gridLines: {
                                                     drawOnChartArea: false, // only want the grid lines for one axis to show up
                                                 },
+                                                scaleLabel: {
+                                                    display: true,
+                                                    labelString: "Count"
+                                                },
+                                                ticks: {
+                                                    min: 0,
+                                                    max: (Math.round(this.state.shop_funnel_max_val / 10) * 10) + 250,
+                                                    callback: function (value) {
+                                                        return value
+                                                    }
+                                                },
+                                            },{
+                                                type: "linear", // only linear but allow scale type registration. This allows extensions to exist solely for log scale for instance
+                                                display: false,
+                                                position: "left",
+                                                id: "y-axis-1",
+                                                ticks: {
+                                                    max: (Math.round(this.state.shop_funnel_max_val / 10) * 10) + 250,
+                                                    callback: function (value) {
+                                                        return value
+                                                    }
+                                                },
                                             }]
                                         }
                                     }}>
@@ -492,26 +758,26 @@ class ConversionDashboard extends React.Component {
                         </CardContent>
                     </Card>
 
-                    <Divider/>
+                    <Divider style={{margin: "1% 5%"}}/>
 
                     <Card style={{margin: "2% 5%"}}>
                         <CardContent>
 
-                            <h3>
+                            <h3 style={{margin: "0.5% 0% 0% 2%"}}>
                                 PRODUCT CONVERSION ANALYSIS
                             </h3>
                             <Divider/>
-                            <div style={{padding: "0.5%", margin: "0% 0% 0% 0.5%", width: "97%"}}>
-                                <p>Conversion for product B is significantly lower than others.</p>
-                                <p>RECOMMENDATION: Improve Product Page B by changing creatives or copy or price.</p>
+                            <div style={{padding: "0.5%", margin: "1% 0% 0% 2%", width: "97%"}}>
+                                <p>{this.state.product_conversion_summary}</p>
+                                <p><strong>CONCLUSION:</strong> {this.state.product_conversion_conclusion}</p>
                             </div>
 
-                            <div style={{margin: "0% 0.5% 1% 1.5%", width: "80%"}}>
+                            <div style={{margin: "0% 0.5% 1% 1.5%", width: "85%"}}>
 
                                 <hr/>
-                                <Bar
 
-                                    yAxisID="% Conversion"
+                                <Bar
+                                    yAxisID="Unique Visitors"
                                     width={45}
                                     height={20}
                                     data={this.state.product_conversion}
@@ -521,45 +787,47 @@ class ConversionDashboard extends React.Component {
                                         scales: {
                                             xAxes: [{
                                                 stacked: true,
-                                                barPercentage: 0.4
+                                                barPercentage: 0.5
                                             }],
                                             yAxes: [{
                                                 stacked: true,
-                                                // ticks: {
-                                                //
-                                                //     min: 0,
-                                                //     max: 100,
-                                                //     callback: function(value){return value+ "%"}
-                                                // },
+                                                ticks: {
+                                                    min: 0,
+                                                    max: (Math.round(this.state.product_visit_max_val / 10) * 10) + 40,
+                                                    callback: function (value) {
+                                                        return value
+                                                    }
+                                                },
                                                 scaleLabel: {
                                                     display: true,
                                                     labelString: "Unique Visitors"
                                                 }
                                             }]
-                                        }
+                                        },
+
                                     }}>
                                 </Bar>
                             </div>
                         </CardContent>
                     </Card>
 
-                    <Divider/>
+                    <Divider style={{margin: "1% 5%"}}/>
 
                     <Card style={{margin: "2% 5%"}}>
                         <CardContent>
-                            <h3>
+                            <h3 style={{margin: "0.5% 0% 0% 2%"}}>
                                 LANDING PAGE ANALYSIS
                             </h3>
                             <Divider/>
-                            <div style={{padding: "0.5%", margin: "0% 0% 0% 0.5%", width: "97%"}}>
-                                <p>Conversion for product B is significantly lower than others.</p>
-                                <p>RECOMMENDATION: Improve Product Page B by changing creatives or copy or price.</p>
+                            <div style={{padding: "0.5%", margin: "1% 0% 0% 2%", width: "97%"}}>
+                                <p>{this.state.landing_page_conversion_summary}</p>
+                                <p><strong>CONCLUSION:</strong> {this.state.landing_page_conversion_conclusion}</p>
                             </div>
 
                             <div style={{margin: "0% 0.5% 1% 1.5%", width: "80%"}}>
                                 <hr/>
                                 <Bar
-                                    width={45}
+                                    width={50}
                                     height={20}
                                     data={this.state.landing_page_conversion}
                                     redraw={this.state.landing_page_conversion}
@@ -568,17 +836,20 @@ class ConversionDashboard extends React.Component {
                                         scales: {
                                             xAxes: [{
                                                 stacked: true,
-                                                barPercentage: 0.4
+                                                barPercentage: 0.3
                                             }],
                                             yAxes: [{
+                                                stacked: true,
                                                 ticks: {
                                                     min: 0,
-                                                    max: 20,
-                                                    callback: function(value){return value + "%"}
+                                                    max: (Math.round(this.state.landing_page_max_val / 10) * 10) + 200,
+                                                    callback: function (value) {
+                                                        return value
+                                                    }
                                                 },
                                                 scaleLabel: {
                                                     display: true,
-                                                    labelString: "% Conversion"
+                                                    labelString: "Unique Visitors"
                                                 }
                                             }]
                                         }
