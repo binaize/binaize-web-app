@@ -165,10 +165,13 @@ class ABTestingDashboard extends React.Component {
             BarDataVisitors: {},
             ConversionData: {},
 
+            step_size_session: '',
+            step_size_visitor: '',
+            step_size_goal_conversion: '',
+
             session_max_value:'',
             visitor_max_value: '',
             conversion_max_value: '',
-
 
             rows: [],
             SummaryDetails: {
@@ -311,6 +314,16 @@ class ABTestingDashboard extends React.Component {
 
     getSessionData(exp_id) {
 
+        const tickSizes = [
+            1, 2, 5,
+            10, 20, 50,
+            100, 200, 500,
+            1000, 2000, 5000,
+            10000, 20000, 50000,
+            100000, 200000, 500000,
+            1000000, 2000000, 5000000
+        ];
+
         // console.log(exp_id)
 
         this.setState({selected: this.state.selected})
@@ -345,8 +358,22 @@ class ABTestingDashboard extends React.Component {
                         max.push(Math.max.apply(null, result["session_count"][key]))
                     })
 
+                    let max_session_value = Math.max.apply(null, max)
+
+                    for (let s = 0; s < tickSizes.length; s++) {
+                        console.log("-------" + max_session_value);
+                        let val = max_session_value/tickSizes[s]
+                        if (val < 6) {
+                            console.log(tickSizes[s]);
+                            this.setState({
+                                step_size_session: tickSizes[s]
+                            })
+                            break
+                        }
+                    }
+
                     this.setState({
-                        session_max_value: Math.max.apply(null, max)
+                        session_max_value: max_session_value
                     })
 
                     Object.keys(result["session_count"]).sort().forEach((key) => {
@@ -416,8 +443,22 @@ class ABTestingDashboard extends React.Component {
                         max.push(Math.max.apply(null, result["visitor_count"][key]))
                     })
 
+                    let max_visitor_value = Math.max.apply(null, max)
+
+                    for (let s = 0; s < tickSizes.length; s++) {
+                        console.log("-------" + max_visitor_value);
+                        let val = max_visitor_value/tickSizes[s]
+                        if (val < 6) {
+                            console.log(tickSizes[s]);
+                            this.setState({
+                                step_size_visitor: tickSizes[s]
+                            })
+                            break
+                        }
+                    }
+
                     this.setState({
-                        visitor_max_value: Math.max.apply(null, max)
+                        visitor_max_value: max_visitor_value
                     })
 
                     Object.keys(result["visitor_count"]).sort().forEach((key) => {
@@ -481,8 +522,22 @@ class ABTestingDashboard extends React.Component {
                         max.push(Math.max.apply(null, result["conversion"][key]))
                     })
 
+                    let max_goal_value = Math.max.apply(null, max)
+
+                    for (let s = 0; s < tickSizes.length; s++) {
+                        console.log("-------" + max_goal_value);
+                        let val = max_goal_value/tickSizes[s]
+                        if (val < 6) {
+                            console.log(tickSizes[s]);
+                            this.setState({
+                                step_size_goal_conversion: tickSizes[s]
+                            })
+                            break
+                        }
+                    }
+
                     this.setState({
-                        conversion_max_value: Math.max.apply(null, max)
+                        conversion_max_value: max_goal_value
                     })
 
 
@@ -728,7 +783,8 @@ class ABTestingDashboard extends React.Component {
                                             yAxes: [{
                                                 ticks: {
                                                     min: 0,
-                                                    max: (Math.round(this.state.session_max_value / 20) + 2) * 20,
+                                                    stepSize: this.state.step_size_session,
+                                                    max: (Math.round(this.state.session_max_value / this.state.step_size_session) + 2) * this.state.step_size_session,
                                                 },
                                                 scaleLabel: {
                                                     display: true,
@@ -762,7 +818,8 @@ class ABTestingDashboard extends React.Component {
                                             yAxes: [{
                                                 ticks: {
                                                     min: 0,
-                                                    max: (Math.round(this.state.visitor_max_value / 10) + 2) * 10,
+                                                    stepSize: this.state.step_size_visitor,
+                                                    max: (Math.round(this.state.visitor_max_value / this.state.step_size_visitor) + 2) * this.state.step_size_visitor,
                                                 },
                                                 scaleLabel: {
                                                     display: true,
