@@ -145,6 +145,12 @@ class ConversionDashboard extends React.Component {
     constructor(props) {
         super(props);
 
+        let startDate = new Date();
+
+        let today_date = startDate.getDate();
+        let today_month = startDate.getMonth();
+        let today_year = startDate.getFullYear();
+
         this.state = {
             access_token: localStorage.getItem("access_token"),
             creation_time: localStorage.getItem("creation_time"),
@@ -171,6 +177,8 @@ class ConversionDashboard extends React.Component {
             experiment_ids: [],
             startDate: '',
             endDate: '',
+
+            today_yearMonthDate : today_year + '-' + this.pad(today_month + 1) + "-" + this.pad(today_date),
 
             shop_funnels: {},
             shop_funnels_summary: '',
@@ -208,17 +216,9 @@ class ConversionDashboard extends React.Component {
 
     getAllData(start, end) {
 
-        let startDate = new Date();
-
-        let today_date = startDate.getDate();
-        let today_month = startDate.getMonth();
-        let today_year = startDate.getFullYear();
-        let today_yearMonthDate = today_year + '-' + this.pad(today_month + 1) + "-" + this.pad(today_date);
-
-        this.setState({selected: this.state.selected})
         const params = new URLSearchParams({
             start_date: start || this.state.creation_time + 'T00-00-00',
-            end_date: end || today_yearMonthDate + 'T23-59-59'
+            end_date: end || this.state.today_yearMonthDate + 'T23-59-59'
         })
 
 
@@ -664,8 +664,7 @@ class ConversionDashboard extends React.Component {
                                 if (this.state.start_yearMonthDate !== "") {
                                     this.getAllData(this.state.start_yearMonthDate + 'T00-00-00', this.state.end_yearMonthDate + 'T23-59-59');
                                 } else {
-                                    this.getAllData(this.state.creation_time + 'T00-00-00', this.state.creation_time + 'T23-59-59');
-
+                                    this.getAllData(this.state.creation_time + 'T00-00-00', this.state.today_yearMonthDate + 'T23-59-59');
                                 }
                             }}
                         ><RefreshRoundedIcon/></Button>
@@ -698,7 +697,7 @@ class ConversionDashboard extends React.Component {
                         placeholder="Till Today"
                         size="lg"
                         style={{ width: 280, margin: "0% 0% 1% 5%", color: "#111"}}
-                        disabledDate={allowedRange(this.state.creation_time, '2022-10-01')}
+                        disabledDate={allowedRange(this.state.creation_time, this.state.today_yearMonthDate)}
                         onChange={(selectedStartEndDate) => {
 
                             function pad(n) {
@@ -729,7 +728,13 @@ class ConversionDashboard extends React.Component {
                                 this.getAllData(s_yearMonthDate + 'T00-00-00', e_yearMonthDate + 'T23-59-59')
 
                             }catch (e) {
-                                console.log(e)
+                                // console.log(e)
+
+                                this.setState({
+                                    start_yearMonthDate : ''
+                                })
+
+                                this.getAllData(this.state.creation_time + 'T00-00-00', this.state.today_yearMonthDate + 'T23-59-59');
                             }
 
                         }}
