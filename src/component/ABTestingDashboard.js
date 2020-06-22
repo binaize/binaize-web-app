@@ -35,7 +35,7 @@ import SideDrawer from "./SideDrawer";
 import Button from "@material-ui/core/Button";
 // import Chart from "react-apexcharts";
 
-const drawerWidth = 300;
+const drawerWidth = 280;
 const exp_style = theme => ({
     root: {
         display: 'flex',
@@ -604,7 +604,7 @@ class ABTestingDashboard extends React.Component {
 
                     for (i; i < result.length; i++) {
 
-                        localData.push(<Link url={url}>{result[i].variation_name}</Link>);
+                        localData.push(result[i]["variation_name"]);
                         localData.push(result[i]["num_session"]);
                         localData.push(result[i]["num_visitor"]);
                         localData.push(result[i]["goal_conversion_count"]);
@@ -738,20 +738,20 @@ class ABTestingDashboard extends React.Component {
                         <Table className={classes.table} aria-label="simple table">
                             <TableHead>
                                 <TableRow>
-                                    <TableCell>Variant</TableCell>
-                                    <TableCell align="left">Sessions</TableCell>
-                                    <TableCell align="left">Visitors</TableCell>
-                                    <TableCell align="left">Goal Conversion (Count)</TableCell>
-                                    <TableCell align="left">Goal Conversion (%)</TableCell>
-                                    <TableCell align="left">Sales Conversion (Count)</TableCell>
-                                    <TableCell align="left">Sales Conversion (%)</TableCell>
+                                    <TableCell><strong>Variant</strong></TableCell>
+                                    <TableCell align="left"><strong>Sessions</strong></TableCell>
+                                    <TableCell align="left"><strong>Visitors</strong></TableCell>
+                                    <TableCell align="left"><strong>Goal Conversion (Count)</strong></TableCell>
+                                    <TableCell align="left"><strong>Goal Conversion (%)</strong></TableCell>
+                                    <TableCell align="left"><strong>Sales Conversion (Count)</strong></TableCell>
+                                    <TableCell align="left"><strong>Sales Conversion (%)</strong></TableCell>
                                 </TableRow>
                             </TableHead>
                             <TableBody>
                                 {this.state.rows.map((row) => (
                                     <TableRow key={row[0]}>
                                         <TableCell component="th" scope="row">
-                                            {row[0]}
+                                            <strong>{row[0]}</strong>
                                         </TableCell>
                                         <TableCell align="left">{row[1]}</TableCell>
                                         <TableCell align="left">{row[2]}</TableCell>

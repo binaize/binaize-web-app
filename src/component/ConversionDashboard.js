@@ -26,7 +26,7 @@ import $ from "jquery";
 
 const {allowedRange} = DateRangePicker;
 
-const drawerWidth = 300;
+const drawerWidth = 280;
 
 const exp_style = theme => ({
     root: {
@@ -313,7 +313,7 @@ class ConversionDashboard extends React.Component {
                                 display: true,
                                 formatter: (value, context) => {
                                     // console.log("asdasdasdasdasdddddddddddddddddddddddddddddddddd")
-                                    return this.state.shop_funnel_per[0][context.dataIndex] + " %";
+                                    return this.state.shop_funnel_per[0][context.dataIndex] + "%";
                                 },
                                 align: "top",
                                 anchor: "end",
@@ -385,26 +385,29 @@ class ConversionDashboard extends React.Component {
             .then(response => response.json())
             .then(result => {
 
-                // console.log("HELLLLLLLLLLOOOOOOOOOOO");
-                // console.log(result);
-
-
                 let mainDataProduct = [];
                 let i = 0;
 
                 let per_data = [];
-                let max_visitor_count = ''
+                let max_visitor_count = []
 
                 Object.keys(result["product_conversion"]).forEach((key) => {
                     if (key === "conversion_percentage") {
                         per_data.push(result["product_conversion"][key])
                     } else if (key === "visitor_count") {
-                        max_visitor_count = result["product_conversion"][key]
+
+                        for(let ij=0; ij< result["product_conversion"][key].length; ij++) {
+                            max_visitor_count.push(result["product_conversion"][key][ij] + result["product_conversion"]["conversion_count"][ij]);
+                        }
+
+
                     }
                 })
 
-                // console.log(max_visitor_count.sort())
+                console.log("MAX")
+                console.log(max_visitor_count)
                 // console.log(Math.max.apply(null, max_visitor_count))
+
 
                 let maxVal = Math.max.apply(null, max_visitor_count)
 
@@ -525,13 +528,18 @@ class ConversionDashboard extends React.Component {
 
                 let i = 0;
                 let landing_per_data = [];
-                let lading_max_visitor_count = ''
+                let lading_max_visitor_count = []
 
                 Object.keys(result["landing_conversion"]).forEach((key) => {
                     if (key === "conversion_percentage") {
                         landing_per_data.push(result["landing_conversion"][key])
                     } else if (key === "visitor_count") {
-                        lading_max_visitor_count = result["landing_conversion"][key]
+                        // lading_max_visitor_count = result["landing_conversion"][key]
+
+                        for(let ij=0; ij< result["landing_conversion"][key].length; ij++) {
+                            lading_max_visitor_count.push(result["landing_conversion"][key][ij] + result["landing_conversion"]["conversion_count"][ij]);
+                        }
+
                     }
                 })
 

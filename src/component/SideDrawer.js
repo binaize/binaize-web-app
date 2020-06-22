@@ -15,7 +15,7 @@ import PriorityHighIcon from "@material-ui/icons/PriorityHigh";
 import {ReactComponent as BinaizeWhiteLogo} from "../images/binaize-logo-white.svg";
 
 
-const drawerWidth = 300;
+const drawerWidth = 270;
 const exp_style = theme => ({
     root: {
         display: 'flex',

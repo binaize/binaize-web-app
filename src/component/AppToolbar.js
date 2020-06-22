@@ -20,7 +20,7 @@ import {REACT_APP_BASE_URL, REACT_APP_CLIENT_DETAILS} from "../config";
 // import {useHistory} from "react-router-dom";
 
 
-const drawerWidth = 300;
+const drawerWidth = 280;
 const exp_style = theme => ({
     root: {
         display: 'flex',
