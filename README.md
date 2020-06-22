@@ -14,6 +14,20 @@ scp -i "binaize-optimize.pem" ./theia-dev.env ubuntu@dev.app.binaize.com:~/binai
 cp binaize-ui/theia-dev.env binaize-ui/theia.env
 ```
 
+## To deploy in EC2 STAGING cluster
+
+```bash
+ssh -i "binaize-optimize.pem" ubuntu@staging.app.binaize.com
+sudo apt update
+sudo apt -y install docker.io
+sudo apt -y install docker-compose
+git clone https://github.com/binaize/binaize-ui.git
+cd binaize-ui
+git checkout staging
+scp -i "binaize-optimize.pem" ./theia-dev.env ubuntu@staging.app.binaize.com:~/binaize-ui/
+cp binaize-ui/theia-staging.env binaize-ui/theia.env
+```
+
 ## To deploy in EC2 PROD cluster
 
 ```bash
@@ -36,5 +50,5 @@ nohup sudo docker-compose -f docker-compose-theia.yaml up --build --remove-orpha
 
 # For re-deployment
 ```bash
-nohup sudo docker-compose -f docker-compose-theia.yaml up --build --remove-orphans theia >> ~/theia.out&
+nohup sudo docker-compose -f docker-compose-theia.yaml up --build --remove-orphans >> ~/theia.out&
 ```
