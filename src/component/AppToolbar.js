@@ -5,19 +5,19 @@ import Toolbar from "@material-ui/core/Toolbar";
 import SearchIcon from "@material-ui/icons/Search";
 import InputBase from "@material-ui/core/InputBase";
 import IconButton from "@material-ui/core/IconButton";
-import Badge from "@material-ui/core/Badge";
-import MailIcon from "@material-ui/icons/Mail";
-import NotificationsIcon from "@material-ui/icons/Notifications";
 import {AccountCircle} from "@material-ui/icons";
 import Typography from "@material-ui/core/Typography";
 import MoreIcon from "@material-ui/icons/MoreVert";
 import {fade} from "@material-ui/core";
 import {withStyles} from "@material-ui/core/styles";
 import {withRouter} from "react-router-dom";
-import {useHistory} from "react-router-dom";
 import AppBar from "@material-ui/core/AppBar";
 import {REACT_APP_BASE_URL, REACT_APP_CLIENT_DETAILS} from "../config";
-import $ from "jquery";
+// import $ from "jquery";
+// import Badge from "@material-ui/core/Badge";
+// import MailIcon from "@material-ui/icons/Mail";
+// import NotificationsIcon from "@material-ui/icons/Notifications";
+// import {useHistory} from "react-router-dom";
 
 
 const drawerWidth = 300;
