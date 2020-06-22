@@ -145,32 +145,43 @@ class ConversionDashboard extends React.Component {
     constructor(props) {
         super(props);
 
+        let startDate = new Date();
+
+        let today_date = startDate.getDate();
+        let today_month = startDate.getMonth();
+        let today_year = startDate.getFullYear();
+
         this.state = {
             access_token: localStorage.getItem("access_token"),
             creation_time: localStorage.getItem("creation_time"),
             start_yearMonthDate: '',
             end_yearMonthDate: '',
-            select_val: "",
-            options: [
-                {label: 'exp_2', value: '13e6f65bacbf4d74b8561e940287e604'},
-                {label: 'exp_1', value: '66f5d1fc432d47b994250688fd728ff7'}
-            ],
+
+            step_size_shop_funnel: '',
+            step_size_product_conversion: '',
+            step_size_landing_page: '',
+
             BarDataSession: {},
             BarDataVisitors: {},
             ConversionData: {},
+
             rows: [],
+
             SummaryDetails: {
                 summary_status: '',
                 summary_conclusion: '',
                 summary_recommendation: '',
             },
+
             bar_background_color: ['#2196f3', '#4caf50', '#ef6c00'],
             bar_background_hover_color: ['#006FBB', '#50B83C', '#DE3618'],
             variation_name2: ["Variation Yel", "Original", "Variation Blue"],
             experiment_names: [],
             experiment_ids: [],
+
             startDate: '',
             endDate: '',
+            today_yearMonthDate : today_year + '-' + this.pad(today_month + 1) + "-" + this.pad(today_date),
 
             shop_funnels: {},
             shop_funnels_summary: '',
@@ -187,6 +198,7 @@ class ConversionDashboard extends React.Component {
             shop_funnel_per: [],
             shop_funnel_count_per: [],
             shop_funnel_max_val: '',
+
             conv_per: [],
             product_visit_max_val: '',
             landing_page_max_val: '',
@@ -208,25 +220,20 @@ class ConversionDashboard extends React.Component {
 
     getAllData(start, end) {
 
-        let startDate = new Date();
+        const tickSizes = [
+            1, 2, 5,
+            10, 20, 50,
+            100, 200, 500,
+            1000, 2000, 5000,
+            10000, 20000, 50000,
+            100000, 200000, 500000,
+            1000000, 2000000, 5000000
+        ];
 
-        let today_date = startDate.getDate();
-        let today_month = startDate.getMonth();
-        let today_year = startDate.getFullYear();
-        let today_yearMonthDate = today_year + '-' + this.pad(today_month + 1) + "-" + this.pad(today_date);
-
-        this.setState({selected: this.state.selected})
         const params = new URLSearchParams({
             start_date: start || this.state.creation_time + 'T00-00-00',
-            end_date: end || today_yearMonthDate + 'T23-59-59'
+            end_date: end || this.state.today_yearMonthDate + 'T23-59-59'
         })
-
-
-
-
-        // console.log(today_yearMonthDate + 'T23-59-59')
-
-
 
         console.log(params.toString())
 
@@ -251,17 +258,31 @@ class ConversionDashboard extends React.Component {
                 let shop_funnel_count_data = ''
 
                 Object.keys(result["shop_funnel"]).sort().forEach((key) => {
-                    if (key === "count") {
+                    if (key === "visitor_count") {
                         shop_funnel_count_data = result["shop_funnel"][key];
                     } else if (key === "percentage") {
                         shop_funnel_per_data.push(result["shop_funnel"][key])
                     }
                 })
 
+                let max = Math.max.apply(null, shop_funnel_count_data)
+
+                for (let s = 0; s < tickSizes.length; s++) {
+                    console.log("-------" + max);
+                    let val = max/tickSizes[s]
+                    if (val < 6) {
+                        console.log(tickSizes[s]);
+                        this.setState({
+                            step_size_shop_funnel: tickSizes[s]
+                        })
+                        break
+                    }
+                }
+
                 this.setState({
                     shop_funnel_per: shop_funnel_per_data,
                     shop_funnel_count_per: shop_funnel_count_data,
-                    shop_funnel_max_val: Math.max.apply(null, shop_funnel_count_data)
+                    shop_funnel_max_val: max
                 })
 
                 // console.log("blah" + this.state.shop_funnel_max_value)
@@ -270,7 +291,7 @@ class ConversionDashboard extends React.Component {
 
                 // console.log(shop_funnel_per_data)
 
-                Object.keys(result["shop_funnel"]).sort().forEach((key) => {
+                Object.keys(result["shop_funnel"]).forEach((key) => {
 
                     let localData;
                     if (key === "percentage") {
@@ -376,7 +397,7 @@ class ConversionDashboard extends React.Component {
                 let i = 0;
 
                 let per_data = [];
-                let max_visitor_count
+                let max_visitor_count = ''
 
                 Object.keys(result["product_conversion"]).forEach((key) => {
                     if (key === "conversion_percentage") {
@@ -386,12 +407,28 @@ class ConversionDashboard extends React.Component {
                     }
                 })
 
-                // // console.log(max_visitor_count.sort())
-                // // console.log(Math.max.apply(null, max_visitor_count))
+                // console.log(max_visitor_count.sort())
+                // console.log(Math.max.apply(null, max_visitor_count))
+
+                let maxVal = Math.max.apply(null, max_visitor_count)
+
+                for (let r = 0; r < tickSizes.length; r++) {
+                    console.log("-------" + maxVal);
+                    let val = maxVal/tickSizes[r]
+                    if (val < 6) {
+                        console.log(tickSizes[r]);
+                        this.setState({
+                            step_size_product_conversion: tickSizes[r]
+                        })
+                        break
+                    }
+                }
+
+
 
                 this.setState({
                     conv_per: per_data,
-                    product_visit_max_val: Math.max.apply(null, max_visitor_count)
+                    product_visit_max_val: maxVal
                 })
 
                 Object.keys(result["product_conversion"]).forEach((key) => {
@@ -466,7 +503,7 @@ class ConversionDashboard extends React.Component {
 
                 this.setState({
                     product_conversion: {
-                        labels: result.products,
+                        labels: result["products"],
                         datasets: mainDataProduct
                     }
                 })
@@ -494,7 +531,7 @@ class ConversionDashboard extends React.Component {
 
                 let i = 0;
                 let landing_per_data = [];
-                let lading_max_visitor_count
+                let lading_max_visitor_count = ''
 
                 Object.keys(result["landing_conversion"]).forEach((key) => {
                     if (key === "conversion_percentage") {
@@ -504,9 +541,24 @@ class ConversionDashboard extends React.Component {
                     }
                 })
 
+                let maxVal = Math.max.apply(null, lading_max_visitor_count)
+
+                for (let r = 0; r < tickSizes.length; r++) {
+                    console.log("-------" + maxVal);
+                    let val = maxVal/tickSizes[r]
+                    if (val < 6) {
+                        console.log(tickSizes[r]);
+                        this.setState({
+                            step_size_landing_page: tickSizes[r]
+                        })
+                        break
+                    }
+                }
+
+
                 this.setState({
                     landing_per: landing_per_data,
-                    landing_page_max_val: Math.max.apply(null, lading_max_visitor_count)
+                    landing_page_max_val: maxVal
                 })
 
 
@@ -664,8 +716,7 @@ class ConversionDashboard extends React.Component {
                                 if (this.state.start_yearMonthDate !== "") {
                                     this.getAllData(this.state.start_yearMonthDate + 'T00-00-00', this.state.end_yearMonthDate + 'T23-59-59');
                                 } else {
-                                    this.getAllData(this.state.creation_time + 'T00-00-00', this.state.creation_time + 'T23-59-59');
-
+                                    this.getAllData(this.state.creation_time + 'T00-00-00', this.state.today_yearMonthDate + 'T23-59-59');
                                 }
                             }}
                         ><RefreshRoundedIcon/></Button>
@@ -698,7 +749,7 @@ class ConversionDashboard extends React.Component {
                         placeholder="Till Today"
                         size="lg"
                         style={{ width: 280, margin: "0% 0% 1% 5%", color: "#111"}}
-                        disabledDate={allowedRange(this.state.creation_time, '2022-10-01')}
+                        disabledDate={allowedRange(this.state.creation_time, this.state.today_yearMonthDate)}
                         onChange={(selectedStartEndDate) => {
 
                             function pad(n) {
@@ -729,7 +780,13 @@ class ConversionDashboard extends React.Component {
                                 this.getAllData(s_yearMonthDate + 'T00-00-00', e_yearMonthDate + 'T23-59-59')
 
                             }catch (e) {
-                                console.log(e)
+                                // console.log(e)
+
+                                this.setState({
+                                    start_yearMonthDate : ''
+                                })
+
+                                this.getAllData(this.state.creation_time + 'T00-00-00', this.state.today_yearMonthDate + 'T23-59-59');
                             }
 
                         }}
@@ -772,7 +829,7 @@ class ConversionDashboard extends React.Component {
                                                     return data['datasets'][0]['data'][tooltipItem['index']];
                                                 }
                                             },
-                                            displayColors: false
+                                            displayColors: false,
                                         },
 
                                         scales: {
@@ -796,7 +853,9 @@ class ConversionDashboard extends React.Component {
                                                 },
                                                 ticks: {
                                                     min: 0,
-                                                    max: (Math.round(this.state.shop_funnel_max_val / 100) + 2)  * 100,
+                                                    stepSize: this.state.step_size_shop_funnel,
+                                                    max: (Math.round(this.state.shop_funnel_max_val / this.state.step_size_shop_funnel) + 2)  * this.state.step_size_shop_funnel,
+                                                    // suggestedMax: 200,
                                                     callback: function (value) {
                                                         return value
                                                     }
@@ -807,7 +866,10 @@ class ConversionDashboard extends React.Component {
                                                 position: "left",
                                                 id: "y-axis-1",
                                                 ticks: {
-                                                    max: (Math.round(this.state.shop_funnel_max_val / 100) + 2)  * 100,
+                                                    min: 0,
+                                                    stepSize: this.state.step_size_shop_funnel,
+                                                    // suggestedMax: 200,
+                                                    max: (Math.round(this.state.shop_funnel_max_val / this.state.step_size_shop_funnel) + 2)  * this.state.step_size_shop_funnel,
                                                     callback: function (value) {
                                                         return value
                                                     }
@@ -855,14 +917,15 @@ class ConversionDashboard extends React.Component {
                                                 stacked: true,
                                                 ticks: {
                                                     min: 0,
-                                                    max: (Math.round(this.state.product_visit_max_val / 10) + 2) * 10,
+                                                    stepSize: this.state.step_size_product_conversion,
+                                                    max: (Math.round(this.state.product_visit_max_val / this.state.step_size_product_conversion) + 2) * this.state.step_size_product_conversion,
                                                     callback: function (value) {
                                                         return value
                                                     }
                                                 },
                                                 scaleLabel: {
                                                     display: true,
-                                                    labelString: "Unique Visitors"
+                                                    labelString: "# Unique Visitors"
                                                 }
                                             }]
                                         },
@@ -904,14 +967,15 @@ class ConversionDashboard extends React.Component {
                                                 stacked: true,
                                                 ticks: {
                                                     min: 0,
-                                                    max: (Math.round(this.state.landing_page_max_val / 100) + 2) * 100,
+                                                    stepSize: this.state.step_size_landing_page,
+                                                    max: (Math.round(this.state.landing_page_max_val / this.state.step_size_landing_page) + 2) * this.state.step_size_landing_page,
                                                     callback: function (value) {
                                                         return value
                                                     }
                                                 },
                                                 scaleLabel: {
                                                     display: true,
-                                                    labelString: "Unique Visitors"
+                                                    labelString: "# Unique Visitors"
                                                 }
                                             }]
                                         }
