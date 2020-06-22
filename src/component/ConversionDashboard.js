@@ -21,12 +21,13 @@ import Button from "@material-ui/core/Button";
 import RefreshRoundedIcon from "@material-ui/icons/RefreshRounded";
 
 import ChartDataLabels from 'chartjs-plugin-datalabels';
-import {DatePicker, DateRangePicker} from "rsuite";
+import {DateRangePicker} from "rsuite";
 import $ from "jquery";
 
 const {allowedRange} = DateRangePicker;
 
 const drawerWidth = 300;
+
 const exp_style = theme => ({
     root: {
         display: 'flex',
@@ -181,7 +182,7 @@ class ConversionDashboard extends React.Component {
 
             startDate: '',
             endDate: '',
-            today_yearMonthDate : today_year + '-' + this.pad(today_month + 1) + "-" + this.pad(today_date),
+            today_yearMonthDate: today_year + '-' + this.pad(today_month + 1) + "-" + this.pad(today_date),
 
             shop_funnels: {},
             shop_funnels_summary: '',
@@ -214,8 +215,6 @@ class ConversionDashboard extends React.Component {
     pad(n) {
         return n < 10 ? '0' + n : n
     }
-
-
 
 
     getAllData(start, end) {
@@ -268,10 +267,8 @@ class ConversionDashboard extends React.Component {
                 let max = Math.max.apply(null, shop_funnel_count_data)
 
                 for (let s = 0; s < tickSizes.length; s++) {
-                    console.log("-------" + max);
-                    let val = max/tickSizes[s]
+                    let val = max / tickSizes[s]
                     if (val < 6) {
-                        console.log(tickSizes[s]);
                         this.setState({
                             step_size_shop_funnel: tickSizes[s]
                         })
@@ -299,7 +296,7 @@ class ConversionDashboard extends React.Component {
                         // console.log(result["shop_funnel"][key])
                         // console.log(shop_funnel_per_data)
                         localData = {
-                            label: key,
+                            label: "Traffic Percentage",
                             type: 'line',
                             fill: false,
                             tooltips: {
@@ -316,7 +313,7 @@ class ConversionDashboard extends React.Component {
                                 display: true,
                                 formatter: (value, context) => {
                                     // console.log("asdasdasdasdasdddddddddddddddddddddddddddddddddd")
-                                    return this.state.shop_funnel_per[0][context.dataIndex]  + " %";
+                                    return this.state.shop_funnel_per[0][context.dataIndex] + " %";
                                 },
                                 align: "top",
                                 anchor: "end",
@@ -329,7 +326,7 @@ class ConversionDashboard extends React.Component {
                         };
                     } else {
                         localData = {
-                            label: key,
+                            label: "Visitor Count",
                             backgroundColor: this.state.bar_background_color[i],
                             borderColor: this.state.bar_background_color[i],
                             borderWidth: 1,
@@ -361,7 +358,6 @@ class ConversionDashboard extends React.Component {
                     shop_funnels_summary_conclusion_html = $.parseHTML(shop_funnels_summary_conclusion_str)
 
                 $shop_funnels_conclusion.html(shop_funnels_summary_conclusion_html);
-
 
 
                 this.setState({
@@ -414,7 +410,7 @@ class ConversionDashboard extends React.Component {
 
                 for (let r = 0; r < tickSizes.length; r++) {
                     console.log("-------" + maxVal);
-                    let val = maxVal/tickSizes[r]
+                    let val = maxVal / tickSizes[r]
                     if (val < 6) {
                         console.log(tickSizes[r]);
                         this.setState({
@@ -423,7 +419,6 @@ class ConversionDashboard extends React.Component {
                         break
                     }
                 }
-
 
 
                 this.setState({
@@ -437,7 +432,7 @@ class ConversionDashboard extends React.Component {
 
                     if (key === "visitor_count") {
                         localData = {
-                            label: key,
+                            label: "Visitor Count",
                             backgroundColor: this.state.bar_background_color[i],
                             borderColor: this.state.bar_background_color[i],
                             borderWidth: 1,
@@ -455,7 +450,7 @@ class ConversionDashboard extends React.Component {
                     } else if (key === "conversion_count") {
 
                         localData = {
-                            label: key,
+                            label: "Conversion Count",
                             backgroundColor: this.state.bar_background_color[i],
                             borderColor: this.state.bar_background_color[i],
                             borderWidth: 1,
@@ -498,7 +493,6 @@ class ConversionDashboard extends React.Component {
                     product_conversion_conclusion_html = $.parseHTML(product_conversion_conclusion_str)
 
                 $product_conversion_conclusion.html(product_conversion_conclusion_html);
-
 
 
                 this.setState({
@@ -545,7 +539,7 @@ class ConversionDashboard extends React.Component {
 
                 for (let r = 0; r < tickSizes.length; r++) {
                     console.log("-------" + maxVal);
-                    let val = maxVal/tickSizes[r]
+                    let val = maxVal / tickSizes[r]
                     if (val < 6) {
                         console.log(tickSizes[r]);
                         this.setState({
@@ -580,7 +574,7 @@ class ConversionDashboard extends React.Component {
 
                     if (key === "visitor_count") {
                         localData = {
-                            label: key,
+                            label: "Visitor Count",
                             backgroundColor: this.state.bar_background_color[i],
                             borderColor: this.state.bar_background_color[i],
                             borderWidth: 1,
@@ -598,7 +592,7 @@ class ConversionDashboard extends React.Component {
                     } else if (key === "conversion_count") {
 
                         localData = {
-                            label: key,
+                            label: "Conversion Count",
                             backgroundColor: this.state.bar_background_color[i],
                             borderColor: this.state.bar_background_color[i],
                             borderWidth: 1,
@@ -681,8 +675,8 @@ class ConversionDashboard extends React.Component {
 
             })
             .catch(err => {
-            console.log(err);
-        });
+                console.log(err);
+            });
 
     }
 
@@ -748,7 +742,7 @@ class ConversionDashboard extends React.Component {
                     <DateRangePicker
                         placeholder="Till Today"
                         size="lg"
-                        style={{ width: 280, margin: "0% 0% 1% 5%", color: "#111"}}
+                        style={{width: 280, margin: "0% 0% 1% 5%", color: "#111"}}
                         disabledDate={allowedRange(this.state.creation_time, this.state.today_yearMonthDate)}
                         onChange={(selectedStartEndDate) => {
 
@@ -756,7 +750,7 @@ class ConversionDashboard extends React.Component {
                                 return n < 10 ? '0' + n : n
                             }
 
-                            try{
+                            try {
                                 let startDate = selectedStartEndDate[0]
                                 let endDate = selectedStartEndDate[1]
 
@@ -779,11 +773,11 @@ class ConversionDashboard extends React.Component {
 
                                 this.getAllData(s_yearMonthDate + 'T00-00-00', e_yearMonthDate + 'T23-59-59')
 
-                            }catch (e) {
+                            } catch (e) {
                                 // console.log(e)
 
                                 this.setState({
-                                    start_yearMonthDate : ''
+                                    start_yearMonthDate: ''
                                 })
 
                                 this.getAllData(this.state.creation_time + 'T00-00-00', this.state.today_yearMonthDate + 'T23-59-59');
@@ -809,75 +803,78 @@ class ConversionDashboard extends React.Component {
                             </div>
 
 
-                            <div style={{margin: "0% 0.5% 1% 1.5%", width: "80%"}}>
+                            <div style={{margin: "0% 0.5% 1% 1.5%", width: "96%"}}>
 
                                 <hr/>
-                                <Bar
-                                    width={45}
-                                    height={20}
-                                    type={'bar'}
-                                    data={this.state.shop_funnels}
-                                    redraw={this.state.shop_funnels}
-                                    options={{
-                                        maintainAspectRatio: true,
-                                        tooltips: {
-                                            callbacks: {
-                                                title: function(tooltipItem, data) {
-                                                    return data['labels'][tooltipItem[0]['index']];
+
+                                <center>
+                                    <Bar
+                                        width={45}
+                                        height={20}
+                                        type={'bar'}
+                                        data={this.state.shop_funnels}
+                                        redraw={this.state.shop_funnels}
+                                        options={{
+                                            maintainAspectRatio: true,
+                                            tooltips: {
+                                                callbacks: {
+                                                    title: function (tooltipItem, data) {
+                                                        return data['labels'][tooltipItem[0]['index']];
+                                                    },
+                                                    label: function (tooltipItem, data) {
+                                                        return data['datasets'][0]['data'][tooltipItem['index']];
+                                                    }
                                                 },
-                                                label: function(tooltipItem, data) {
-                                                    return data['datasets'][0]['data'][tooltipItem['index']];
-                                                }
+                                                displayColors: false,
                                             },
-                                            displayColors: false,
-                                        },
 
-                                        scales: {
-                                            xAxes: [{
-                                                barPercentage: 0.5,
-                                                linePercentage: 0.5
-                                            }],
-                                            yAxes: [{
-                                                type: "linear", // only linear but allow scale type registration. This allows extensions to exist solely for log scale for instance
-                                                display: true,
-                                                position: "left",
-                                                id: "y-axis-2",
-
-                                                // grid line settings
-                                                gridLines: {
-                                                    drawOnChartArea: false, // only want the grid lines for one axis to show up
-                                                },
-                                                scaleLabel: {
+                                            scales: {
+                                                xAxes: [{
+                                                    barPercentage: 0.5,
+                                                    linePercentage: 0.5
+                                                }],
+                                                yAxes: [{
+                                                    type: "linear", // only linear but allow scale type registration. This allows extensions to exist solely for log scale for instance
                                                     display: true,
-                                                    labelString: "# Visitors"
-                                                },
-                                                ticks: {
-                                                    min: 0,
-                                                    stepSize: this.state.step_size_shop_funnel,
-                                                    max: (Math.round(this.state.shop_funnel_max_val / this.state.step_size_shop_funnel) + 2)  * this.state.step_size_shop_funnel,
-                                                    // suggestedMax: 200,
-                                                    callback: function (value) {
-                                                        return value
-                                                    }
-                                                },
-                                            },{
-                                                type: "linear", // only linear but allow scale type registration. This allows extensions to exist solely for log scale for instance
-                                                display: false,
-                                                position: "left",
-                                                id: "y-axis-1",
-                                                ticks: {
-                                                    min: 0,
-                                                    stepSize: this.state.step_size_shop_funnel,
-                                                    // suggestedMax: 200,
-                                                    max: (Math.round(this.state.shop_funnel_max_val / this.state.step_size_shop_funnel) + 2)  * this.state.step_size_shop_funnel,
-                                                    callback: function (value) {
-                                                        return value
-                                                    }
-                                                },
-                                            }]
-                                        }
-                                    }}>
-                                </Bar>
+                                                    position: "left",
+                                                    id: "y-axis-2",
+
+                                                    // grid line settings
+                                                    gridLines: {
+                                                        drawOnChartArea: false, // only want the grid lines for one axis to show up
+                                                    },
+                                                    scaleLabel: {
+                                                        display: true,
+                                                        labelString: "# Visitors"
+                                                    },
+                                                    ticks: {
+                                                        min: 0,
+                                                        stepSize: this.state.step_size_shop_funnel,
+                                                        max: (Math.round(this.state.shop_funnel_max_val / this.state.step_size_shop_funnel) + 2) * this.state.step_size_shop_funnel,
+                                                        // suggestedMax: 200,
+                                                        callback: function (value) {
+                                                            return value
+                                                        }
+                                                    },
+                                                }, {
+                                                    type: "linear", // only linear but allow scale type registration. This allows extensions to exist solely for log scale for instance
+                                                    display: false,
+                                                    position: "left",
+                                                    id: "y-axis-1",
+                                                    ticks: {
+                                                        min: 0,
+                                                        stepSize: this.state.step_size_shop_funnel,
+                                                        // suggestedMax: 200,
+                                                        max: (Math.round(this.state.shop_funnel_max_val / this.state.step_size_shop_funnel) + 2) * this.state.step_size_shop_funnel,
+                                                        callback: function (value) {
+                                                            return value
+                                                        }
+                                                    },
+                                                }]
+                                            }
+                                        }}>
+                                    </Bar>
+                                </center>
                             </div>
                         </CardContent>
                     </Card>
@@ -896,7 +893,7 @@ class ConversionDashboard extends React.Component {
                                 <p id={"product_conversion_conclusion"}/>
                             </div>
 
-                            <div style={{margin: "0% 0.5% 1% 1.5%", width: "85%"}}>
+                            <div style={{margin: "0% 0.5% 1% 1.5%", width: "96%"}}>
 
                                 <hr/>
 
@@ -949,7 +946,7 @@ class ConversionDashboard extends React.Component {
                                 <p id={"landing_page_conversion_conclusion"}/>
                             </div>
 
-                            <div style={{margin: "0% 0.5% 1% 1.5%", width: "80%"}}>
+                            <div style={{margin: "0% 0.5% 1% 1.5%", width: "96%"}}>
                                 <hr/>
                                 <Bar
                                     width={50}

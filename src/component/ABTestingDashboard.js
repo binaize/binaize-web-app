@@ -607,8 +607,9 @@ class ABTestingDashboard extends React.Component {
                         localData.push(<Link url={url}>{result[i].variation_name}</Link>);
                         localData.push(result[i]["num_session"]);
                         localData.push(result[i]["num_visitor"]);
-                        localData.push(result[i]["visitor_converted"]);
+                        localData.push(result[i]["goal_conversion_count"]);
                         localData.push(result[i]["goal_conversion"]);
+                        localData.push(result[i]["sales_conversion_count"]);
                         localData.push(result[i]["sales_conversion"]);
 
                         localRows.push(localData);
@@ -740,8 +741,9 @@ class ABTestingDashboard extends React.Component {
                                     <TableCell>Variant</TableCell>
                                     <TableCell align="left">Sessions</TableCell>
                                     <TableCell align="left">Visitors</TableCell>
-                                    <TableCell align="left">Visitors Converted</TableCell>
+                                    <TableCell align="left">Goal Conversion (Count)</TableCell>
                                     <TableCell align="left">Goal Conversion (%)</TableCell>
+                                    <TableCell align="left">Sales Conversion (Count)</TableCell>
                                     <TableCell align="left">Sales Conversion (%)</TableCell>
                                 </TableRow>
                             </TableHead>
@@ -756,6 +758,7 @@ class ABTestingDashboard extends React.Component {
                                         <TableCell align="left">{row[3]}</TableCell>
                                         <TableCell align="left">{row[4]}</TableCell>
                                         <TableCell align="left">{row[5]}</TableCell>
+                                        <TableCell align="left">{row[6]}</TableCell>
                                     </TableRow>
                                 ))}
                             </TableBody>
@@ -766,7 +769,7 @@ class ABTestingDashboard extends React.Component {
 
                     <Card style={{margin: "2% 5%"}}>
                         <CardContent>
-                            <div style={{margin: "0% 0.5% 1% 1.5%", width: "97%"}}>
+                            <div style={{margin: "0% 0.5% 1% 1.5%", width: "96%"}}>
                                 <h3>
                                     Session Over Time
                                 </h3>
@@ -800,7 +803,7 @@ class ABTestingDashboard extends React.Component {
                     <Divider style={{margin: "1% 5%"}}/>
                     <Card style={{margin: "2% 5%"}}>
                         <CardContent>
-                            <div style={{margin: "0% 0.5% 1% 1.5%", width: "97%"}}>
+                            <div style={{margin: "0% 0.5% 1% 1.5%", width: "96%"}}>
                                 <h3>
                                     Visitor Over Time
                                 </h3>
@@ -835,7 +838,7 @@ class ABTestingDashboard extends React.Component {
                     <Divider style={{margin: "1% 5%"}}/>
                     <Card style={{margin: "2% 5%"}}>
                         <CardContent>
-                            <div style={{margin: "0% 0.5% 1% 1.5%", width: "97%"}}>
+                            <div style={{margin: "0% 0.5% 1% 1.5%", width: "96%"}}>
                                 <h3>
                                     Goal Conversion Over Time
                                 </h3>
