@@ -19,6 +19,7 @@ import "./Experiments.css"
 import {REACT_APP_BASE_URL, REACT_APP_URL_EXPERIMENTS} from "../config"
 import AppToolbar from "./AppToolbar";
 import SideDrawer from "./SideDrawer";
+import Demo from "./SideDrawer_rsuit";
 
 const drawerWidth = 300;
 const exp_style = theme => ({
@@ -187,8 +188,8 @@ class Experiments extends React.Component {
 
                 <AppToolbar/>
 
-                <SideDrawer/>
-
+                {/*<SideDrawer/>*/}
+                <Demo active={localStorage.getItem("activeKey")}/>
                 <main className={classes.content}>
                     <div className={classes.toolbar}/>
 

@@ -1,0 +1,60 @@
+
+.custom-side-drawer {
+    width: 300px !important;
+    z-index: 1200 !important;
+    background-color: #1A2330 !important;
+}
+
+.rs-sidenav-default {
+    flex: 1 0 auto;
+    height: 100%;
+    display: flex;
+    outline: 0;
+    z-index: 1200;
+    position: fixed;
+    overflow-y: auto;
+    flex-direction: column;
+    width: 300px !important;
+    background-color: #1A2330 !important;
+}
+
+
+.rs-sidenav-default.rs-sidenav-collapse-in .rs-dropdown-menu > li > .rs-dropdown-item-content,
+.rs-sidenav-default.rs-sidenav-collapsing .rs-dropdown-menu > li > .rs-dropdown-item-content,
+.rs-sidenav-default.rs-sidenav-collapse-in .rs-dropdown-item-content > .rs-dropdown-menu-toggle,
+.rs-sidenav-default.rs-sidenav-collapsing .rs-dropdown-item-content > .rs-dropdown-menu-toggle {
+    color: #FFFFFF !important;
+}
+
+.rs-nav-item > .rs-nav-item-content {
+    color: #FFFFFF !important;
+}
+
+.rs-sidenav-default.rs-sidenav-collapse-in .rs-dropdown-menu.rs-dropdown-menu-active ~ .rs-dropdown-toggle, .rs-sidenav-default.rs-sidenav-collapsing .rs-dropdown-menu.rs-dropdown-menu-active ~ .rs-dropdown-toggle, .rs-sidenav-default.rs-sidenav-collapse-out .rs-dropdown-menu.rs-dropdown-menu-active ~ .rs-dropdown-toggle {
+    color: #1675e0 !important;
+}
+
+.rs-sidenav-default.rs-sidenav-collapse-in .rs-dropdown-menu > li.rs-dropdown-item-active > .rs-dropdown-item-content, .rs-sidenav-default.rs-sidenav-collapsing .rs-dropdown-menu > li.rs-dropdown-item-active > .rs-dropdown-item-content, .rs-sidenav-default.rs-sidenav-collapse-in .rs-dropdown-menu > li.rs-dropdown-item-active > .rs-dropdown-item-content:hover, .rs-sidenav-default.rs-sidenav-collapsing .rs-dropdown-menu > li.rs-dropdown-item-active > .rs-dropdown-item-content:hover, .rs-sidenav-default.rs-sidenav-collapse-in .rs-dropdown-menu > li.rs-dropdown-item-active > .rs-dropdown-item-content:focus, .rs-sidenav-default.rs-sidenav-collapsing .rs-dropdown-menu > li.rs-dropdown-item-active > .rs-dropdown-item-content:focus {
+    color: #FFFFFF !important;
+    background-color: #0A0E13 !important;
+}
+.rs-nav-item > .rs-nav-item-content:hover {
+    color: #1675e0 !important;
+    background-color: #0A0E13 !important;
+}
+
+.rs-btn .rs-btn-subtle .rs-dropdown-toggle {
+    color: #1675e0 !important;
+    background-color: #0A0E13 !important;
+}
+
+.rs-nav.rs-nav-vertical:hover .rs-dropdown > .rs-dropdown-toggle:hover {
+    color: #1675e0 !important;
+    background-color: #0A0E13 !important;
+}
+
+.rs-sidenav-default.rs-sidenav-collapse-in:hover .rs-dropdown-menu > li > .rs-dropdown-item-content:hover {
+    color: #1675e0 !important;
+    background-color: #0A0E13 !important;
+}
+

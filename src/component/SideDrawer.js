@@ -126,12 +126,13 @@ class SideDrawer extends React.Component {
         const {classes} = this.props;
 
         return (<Drawer
-            variant="permanent"
+            variant="persistent"
+            anchor="left"
+            open={true}
             className={classes.drawer}
             classes={{
                 paper: classes.drawerPaper,
-            }}
-            anchor="left">
+            }}>
 
             <div className={classes.toolbar}>
                 <BinaizeWhiteLogo

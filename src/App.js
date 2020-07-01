@@ -11,6 +11,7 @@ import ConversionDashboard from "./component/ConversionDashboard";
 import ABTestingDashboard from "./component/ABTestingDashboard";
 
 class App extends React.Component {
+
     render() {
         return (
             <AppProvider i18n={enTranslations}>

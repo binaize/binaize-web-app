@@ -23,6 +23,11 @@ import RefreshRoundedIcon from "@material-ui/icons/RefreshRounded";
 import ChartDataLabels from 'chartjs-plugin-datalabels';
 import {DateRangePicker} from "rsuite";
 import $ from "jquery";
+import Demo from "./SideDrawer_rsuit";
+import FormControl from "@material-ui/core/FormControl";
+import InputLabel from "@material-ui/core/InputLabel";
+import Select from "@material-ui/core/Select";
+import MenuItem from "@material-ui/core/MenuItem";
 
 const {allowedRange} = DateRangePicker;
 
@@ -121,8 +126,9 @@ const exp_style = theme => ({
         },
     },
     formControl: {
-        margin: theme.spacing(1),
+        margin: "0.5% 0% 0% 2%",
         minWidth: 300,
+
     },
     selectEmpty: {
         marginTop: theme.spacing(2),
@@ -141,10 +147,15 @@ const exp_style = theme => ({
     }
 })
 
+
 class ConversionDashboard extends React.Component {
 
     constructor(props) {
         super(props);
+
+        this.shop_funnel_ref = React.createRef();
+        this.product_conversion_ref = React.createRef();
+        this.landing_page_ref = React.createRef();
 
         let startDate = new Date();
 
@@ -157,6 +168,15 @@ class ConversionDashboard extends React.Component {
             creation_time: localStorage.getItem("creation_time"),
             start_yearMonthDate: '',
             end_yearMonthDate: '',
+
+            experiment_names: [
+              "default-spo",
+              "disabled-spo",
+              "default-spo_disabled-spo_subscription",
+            ],
+
+            select_val: '',
+            barWidth: '',
 
             step_size_shop_funnel: '',
             step_size_product_conversion: '',
@@ -177,7 +197,7 @@ class ConversionDashboard extends React.Component {
             bar_background_color: ['#2196f3', '#4caf50', '#ef6c00'],
             bar_background_hover_color: ['#006FBB', '#50B83C', '#DE3618'],
             variation_name2: ["Variation Yel", "Original", "Variation Blue"],
-            experiment_names: [],
+
             experiment_ids: [],
 
             startDate: '',
@@ -188,6 +208,10 @@ class ConversionDashboard extends React.Component {
             shop_funnels_summary: '',
             shop_funnels_conclusion: '',
 
+            full_product_data : {
+                tags: [0,0],
+                results: [0]
+            },
             product_conversion: {},
             product_conversion_summary: '',
             product_conversion_conclusion: '',
@@ -215,6 +239,168 @@ class ConversionDashboard extends React.Component {
     pad(n) {
         return n < 10 ? '0' + n : n
     }
+
+    getProductTag(nn) {
+
+        if (this.state.full_product_data.results[nn]["products"].length <= 3) {
+            this.setState({
+                barWidth: 0.2
+            })
+        }else {
+            this.setState({
+                barWidth: 0.3
+            })
+        }
+
+
+
+
+        this.setState({
+            select_val: nn,
+            full_product_data_tags: this.state.full_product_data.tags
+        })
+
+        console.log(this.state.select_val);
+
+        const tickSizes = [
+            1, 2, 5,
+            10, 20, 50,
+            100, 200, 500,
+            1000, 2000, 5000,
+            10000, 20000, 50000,
+            100000, 200000, 500000,
+            1000000, 2000000, 5000000
+        ];
+
+        let mainDataProduct = [];
+
+
+        let per_data = [];
+        let max_visitor_count = []
+
+
+
+        Object.keys(this.state.full_product_data.results[nn]["product_conversion"]).forEach((key) => {
+            if (key === "conversion_percentage") {
+                per_data.push(this.state.full_product_data.results[nn]["product_conversion"][key])
+            } else if (key === "non_conversion_count") {
+
+                for(let ij=0; ij< this.state.full_product_data.results[nn]["product_conversion"][key].length; ij++) {
+                    max_visitor_count.push(this.state.full_product_data.results[nn]["product_conversion"][key][ij] + this.state.full_product_data.results[nn]["product_conversion"]["conversion_count"][ij]);
+                }
+            }
+        })
+
+
+        console.log("MAX")
+        console.log(max_visitor_count)
+        // console.log(Math.max.apply(null, max_visitor_count))
+
+
+        let maxVal = Math.max.apply(null, max_visitor_count)
+
+        for (let r = 0; r < tickSizes.length; r++) {
+            console.log("-------" + maxVal);
+            let val = maxVal / tickSizes[r]
+            if (val < 6) {
+                console.log(tickSizes[r]);
+                this.setState({
+                    step_size_product_conversion: tickSizes[r]
+                })
+                break
+            }
+        }
+
+
+        this.setState({
+            conv_per: per_data,
+            product_visit_max_val: maxVal
+        })
+
+        let i = 0;
+
+        Object.keys(this.state.full_product_data.results[nn]["product_conversion"]).forEach((key) => {
+
+            let localData;
+
+            if (key === "non_conversion_count") {
+                localData = {
+                    label: "Non Conversion Count",
+                    backgroundColor: this.state.bar_background_color[i],
+                    borderColor: this.state.bar_background_color[i],
+                    borderWidth: 1,
+                    hoverBackgroundColor: this.state.bar_background_hover_color[i],
+                    hoverBorderColor: this.state.bar_background_hover_color[i],
+                    data: this.state.full_product_data.results[nn]["product_conversion"][key],
+                    datalabels: {
+                        display: false,
+                    }
+                }
+
+                i = i + 1
+                mainDataProduct.push(localData);
+
+            } else if (key === "conversion_count") {
+
+                localData = {
+                    label: "Conversion Count",
+                    backgroundColor: this.state.bar_background_color[i],
+                    borderColor: this.state.bar_background_color[i],
+                    borderWidth: 1,
+                    hoverBackgroundColor: this.state.bar_background_hover_color[i],
+                    hoverBorderColor: this.state.bar_background_hover_color[i],
+                    data: this.state.full_product_data.results[nn]["product_conversion"][key],
+
+                    datalabels: {
+                        display: true,
+                        formatter: (value, context) => {
+                            return this.state.conv_per[0][context.dataIndex] + "%";
+                        },
+                        align: "top",
+                        anchor: "end",
+                        clip: true,
+                        font: {
+                            size: "16",
+                            weight: "bold"
+                        }
+                    }
+                }
+
+                i = i + 1
+                mainDataProduct.push(localData);
+
+            }
+
+
+        });
+
+
+        let $product_conversion_summary = $("#product_conversion_summary"),
+            product_conversion_summary_str = this.state.full_product_data.results[nn]["summary"],
+            product_conversion_summary_html = $.parseHTML(product_conversion_summary_str)
+
+        $product_conversion_summary.html(product_conversion_summary_html);
+
+        let $product_conversion_conclusion = $("#product_conversion_conclusion"),
+            product_conversion_conclusion_str = this.state.full_product_data.results[nn]["conclusion"],
+            product_conversion_conclusion_html = $.parseHTML(product_conversion_conclusion_str)
+
+        $product_conversion_conclusion.html(product_conversion_conclusion_html);
+
+
+        this.setState({
+            product_conversion: {
+                labels: this.state.full_product_data.results[nn]["products"],
+                datasets: mainDataProduct
+            }
+        })
+
+        let shop_fun_ref = this.shop_funnel_ref.chartInstance
+        shop_fun_ref.update()
+
+
+    }
+
 
 
     getAllData(start, end) {
@@ -365,12 +551,17 @@ class ConversionDashboard extends React.Component {
                         labels: result.pages,
                         datasets: mainDataFunnel
                     }
-                })
+                });
+
+                let shop_fun_ref = this.shop_funnel_ref.chartInstance
+                shop_fun_ref.update()
+
 
             })
             .catch(err => {
                 console.log(err);
             });
+
 
 
         // PRODUCT CONVERSION API CALL
@@ -383,127 +574,17 @@ class ConversionDashboard extends React.Component {
             }
         })
             .then(response => response.json())
-            .then(result => {
-
-                let mainDataProduct = [];
-                let i = 0;
-
-                let per_data = [];
-                let max_visitor_count = []
-
-                Object.keys(result["product_conversion"]).forEach((key) => {
-                    if (key === "conversion_percentage") {
-                        per_data.push(result["product_conversion"][key])
-                    } else if (key === "visitor_count") {
-
-                        for(let ij=0; ij< result["product_conversion"][key].length; ij++) {
-                            max_visitor_count.push(result["product_conversion"][key][ij] + result["product_conversion"]["conversion_count"][ij]);
-                        }
-
-
-                    }
-                })
-
-                console.log("MAX")
-                console.log(max_visitor_count)
-                // console.log(Math.max.apply(null, max_visitor_count))
-
-
-                let maxVal = Math.max.apply(null, max_visitor_count)
-
-                for (let r = 0; r < tickSizes.length; r++) {
-                    console.log("-------" + maxVal);
-                    let val = maxVal / tickSizes[r]
-                    if (val < 6) {
-                        console.log(tickSizes[r]);
-                        this.setState({
-                            step_size_product_conversion: tickSizes[r]
-                        })
-                        break
-                    }
-                }
-
+            .then(product_result => {
 
                 this.setState({
-                    conv_per: per_data,
-                    product_visit_max_val: maxVal
-                })
-
-                Object.keys(result["product_conversion"]).forEach((key) => {
-
-                    let localData;
-
-                    if (key === "visitor_count") {
-                        localData = {
-                            label: "Visitor Count",
-                            backgroundColor: this.state.bar_background_color[i],
-                            borderColor: this.state.bar_background_color[i],
-                            borderWidth: 1,
-                            hoverBackgroundColor: this.state.bar_background_hover_color[i],
-                            hoverBorderColor: this.state.bar_background_hover_color[i],
-                            data: result["product_conversion"][key],
-                            datalabels: {
-                                display: false,
-                            }
-                        }
-
-                        i = i + 1
-                        mainDataProduct.push(localData);
-
-                    } else if (key === "conversion_count") {
-
-                        localData = {
-                            label: "Conversion Count",
-                            backgroundColor: this.state.bar_background_color[i],
-                            borderColor: this.state.bar_background_color[i],
-                            borderWidth: 1,
-                            hoverBackgroundColor: this.state.bar_background_hover_color[i],
-                            hoverBorderColor: this.state.bar_background_hover_color[i],
-                            data: result["product_conversion"][key],
-
-                            datalabels: {
-                                display: true,
-                                formatter: (value, context) => {
-                                    return this.state.conv_per[0][context.dataIndex] + "%";
-                                },
-                                align: "top",
-                                anchor: "end",
-                                clip: true,
-                                font: {
-                                    size: "16",
-                                    weight: "bold"
-                                }
-                            }
-                        }
-
-                        i = i + 1
-                        mainDataProduct.push(localData);
-
-                    }
-
-
-                });
-
-
-                let $product_conversion_summary = $("#product_conversion_summary"),
-                    product_conversion_summary_str = result["summary"],
-                    product_conversion_summary_html = $.parseHTML(product_conversion_summary_str)
-
-                $product_conversion_summary.html(product_conversion_summary_html);
-
-                let $product_conversion_conclusion = $("#product_conversion_conclusion"),
-                    product_conversion_conclusion_str = result["conclusion"],
-                    product_conversion_conclusion_html = $.parseHTML(product_conversion_conclusion_str)
-
-                $product_conversion_conclusion.html(product_conversion_conclusion_html);
-
-
-                this.setState({
-                    product_conversion: {
-                        labels: result["products"],
-                        datasets: mainDataProduct
+                    full_product_data: {
+                        results: product_result["results"],
+                        tags: product_result["tags"]
                     }
                 })
+
+                this.getProductTag(0);
+
 
             })
             .catch(err => {
@@ -533,7 +614,7 @@ class ConversionDashboard extends React.Component {
                 Object.keys(result["landing_conversion"]).forEach((key) => {
                     if (key === "conversion_percentage") {
                         landing_per_data.push(result["landing_conversion"][key])
-                    } else if (key === "visitor_count") {
+                    } else if (key === "non_conversion_count") {
                         // lading_max_visitor_count = result["landing_conversion"][key]
 
                         for(let ij=0; ij< result["landing_conversion"][key].length; ij++) {
@@ -567,22 +648,10 @@ class ConversionDashboard extends React.Component {
                 Object.keys(result["landing_conversion"]).forEach((key) => {
 
                     let localData = {}
-                    // localData = {
-                    //     label: key,
-                    //     backgroundColor: this.state.bar_background_color[i],
-                    //     borderColor: this.state.bar_background_color[i],
-                    //     borderWidth: 1,
-                    //     hoverBackgroundColor: this.state.bar_background_hover_color[i],
-                    //     hoverBorderColor: this.state.bar_background_hover_color[i],
-                    //     data: result["landing_conversion"][key]
-                    // }
-                    // i = i + 1
-                    // mainDataLanding.push(localData);
 
-
-                    if (key === "visitor_count") {
+                    if (key === "non_conversion_count") {
                         localData = {
-                            label: "Visitor Count",
+                            label: "Non Conversion Count",
                             backgroundColor: this.state.bar_background_color[i],
                             borderColor: this.state.bar_background_color[i],
                             borderWidth: 1,
@@ -680,6 +749,9 @@ class ConversionDashboard extends React.Component {
                     }
                 })
 
+                let shop_fun_ref = this.shop_funnel_ref.chartInstance
+                shop_fun_ref.update()
+
 
             })
             .catch(err => {
@@ -701,7 +773,8 @@ class ConversionDashboard extends React.Component {
 
                 <AppToolbar/>
 
-                <SideDrawer/>
+                {/*<SideDrawer/>*/}
+                <Demo active={localStorage.getItem("activeKey")}/>
 
                 {/* MAIN LAYOUT */}
                 <main className={classes.content}>
@@ -723,28 +796,6 @@ class ConversionDashboard extends React.Component {
                             }}
                         ><RefreshRoundedIcon/></Button>
 
-                        {/*<FormControl variant="outlined" className={classes.formControl}>*/}
-                        {/*    <InputLabel id="demo-simple-select-outlined-label">Experiment Name</InputLabel>*/}
-                        {/*    <Select*/}
-                        {/*        labelId="demo-simple-select-outlined-label"*/}
-                        {/*        id="demo-simple-select-outlined"*/}
-                        {/*        value={this.state.select_val}*/}
-                        {/*        onChange={(e) => {*/}
-                        {/*            this.setState({select_val: e.target.value})*/}
-                        {/*            this.getSessionData(e.target.value);*/}
-                        {/*        }}*/}
-                        {/*        label="Experiment Name">*/}
-
-                        {/*        {this.state.experiment_names.map((exp_name) => (*/}
-                        {/*            <MenuItem className={classes.expMenu} value={exp_name[1]}>{exp_name[0]}</MenuItem>*/}
-                        {/*        ))}*/}
-
-                        {/*        /!*<MenuItem value={"13e6f65bacbf4d74b8561e940287e604"} style={{color: "black"}}>Product*!/*/}
-                        {/*        /!*    page design</MenuItem>*!/*/}
-                        {/*        /!*<MenuItem value={"66f5d1fc432d47b994250688fd728ff7"} style={{color: "black"}}>Home page*!/*/}
-                        {/*        /!*    messaging</MenuItem>*!/*/}
-                        {/*    </Select>*/}
-                        {/*</FormControl>*/}
                     </div>
 
                     <DateRangePicker
@@ -804,24 +855,23 @@ class ConversionDashboard extends React.Component {
                             <h3 style={{margin: "0.5% 0% 0% 2%"}}>
                                 SHOP FUNNEL ANALYSIS
                             </h3>
-                            <Divider/>
+                            <Divider style={{margin: "1% 2%"}}/>
                             <div style={{padding: "0.5%", margin: "1% 0% 0% 2%", width: "97%"}}>
                                 <p id={"shop_funnels_summary"}/>
                                 <p id={"shop_funnels_conclusion"}/>
                             </div>
 
-
                             <div style={{margin: "0% 0.5% 1% 1.5%", width: "96%"}}>
 
-                                <hr/>
+                                <Divider style={{margin: "1% 1%"}}/>
 
                                 <center>
                                     <Bar
                                         width={45}
                                         height={20}
                                         type={'bar'}
+                                        ref={(reference) => this.shop_funnel_ref = reference }
                                         data={this.state.shop_funnels}
-                                        redraw={this.state.shop_funnels}
                                         options={{
                                             maintainAspectRatio: true,
                                             tooltips: {
@@ -895,7 +945,40 @@ class ConversionDashboard extends React.Component {
                             <h3 style={{margin: "0.5% 0% 0% 2%"}}>
                                 PRODUCT CONVERSION ANALYSIS
                             </h3>
-                            <Divider/>
+
+                            <Divider style={{margin: "1% 2%"}}/>
+
+                            <FormControl variant="outlined" className={classes.formControl}>
+                                <InputLabel id="demo-simple-select-outlined-label">Product Tag</InputLabel>
+                                <Select
+                                    labelId="demo-simple-select-outlined-label"
+                                    value={this.state.select_val}
+                                    onChange={(e) => {
+                                        console.log(this.state.select_val);
+                                        this.setState({select_val: e.target.value})
+                                        this.getProductTag(e.target.value);
+                                    }}
+                                    label="Product Tag">
+
+                                    {this.state.full_product_data.tags.map((pro_tag) => (
+                                        <MenuItem
+                                            className={classes.expMenu}
+                                            key={this.state.full_product_data.tags.indexOf(pro_tag)}
+                                            value={this.state.full_product_data.tags.indexOf(pro_tag)}>
+                                            {pro_tag}
+                                        </MenuItem>
+                                    ))}
+
+                                    {/*{this.state.experiment_names.map((exp_name) => (*/}
+                                    {/*    <MenuItem className={classes.expMenu} value={exp_name[0]}>{exp_name[0]}</MenuItem>*/}
+                                    {/*))}*/}
+
+                                </Select>
+                            </FormControl>
+
+                            <Divider style={{margin: "1% 2%"}}/>
+
+
                             <div style={{padding: "0.5%", margin: "1% 0% 0% 2%", width: "97%"}}>
                                 <p id={"product_conversion_summary"}/>
                                 <p id={"product_conversion_conclusion"}/>
@@ -909,14 +992,15 @@ class ConversionDashboard extends React.Component {
                                     yAxisID="Unique Visitors"
                                     width={45}
                                     height={20}
+                                    redraw={true}
+                                    ref={(reference) => this.product_conversion_ref = reference }
                                     data={this.state.product_conversion}
-                                    redraw={this.state.product_conversion}
                                     options={{
                                         maintainAspectRatio: true,
                                         scales: {
                                             xAxes: [{
                                                 stacked: true,
-                                                barPercentage: 0.5
+                                                barPercentage: this.state.barWidth
                                             }],
                                             yAxes: [{
                                                 stacked: true,
@@ -960,7 +1044,7 @@ class ConversionDashboard extends React.Component {
                                     width={50}
                                     height={20}
                                     data={this.state.landing_page_conversion}
-                                    redraw={this.state.landing_page_conversion}
+                                    ref={(reference) => this.landing_page_ref = reference }
                                     options={{
                                         maintainAspectRatio: true,
                                         scales: {

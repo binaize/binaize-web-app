@@ -13,7 +13,7 @@ import TableHead from '@material-ui/core/TableHead';
 import TableRow from '@material-ui/core/TableRow';
 import {withStyles} from "@material-ui/core/styles";
 import {withRouter} from "react-router-dom";
-import "./Experiments.css"
+// import "./Experiments.css"
 import CardContent from "@material-ui/core/CardContent";
 import Card from "@material-ui/core/Card";
 import {Bar, Line} from "react-chartjs-2";
@@ -23,16 +23,15 @@ import RefreshRoundedIcon from '@material-ui/icons/RefreshRounded';
 
 import {
     REACT_APP_BASE_URL,
-    REACT_APP_URL_SESSION_COUNT,
-    REACT_APP_URL_CONVERSION_RATE,
+    REACT_APP_URL_CONVERSION_OVER_TIME,
     REACT_APP_URL_CONVERSION_TABLE,
-    REACT_APP_URL_VISITOR_COUNT,
     REACT_APP_URL_EXPERIMENTS,
     REACT_APP_EXPERIMENT_SUMMARY
 } from "../config"
 import AppToolbar from "./AppToolbar";
 import SideDrawer from "./SideDrawer";
 import Button from "@material-ui/core/Button";
+import Demo from "./SideDrawer_rsuit";
 // import Chart from "react-apexcharts";
 
 const drawerWidth = 280;
@@ -149,6 +148,17 @@ const exp_style = theme => ({
     }
 })
 
+const tickSizes = [
+    1, 2, 5,
+    10, 20, 50,
+    100, 200, 500,
+    1000, 2000, 5000,
+    10000, 20000, 50000,
+    100000, 200000, 500000,
+    1000000, 2000000, 5000000
+];
+
+
 class ABTestingDashboard extends React.Component {
 
     constructor(props) {
@@ -161,17 +171,27 @@ class ABTestingDashboard extends React.Component {
                 {label: 'exp_2', value: '13e6f65bacbf4d74b8561e940287e604'},
                 {label: 'exp_1', value: '66f5d1fc432d47b994250688fd728ff7'}
             ],
-            BarDataSession: {},
-            BarDataVisitors: {},
-            ConversionData: {},
+
+            full_conversion_over_time: {},
+
+            SessionCountData: {},
+            VisitorCountData: {},
+
+            GoalConversionData: {},
+            GoalConversionPercentData: {},
+
+            SalesConversionData: {},
+            SalesConversionPercentData: {},
 
             step_size_session: '',
             step_size_visitor: '',
             step_size_goal_conversion: '',
+            step_size_sales_conversion: '',
 
-            session_max_value:'',
+            session_max_value: '',
             visitor_max_value: '',
-            conversion_max_value: '',
+            goal_conversion_max_value: '',
+            sales_conversion_max_value: '',
 
             rows: [],
             SummaryDetails: {
@@ -272,7 +292,6 @@ class ABTestingDashboard extends React.Component {
         }
 
 
-
     }
 
     createExpList(experiment_name, experiment_id) {
@@ -312,17 +331,410 @@ class ABTestingDashboard extends React.Component {
         }
     }
 
-    getSessionData(exp_id) {
 
-        const tickSizes = [
-            1, 2, 5,
-            10, 20, 50,
-            100, 200, 500,
-            1000, 2000, 5000,
-            10000, 20000, 50000,
-            100000, 200000, 500000,
-            1000000, 2000000, 5000000
-        ];
+    getSession() {
+
+
+        // SESSION COUNT DATA
+        let i = 0;
+        let mainDatasetSession = [];
+
+        try {
+
+            let max = []
+
+            Object.keys(this.state.full_conversion_over_time["session_count"]).forEach((key) => {
+                max.push(Math.max.apply(null, this.state.full_conversion_over_time["session_count"][key]))
+            })
+
+            let max_session_value = Math.max.apply(null, max)
+
+            for (let s = 0; s < tickSizes.length; s++) {
+                console.log("-------" + max_session_value);
+                let val = max_session_value / tickSizes[s]
+                if (val < 6) {
+                    console.log(tickSizes[s]);
+                    this.setState({
+                        step_size_session: tickSizes[s]
+                    })
+                    break
+                }
+            }
+
+            this.setState({
+                session_max_value: max_session_value
+            })
+
+            Object.keys(this.state.full_conversion_over_time["session_count"]).sort().forEach((key) => {
+
+                let localData;
+                localData = {
+                    label: key,
+                    backgroundColor: this.state.bar_background_color[i],
+                    borderColor: this.state.bar_background_color[i],
+                    borderWidth: 1,
+                    hoverBackgroundColor: this.state.bar_background_hover_color[i],
+                    hoverBorderColor: this.state.bar_background_hover_color[i],
+                    data: this.state.full_conversion_over_time["session_count"][key],
+                    datalabels: {
+                        display: false,
+                    }
+                }
+                i = i + 1;
+                mainDatasetSession.push(localData);
+            })
+
+
+        } catch (e) {
+            console.log(e)
+            this.setState({
+                SummaryDetails: {
+                    summary_status: "Error in fetching data"
+                }
+            })
+        }
+
+        this.setState({
+            SessionCountData: {
+                labels: this.state.full_conversion_over_time.date,
+                datasets: mainDatasetSession
+            }
+        })
+
+    }
+
+
+    getVisitor() {
+
+        // VISITOR COUNT DATA
+        let visitor_counter = 0;
+        let mainDatasetVisitors = [];
+
+        try {
+
+            let max = [];
+
+            Object.keys(this.state.full_conversion_over_time["visitor_count"]).sort().forEach((key) => {
+                max.push(Math.max.apply(null, this.state.full_conversion_over_time["visitor_count"][key]))
+            })
+
+            console.log(max)
+            let max_visitor_value = Math.max.apply(null, max)
+
+            console.log(max_visitor_value)
+
+            for (let s = 0; s < tickSizes.length; s++) {
+                // console.log("-------" + max_visitor_value);
+                let val = max_visitor_value / tickSizes[s]
+                if (val < 6) {
+                    // console.log(tickSizes[s]);
+                    this.setState({
+                        step_size_visitor: tickSizes[s]
+                    })
+                    break
+                }
+            }
+
+            this.setState({
+                visitor_max_value: max_visitor_value
+            })
+
+            Object.keys(this.state.full_conversion_over_time["visitor_count"]).sort().forEach((key) => {
+
+                let localDataVisitor
+                localDataVisitor = {
+                    label: key,
+                    backgroundColor: this.state.bar_background_color[visitor_counter],
+                    borderColor: this.state.bar_background_color[visitor_counter],
+                    hoverBackgroundColor: this.state.bar_background_hover_color[visitor_counter],
+                    hoverBorderColor: this.state.bar_background_hover_color[visitor_counter],
+                    data: this.state.full_conversion_over_time["visitor_count"][key],
+                    datalabels: {
+                        display: false,
+                    }
+                }
+                visitor_counter = visitor_counter + 1
+                mainDatasetVisitors.push(localDataVisitor);
+
+            })
+        } catch (e) {
+            console.log(e);
+        }
+
+        this.setState({
+            VisitorCountData: {
+                labels: this.state.full_conversion_over_time.date,
+                datasets: mainDatasetVisitors
+            }
+        })
+
+
+    }
+
+
+    getGoalConversion() {
+
+        // GOAL CONVERSION COUNT DATA
+        let goal_conversion_counter = 0;
+        let mainDatasetConversion = [];
+
+        try {
+
+            let max = [];
+            Object.keys(this.state.full_conversion_over_time["goal_conversion_count"]).sort().forEach((key) => {
+                max.push(Math.max.apply(null, this.state.full_conversion_over_time["goal_conversion_count"][key]))
+            })
+
+            let max_goal_value = Math.max.apply(null, max)
+
+            for (let s = 0; s < tickSizes.length; s++) {
+                console.log("-------" + max_goal_value);
+                let val = max_goal_value / tickSizes[s]
+                if (val < 6) {
+                    console.log(tickSizes[s]);
+                    this.setState({
+                        step_size_goal_conversion: tickSizes[s]
+                    })
+                    break
+                }
+            }
+
+            this.setState({
+                goal_conversion_max_value: max_goal_value
+            })
+
+
+            Object.keys(this.state.full_conversion_over_time["goal_conversion_count"]).sort().forEach((key) => {
+
+                let localData
+                localData = {
+                    label: key,
+                    backgroundColor: this.state.bar_background_color[goal_conversion_counter],
+                    borderColor: this.state.bar_background_color[goal_conversion_counter],
+                    hoverBackgroundColor: this.state.bar_background_hover_color[goal_conversion_counter],
+                    hoverBorderColor: this.state.bar_background_hover_color[goal_conversion_counter],
+                    data: this.state.full_conversion_over_time["goal_conversion_count"][key],
+                    datalabels: {
+                        display: false,
+                    }
+                }
+                goal_conversion_counter = goal_conversion_counter + 1;
+                mainDatasetConversion.push(localData);
+
+            })
+        } catch (e) {
+            console.log(e);
+        }
+
+        this.setState({
+            GoalConversionData: {
+                labels: this.state.full_conversion_over_time.date,
+                datasets: mainDatasetConversion
+            }
+        })
+
+
+    }
+
+
+    getSalesConversion() {
+
+        // SALES CONVERSION COUNT DATA
+        let sales_counter = 0;
+        let mainDatasetSales = [];
+
+        try {
+
+            let max = [];
+
+            Object.keys(this.state.full_conversion_over_time["sales_conversion_count"]).forEach((key) => {
+                max.push(Math.max.apply(null, this.state.full_conversion_over_time["sales_conversion_count"][key]))
+            })
+
+            let max_visitor_value = Math.max.apply(null, max)
+
+            for (let s = 0; s < tickSizes.length; s++) {
+                console.log("-------" + max_visitor_value);
+                let val = max_visitor_value / tickSizes[s]
+                if (val < 6) {
+                    console.log(tickSizes[s]);
+                    this.setState({
+                        step_size_sales_conversion: tickSizes[s]
+                    })
+                    break
+                }
+            }
+
+            this.setState({
+                sales_conversion_max_value: max_visitor_value
+            })
+
+            Object.keys(this.state.full_conversion_over_time["sales_conversion_count"]).sort().forEach((key) => {
+
+                let localDataSales
+                localDataSales = {
+                    label: key,
+                    backgroundColor: this.state.bar_background_color[sales_counter],
+                    borderColor: this.state.bar_background_color[sales_counter],
+                    hoverBackgroundColor: this.state.bar_background_hover_color[sales_counter],
+                    hoverBorderColor: this.state.bar_background_hover_color[sales_counter],
+                    data: this.state.full_conversion_over_time["sales_conversion_count"][key],
+                    datalabels: {
+                        display: false,
+                    }
+                }
+                sales_counter = sales_counter + 1
+                mainDatasetSales.push(localDataSales);
+
+            })
+        } catch (e) {
+            console.log(e);
+        }
+
+        console.log(mainDatasetSales)
+
+        this.setState({
+            SalesConversionData: {
+                labels: this.state.full_conversion_over_time.date,
+                datasets: mainDatasetSales
+            }
+        })
+
+
+    }
+
+
+    getGoalConversionPercentage() {
+
+        // GOAL CONVERSION PERCENTAGE DATA
+        let goal_percent_counter = 0;
+        let mainDatasetGoalPercent = [];
+
+        try {
+
+            // let max = [];
+
+            // Object.keys(this.state.full_conversion_over_time["goal_conversion_percentage"]).forEach((key) => {
+            //     max.push(Math.max.apply(null, this.state.full_conversion_over_time["goal_conversion_percentage"][key]))
+            // })
+            //
+            // let max_goal_value = Math.max.apply(null, max)
+            //
+            // for (let s = 0; s < tickSizes.length; s++) {
+            //     console.log("-------" + max_goal_value);
+            //     let val = max_goal_value / tickSizes[s]
+            //     if (val < 6) {
+            //         console.log(tickSizes[s]);
+            //         this.setState({
+            //             step_size_visitor: tickSizes[s]
+            //         })
+            //         break
+            //     }
+            // }
+            //
+            // this.setState({
+            //     visitor_max_value: max_visitor_value
+            // })
+
+            Object.keys(this.state.full_conversion_over_time["goal_conversion_percentage"]).sort().forEach((key) => {
+
+                let localDataGoalPercent
+                localDataGoalPercent = {
+                    label: key,
+                    borderColor: this.state.bar_background_color[goal_percent_counter],
+                    borderWidth: 3,
+                    fill: false,
+                    hoverBackgroundColor: this.state.bar_background_hover_color[goal_percent_counter],
+                    hoverBorderColor: this.state.bar_background_hover_color[goal_percent_counter],
+                    data: this.state.full_conversion_over_time["goal_conversion_percentage"][key],
+                    datalabels: {
+                        display: false,
+                    }
+                }
+                goal_percent_counter = goal_percent_counter + 1
+                mainDatasetGoalPercent.push(localDataGoalPercent)
+
+            })
+        } catch (e) {
+            console.log(e);
+        }
+
+        this.setState({
+            GoalConversionPercentData: {
+                labels: this.state.full_conversion_over_time.date,
+                datasets: mainDatasetGoalPercent
+            }
+        })
+
+    }
+
+
+    getSalesConversionPercentage() {
+        // SALES CONVERSION PERCENTAGE DATA
+        let sales_percent_counter = 0;
+        let mainDatasetSalesPercent = [];
+
+        try {
+
+            // let max = [];
+
+            // Object.keys(this.state.full_conversion_over_time["sales_conversion_percentage"]).forEach((key) => {
+            //     max.push(Math.max.apply(null, this.state.full_conversion_over_time["sales_conversion_percentage"][key]))
+            // })
+            //
+            // let max_visitor_value = Math.max.apply(null, max)
+            //
+            // for (let s = 0; s < tickSizes.length; s++) {
+            //     console.log("-------" + max_visitor_value);
+            //     let val = max_visitor_value / tickSizes[s]
+            //     if (val < 6) {
+            //         console.log(tickSizes[s]);
+            //         this.setState({
+            //             step_size_visitor: tickSizes[s]
+            //         })
+            //         break
+            //     }
+            // }
+            //
+            // this.setState({
+            //     sales_conversion_max_value: max_visitor_value
+            // })
+
+            Object.keys(this.state.full_conversion_over_time["sales_conversion_percentage"]).sort().forEach((key) => {
+
+                let localDataSalesPercent
+                localDataSalesPercent = {
+                    label: key,
+                    borderColor: this.state.bar_background_color[sales_percent_counter],
+                    borderWidth: 3,
+                    fill: false,
+                    hoverBackgroundColor: this.state.bar_background_hover_color[sales_percent_counter],
+                    hoverBorderColor: this.state.bar_background_hover_color[sales_percent_counter],
+                    data: this.state.full_conversion_over_time["sales_conversion_percentage"][key],
+                    datalabels: {
+                        display: false,
+                    }
+                }
+                sales_percent_counter = sales_percent_counter + 1
+                mainDatasetSalesPercent.push(localDataSalesPercent)
+
+            })
+        } catch (e) {
+            console.log(e);
+        }
+
+        this.setState({
+            SalesConversionPercentData: {
+                labels: this.state.full_conversion_over_time.date,
+                datasets: mainDatasetSalesPercent
+            }
+        })
+
+    }
+
+
+    getAllData(exp_id) {
+
 
         // console.log(exp_id)
 
@@ -330,303 +742,8 @@ class ABTestingDashboard extends React.Component {
         const params = new URLSearchParams({
             experiment_id: exp_id
         })
+
         let access = "Bearer " + this.state.access_token;
-
-        // SESSION COUNT API CALL
-        const urlSession = REACT_APP_URL_SESSION_COUNT + `?${params.toString()}`
-
-        fetch(REACT_APP_BASE_URL + urlSession, {
-            method: 'GET',
-            headers: {
-                'Access-Control-Allow-Origin': '*',
-                'Authorization': access,
-                'Accept': 'application/json'
-            }
-        })
-            .then(response => response.json())
-            .then(result => {
-                // console.log("Success:", result);
-
-                let i = 0;
-                let mainDatasetSession = [];
-
-                try {
-
-                    let max = []
-
-                    Object.keys(result["session_count"]).forEach((key) => {
-                        max.push(Math.max.apply(null, result["session_count"][key]))
-                    })
-
-                    let max_session_value = Math.max.apply(null, max)
-
-                    for (let s = 0; s < tickSizes.length; s++) {
-                        console.log("-------" + max_session_value);
-                        let val = max_session_value/tickSizes[s]
-                        if (val < 6) {
-                            console.log(tickSizes[s]);
-                            this.setState({
-                                step_size_session: tickSizes[s]
-                            })
-                            break
-                        }
-                    }
-
-                    this.setState({
-                        session_max_value: max_session_value
-                    })
-
-                    Object.keys(result["session_count"]).sort().forEach((key) => {
-
-                        let localData;
-                        localData = {
-                            label: key,
-                            backgroundColor: this.state.bar_background_color[i],
-                            borderColor: this.state.bar_background_color[i],
-                            borderWidth: 1,
-                            hoverBackgroundColor: this.state.bar_background_hover_color[i],
-                            hoverBorderColor: this.state.bar_background_hover_color[i],
-                            data: result["session_count"][key],
-                            datalabels: {
-                                display: false,
-                            }
-                        }
-                        i = i + 1;
-                        mainDatasetSession.push(localData);
-                    })
-
-
-                } catch (e) {
-                    console.log(e)
-                    this.setState({
-                        SummaryDetails: {
-                            summary_status: "Error in fetching data"
-                        }
-                    })
-                }
-
-                this.setState({
-                    BarDataSession: {
-                        labels: result.date,
-                        datasets: mainDatasetSession
-                    }
-                })
-            })
-            .catch(err => {
-                console.log(err)
-            })
-
-
-        // VISITOR COUNT API CALL
-        const urlVisitor = REACT_APP_URL_VISITOR_COUNT + `?${params.toString()}`
-
-        fetch(REACT_APP_BASE_URL + urlVisitor, {
-            method: 'GET',
-            headers: {
-                'Access-Control-Allow-Origin': '*',
-                'Authorization': access,
-                'Accept': 'application/json'
-            }
-        })
-            .then(response => response.json())
-            .then(result => {
-                // console.log("Success URL Visitor Count: ", result);
-
-                let i = 0;
-                let mainDatasetVisitors = [];
-
-                try {
-
-                    let max = [];
-
-                    Object.keys(result["visitor_count"]).forEach((key) => {
-                        max.push(Math.max.apply(null, result["visitor_count"][key]))
-                    })
-
-                    let max_visitor_value = Math.max.apply(null, max)
-
-                    for (let s = 0; s < tickSizes.length; s++) {
-                        console.log("-------" + max_visitor_value);
-                        let val = max_visitor_value/tickSizes[s]
-                        if (val < 6) {
-                            console.log(tickSizes[s]);
-                            this.setState({
-                                step_size_visitor: tickSizes[s]
-                            })
-                            break
-                        }
-                    }
-
-                    this.setState({
-                        visitor_max_value: max_visitor_value
-                    })
-
-                    Object.keys(result["visitor_count"]).sort().forEach((key) => {
-
-                        let localDataVisitor
-                        localDataVisitor = {
-                            label: key,
-                            backgroundColor: this.state.bar_background_color[i],
-                            borderColor: this.state.bar_background_color[i],
-                            borderWidth: 1,
-                            hoverBackgroundColor: this.state.bar_background_hover_color[i],
-                            hoverBorderColor: this.state.bar_background_hover_color[i],
-                            data: result["visitor_count"][key],
-                            datalabels: {
-                                display: false,
-                            }
-                        }
-                        i = i + 1
-                        mainDatasetVisitors.push(localDataVisitor);
-
-                    })
-                } catch (e) {
-                    console.log(e);
-                }
-
-                this.setState({
-                    BarDataVisitors: {
-                        labels: result.date,
-                        datasets: mainDatasetVisitors
-                    }
-                })
-
-            })
-            .catch(err => {
-                console.log(err)
-            })
-
-
-        // CONVERSION RATE API CALL
-        const urlConvert = REACT_APP_URL_CONVERSION_RATE + `?${params.toString()}`
-
-        fetch(REACT_APP_BASE_URL + urlConvert, {
-            method: 'GET',
-            headers: {
-                'Access-Control-Allow-Origin': '*',
-                'Authorization': access,
-                'Accept': 'application/json'
-            }
-        })
-            .then(response => response.json())
-            .then(result => {
-                // console.log("Success : ", result);
-
-                let mainDatasetConversion = [];
-                let i = 0;
-
-                try {
-
-                    let max = [];
-                    Object.keys(result["conversion"]).sort().forEach((key) => {
-                        max.push(Math.max.apply(null, result["conversion"][key]))
-                    })
-
-                    let max_goal_value = Math.max.apply(null, max)
-
-                    for (let s = 0; s < tickSizes.length; s++) {
-                        console.log("-------" + max_goal_value);
-                        let val = max_goal_value/tickSizes[s]
-                        if (val < 6) {
-                            console.log(tickSizes[s]);
-                            this.setState({
-                                step_size_goal_conversion: tickSizes[s]
-                            })
-                            break
-                        }
-                    }
-
-                    this.setState({
-                        conversion_max_value: max_goal_value
-                    })
-
-
-                    Object.keys(result["conversion"]).sort().forEach((key) => {
-
-                        let localData
-                        localData = {
-                            label: key,
-                            borderColor: this.state.bar_background_color[i],
-                            borderWidth: 3,
-                            fill: false,
-                            hoverBackgroundColor: this.state.bar_background_hover_color[i],
-                            hoverBorderColor: this.state.bar_background_hover_color[i],
-                            data: result["conversion"][key],
-                            datalabels: {
-                                display: false,
-                            }
-                        }
-                        i = i + 1;
-                        mainDatasetConversion.push(localData);
-
-                    })
-                } catch (e) {
-                    console.log(e);
-                }
-
-                this.setState({
-                    ConversionData: {
-                        labels: result.date,
-                        datasets: mainDatasetConversion
-                    }
-                })
-            })
-            .catch(err => {
-                console.log(err)
-            })
-
-
-        // CONVERSION TABLE API CALL
-        const urlConversationTable = REACT_APP_URL_CONVERSION_TABLE + `?${params.toString()}`
-
-        try {
-
-            fetch(REACT_APP_BASE_URL + urlConversationTable, {
-                method: 'GET',
-                headers: {
-                    'Access-Control-Allow-Origin': '*',
-                    'Authorization': access,
-                    'Accept': 'application/json'
-                }
-            })
-                .then(response => response.json())
-                .then(result => {
-
-                    let localData = [];
-                    let localRows = [];
-
-                    // console.log("Success: TABLE ", result);
-
-                    let i = 0;
-                    // console.log("Success: TABLE " + result[i]["variation_name"])
-
-                    let url = "www.smth.com"
-
-                    for (i; i < result.length; i++) {
-
-                        localData.push(result[i]["variation_name"]);
-                        localData.push(result[i]["num_session"]);
-                        localData.push(result[i]["num_visitor"]);
-                        localData.push(result[i]["goal_conversion_count"]);
-                        localData.push(result[i]["goal_conversion"]);
-                        localData.push(result[i]["sales_conversion_count"]);
-                        localData.push(result[i]["sales_conversion"]);
-
-                        localRows.push(localData);
-                        localData = [];
-
-                    }
-
-                    this.setState({rows: localRows})
-
-                }).catch(err => {
-                console.log(err);
-            })
-
-        } catch (e) {
-            console.error("Error!", e);
-        }
-
 
         // EXPERIMENT SUMMARY API CALL
         const urlSummary = REACT_APP_EXPERIMENT_SUMMARY + `?${params.toString()}`;
@@ -664,11 +781,96 @@ class ABTestingDashboard extends React.Component {
             })
 
 
+        // CONVERSION OVER TIME API CALL
+        const urlSession = REACT_APP_URL_CONVERSION_OVER_TIME + `?${params.toString()}`
+
+        fetch(REACT_APP_BASE_URL + urlSession, {
+            method: 'GET',
+            headers: {
+                'Access-Control-Allow-Origin': '*',
+                'Authorization': access,
+                'Accept': 'application/json'
+            }
+        })
+            .then(response => response.json())
+            .then(result => {
+                // console.log("Success:", result);
+
+                this.setState({
+                    full_conversion_over_time: result
+                })
+
+                console.log(this.state.full_conversion_over_time)
+
+                this.getSession();
+                this.getVisitor();
+                this.getGoalConversion();
+                this.getSalesConversion();
+                this.getGoalConversionPercentage();
+                this.getSalesConversionPercentage();
+
+            })
+            .catch(err => {
+                console.log(err)
+            })
+
+
+        // CONVERSION TABLE API CALL
+        const urlConversationTable = REACT_APP_URL_CONVERSION_TABLE + `?${params.toString()}`
+
+        try {
+
+            fetch(REACT_APP_BASE_URL + urlConversationTable, {
+                method: 'GET',
+                headers: {
+                    'Access-Control-Allow-Origin': '*',
+                    'Authorization': access,
+                    'Accept': 'application/json'
+                }
+            })
+                .then(response => response.json())
+                .then(result => {
+
+                    let localData = [];
+                    let localRows = [];
+
+                    // console.log("Success: TABLE ", result);
+
+                    let i = 0;
+                    // console.log("Success: TABLE " + result[i]["variation_name"])
+
+
+                    for (i; i < result.length; i++) {
+
+                        localData.push(result[i]["variation_name"]);
+                        localData.push(result[i]["num_session"]);
+                        localData.push(result[i]["num_visitor"]);
+                        localData.push(result[i]["goal_conversion_count"]);
+                        localData.push(result[i]["goal_conversion"]);
+                        localData.push(result[i]["sales_conversion_count"]);
+                        localData.push(result[i]["sales_conversion"]);
+
+                        localRows.push(localData);
+                        localData = [];
+
+                    }
+
+                    this.setState({rows: localRows})
+
+                }).catch(err => {
+                console.log(err);
+            })
+
+        } catch (e) {
+            console.error("Error!", e);
+        }
+
+
     }
 
+
     componentDidMount() {
-        // this.getExperimentNames();
-        this.getSessionData(localStorage.getItem("experiment_id"));
+        this.getAllData(localStorage.getItem("experiment_id"));
     }
 
     render() {
@@ -680,7 +882,8 @@ class ABTestingDashboard extends React.Component {
 
                 <AppToolbar/>
 
-                <SideDrawer/>
+                {/*<SideDrawer/>*/}
+                <Demo active={localStorage.getItem("activeKey")}/>
 
                 {/* MAIN LAYOUT */}
                 <main className={classes.content}>
@@ -688,13 +891,13 @@ class ABTestingDashboard extends React.Component {
 
                     <div style={{display: "flex"}}>
                         {/*<h2 style={{margin: "2% 2%"}}>A/B Testing  Dashboard</h2>*/}
-                        <h2 style={{margin: "2% 5%"}}> {this.state.exp_name} </h2>
+                        <h2 style={{margin: "2% 1% 1% 5%"}}> {this.state.exp_name} </h2>
 
                         <Button
                             color="primary"
                             className={classes.button}
                             onClick={() => {
-                                this.getSessionData(localStorage.getItem("experiment_id"))
+                                this.getAllData(localStorage.getItem("experiment_id"))
                             }}
                         ><RefreshRoundedIcon/></Button>
 
@@ -707,7 +910,7 @@ class ABTestingDashboard extends React.Component {
                         {/*        value={this.state.select_val}*/}
                         {/*        onChange={(e) => {*/}
                         {/*            this.setState({select_val: e.target.value})*/}
-                        {/*            this.getSessionData(e.target.value);*/}
+                        {/*            this.getAllData(e.target.value);*/}
                         {/*        }}*/}
                         {/*        label="Experiment Name">*/}
 
@@ -722,9 +925,9 @@ class ABTestingDashboard extends React.Component {
                         {/*    </Select>*/}
                         {/*</FormControl>*/}
                     </div>
-                    <Card style={{margin: "1% 5%"}}>
+                    <Card style={{margin: "2% 5%"}}>
                         <CardContent>
-                            <div style={{padding: "0.5%", margin: "0% 0% 0% 0.5%", width: "97%", fontSize: "16px"}}>
+                            <div style={{padding: "0.5%", margin: "0% 2%", width: "90%", fontSize: "14px"}}>
                                 <p id="summary"/>
                                 <p id="summary_conclusion"/>
                                 <p id="summary_recommendation"/>
@@ -732,7 +935,7 @@ class ABTestingDashboard extends React.Component {
                         </CardContent>
                     </Card>
 
-                    <Divider style={{margin: "1% 5%"}}/>
+                    <Divider style={{margin: "0% 5%"}}/>
 
                     <TableContainer component={Paper} style={{margin: "2% 5%", width: "90%"}}>
                         <Table className={classes.table} aria-label="simple table">
@@ -765,10 +968,10 @@ class ABTestingDashboard extends React.Component {
                         </Table>
                     </TableContainer>
 
-                    <Divider style={{margin: "1% 5%"}}/>
+                    <Divider style={{margin: "0% 5%"}}/>
 
                     <Card style={{margin: "2% 5%"}}>
-                        <CardContent>
+                        <CardContent style={{display: "flex"}}>
                             <div style={{margin: "0% 0.5% 1% 1.5%", width: "96%"}}>
                                 <h3>
                                     Session Over Time
@@ -778,8 +981,8 @@ class ABTestingDashboard extends React.Component {
                                 <Bar
                                     width={100}
                                     height={40}
-                                    data={this.state.BarDataSession}
-                                    redraw={this.state.BarDataSession}
+                                    data={this.state.SessionCountData}
+                                    redraw={true}
                                     options={{
                                         maintainAspectRatio: true,
                                         scales: {
@@ -798,23 +1001,18 @@ class ABTestingDashboard extends React.Component {
                                     }}>
                                 </Bar>
                             </div>
-                        </CardContent>
-                    </Card>
-                    <Divider style={{margin: "1% 5%"}}/>
-                    <Card style={{margin: "2% 5%"}}>
-                        <CardContent>
+
                             <div style={{margin: "0% 0.5% 1% 1.5%", width: "96%"}}>
                                 <h3>
-                                    Visitor Over Time
+                                    Visitor Count
                                 </h3>
                                 <hr/>
-                                <Bar
 
-                                    yAxisID="% Conversion"
+                                <Bar
                                     width={100}
                                     height={40}
-                                    data={this.state.BarDataVisitors}
-                                    redraw={this.state.BarDataVisitors}
+                                    data={this.state.VisitorCountData}
+                                    redraw={true}
                                     options={{
                                         maintainAspectRatio: true,
                                         scales: {
@@ -833,21 +1031,88 @@ class ABTestingDashboard extends React.Component {
                                     }}>
                                 </Bar>
                             </div>
+
                         </CardContent>
-                    </Card>
-                    <Divider style={{margin: "1% 5%"}}/>
-                    <Card style={{margin: "2% 5%"}}>
-                        <CardContent>
+
+                        <CardContent style={{display: "flex"}}>
                             <div style={{margin: "0% 0.5% 1% 1.5%", width: "96%"}}>
                                 <h3>
-                                    Goal Conversion Over Time
+                                    Goal Conversion Count
                                 </h3>
                                 <hr/>
+
+                                <Bar
+                                    width={100}
+                                    height={40}
+                                    data={this.state.GoalConversionData}
+                                    redraw={true}
+                                    options={{
+                                        maintainAspectRatio: true,
+                                        scales: {
+                                            yAxes: [{
+                                                ticks: {
+                                                    min: 0,
+                                                    stepSize: this.state.step_size_goal_conversion,
+                                                    max: (Math.round(this.state.goal_conversion_max_value / this.state.step_size_goal_conversion) + 2) * this.state.step_size_goal_conversion,
+                                                },
+                                                scaleLabel: {
+                                                    display: true,
+                                                    labelString: "# Visitors"
+                                                }
+                                            }]
+                                        }
+                                    }}>
+                                </Bar>
+                            </div>
+
+                            <div style={{margin: "0% 0.5% 1% 1.5%", width: "96%"}}>
+                                <h3>
+                                    Sales Conversion Count
+                                </h3>
+                                <hr/>
+
+                                <Bar
+                                    width={100}
+                                    height={40}
+                                    data={this.state.SalesConversionData}
+                                    redraw={true}
+                                    options={{
+                                        maintainAspectRatio: true,
+                                        scales: {
+                                            yAxes: [{
+                                                ticks: {
+                                                    min: 0,
+                                                    stepSize: this.state.step_size_sales_conversion,
+                                                    max: (Math.round(this.state.sales_conversion_max_value / this.state.step_size_sales_conversion) + 2) * this.state.step_size_sales_conversion,
+                                                },
+                                                scaleLabel: {
+                                                    display: true,
+                                                    labelString: "# Sales"
+                                                }
+                                            }]
+                                        }
+                                    }}>
+                                </Bar>
+                            </div>
+
+                        </CardContent>
+
+
+                        {/*LINE*/}
+
+
+                        <CardContent style={{display: "flex"}}>
+                            <div style={{margin: "0% 0.5% 1% 1.5%", width: "96%"}}>
+                                <h3>
+                                    Goal Conversion Percentage
+                                </h3>
+                                <hr/>
+
                                 <Line
                                     width={100}
                                     height={40}
-                                    data={this.state.ConversionData}
-                                    redraw={this.state.ConversionData}
+                                    data={this.state.GoalConversionPercentData}
+                                    redraw={true}
                                     options={{
                                         tooltips: {
                                             intersect: false,
@@ -870,9 +1135,122 @@ class ABTestingDashboard extends React.Component {
                                         }
                                     }}>
                                 </Line>
+
                             </div>
+
+                            <div style={{margin: "0% 0.5% 1% 1.5%", width: "96%"}}>
+                                <h3>
+                                    Sales Conversion Percentage
+                                </h3>
+                                <hr/>
+
+                                <Line
+                                    width={100}
+                                    height={40}
+                                    data={this.state.SalesConversionPercentData}
+                                    redraw={true}
+                                    options={{
+                                        tooltips: {
+                                            intersect: false,
+                                        },
+                                        hover: {
+                                            intersect: false
+                                        },
+                                        maintainAspectRatio: true,
+                                        scales: {
+                                            yAxes: [{
+                                                ticks: {
+                                                    min: 0,
+                                                    max: 100,
+                                                },
+                                                scaleLabel: {
+                                                    display: true,
+                                                    labelString: "% Sales Conversion"
+                                                }
+                                            }]
+                                        }
+                                    }}>
+                                </Line>
+                            </div>
+
                         </CardContent>
+
                     </Card>
+                    <Divider style={{margin: "1% 5%"}}/>
+
+
+                    {/*<Card style={{margin: "2% 5%"}}>*/}
+                    {/*    <CardContent>*/}
+                    {/*        <div style={{margin: "0% 0.5% 1% 1.5%", width: "96%"}}>*/}
+                    {/*            <h3>*/}
+                    {/*                Sales Conversion Percentage*/}
+                    {/*            </h3>*/}
+                    {/*            <hr/>*/}
+                    {/*            <Bar*/}
+
+                    {/*                yAxisID="% Conversion"*/}
+                    {/*                width={100}*/}
+                    {/*                height={40}*/}
+                    {/*                data={this.state.SalesConversionPercentData}*/}
+                    {/*                redraw={true}*/}
+                    {/*                options={{*/}
+                    {/*                    maintainAspectRatio: true,*/}
+                    {/*                    scales: {*/}
+                    {/*                        yAxes: [{*/}
+                    {/*                            ticks: {*/}
+                    {/*                                min: 0,*/}
+                    {/*                                stepSize: this.state.step_size_visitor,*/}
+                    {/*                                max: (Math.round(this.state.visitor_max_value / this.state.step_size_visitor) + 2) * this.state.step_size_visitor,*/}
+                    {/*                            },*/}
+                    {/*                            scaleLabel: {*/}
+                    {/*                                display: true,*/}
+                    {/*                                labelString: "# Visitors"*/}
+                    {/*                            }*/}
+                    {/*                        }]*/}
+                    {/*                    }*/}
+                    {/*                }}>*/}
+                    {/*            </Bar>*/}
+                    {/*        </div>*/}
+                    {/*    </CardContent>*/}
+                    {/*</Card>*/}
+                    {/*<Divider style={{margin: "1% 5%"}}/>*/}
+                    {/*<Card style={{margin: "2% 5%"}}>*/}
+                    {/*    <CardContent>*/}
+                    {/*        <div style={{margin: "0% 0.5% 1% 1.5%", width: "96%"}}>*/}
+                    {/*            <h3>*/}
+                    {/*                Goal Conversion Over Time*/}
+                    {/*            </h3>*/}
+                    {/*            <hr/>*/}
+                    {/*            <Line*/}
+                    {/*                width={100}*/}
+                    {/*                height={40}*/}
+                    {/*                data={this.state.GoalConversionData}*/}
+                    {/*                redraw={this.state.GoalConversionData}*/}
+                    {/*                options={{*/}
+                    {/*                    tooltips: {*/}
+                    {/*                        intersect: false,*/}
+                    {/*                    },*/}
+                    {/*                    hover: {*/}
+                    {/*                        intersect: false*/}
+                    {/*                    },*/}
+                    {/*                    maintainAspectRatio: true,*/}
+                    {/*                    scales: {*/}
+                    {/*                        yAxes: [{*/}
+                    {/*                            ticks: {*/}
+                    {/*                                min: 0,*/}
+                    {/*                                max: 100,*/}
+                    {/*                            },*/}
+                    {/*                            scaleLabel: {*/}
+                    {/*                                display: true,*/}
+                    {/*                                labelString: "% Goal Conversion"*/}
+                    {/*                            }*/}
+                    {/*                        }]*/}
+                    {/*                    }*/}
+                    {/*                }}>*/}
+                    {/*            </Line>*/}
+                    {/*        </div>*/}
+                    {/*    </CardContent>*/}
+                    {/*</Card>*/}
 
                     {/*/!*  APEX CHARTS TESTING  *!/*/}
 
