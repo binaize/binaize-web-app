@@ -55,6 +55,7 @@ const exp_style = theme => ({
         flexGrow: 1,
         backgroundColor: theme.palette.background.default,
         padding: theme.spacing(1),
+        marginLeft: "300px"
     },
     grow: {
         flexGrow: 1,
@@ -170,9 +171,9 @@ class ConversionDashboard extends React.Component {
             end_yearMonthDate: '',
 
             experiment_names: [
-              "default-spo",
-              "disabled-spo",
-              "default-spo_disabled-spo_subscription",
+                "default-spo",
+                "disabled-spo",
+                "default-spo_disabled-spo_subscription",
             ],
 
             select_val: '',
@@ -208,8 +209,8 @@ class ConversionDashboard extends React.Component {
             shop_funnels_summary: '',
             shop_funnels_conclusion: '',
 
-            full_product_data : {
-                tags: [0,0],
+            full_product_data: {
+                tags: [0, 0],
                 results: [0]
             },
             product_conversion: {},
@@ -246,13 +247,11 @@ class ConversionDashboard extends React.Component {
             this.setState({
                 barWidth: 0.2
             })
-        }else {
+        } else {
             this.setState({
                 barWidth: 0.3
             })
         }
-
-
 
 
         this.setState({
@@ -279,13 +278,12 @@ class ConversionDashboard extends React.Component {
         let max_visitor_count = []
 
 
-
         Object.keys(this.state.full_product_data.results[nn]["product_conversion"]).forEach((key) => {
             if (key === "conversion_percentage") {
                 per_data.push(this.state.full_product_data.results[nn]["product_conversion"][key])
             } else if (key === "non_conversion_count") {
 
-                for(let ij=0; ij< this.state.full_product_data.results[nn]["product_conversion"][key].length; ij++) {
+                for (let ij = 0; ij < this.state.full_product_data.results[nn]["product_conversion"][key].length; ij++) {
                     max_visitor_count.push(this.state.full_product_data.results[nn]["product_conversion"][key][ij] + this.state.full_product_data.results[nn]["product_conversion"]["conversion_count"][ij]);
                 }
             }
@@ -360,7 +358,7 @@ class ConversionDashboard extends React.Component {
                         anchor: "end",
                         clip: true,
                         font: {
-                            size: "16",
+                            size: "12",
                             weight: "bold"
                         }
                     }
@@ -400,7 +398,6 @@ class ConversionDashboard extends React.Component {
 
 
     }
-
 
 
     getAllData(start, end) {
@@ -505,7 +502,7 @@ class ConversionDashboard extends React.Component {
                                 anchor: "end",
                                 clip: true,
                                 font: {
-                                    size: "16",
+                                    size: "12",
                                     weight: "bold"
                                 }
                             }
@@ -563,7 +560,6 @@ class ConversionDashboard extends React.Component {
             });
 
 
-
         // PRODUCT CONVERSION API CALL
         fetch(REACT_APP_BASE_URL + REACT_APP_URL_PRODUCT_CONVERSION + `?${params.toString()}`, {
             method: 'GET',
@@ -617,7 +613,7 @@ class ConversionDashboard extends React.Component {
                     } else if (key === "non_conversion_count") {
                         // lading_max_visitor_count = result["landing_conversion"][key]
 
-                        for(let ij=0; ij< result["landing_conversion"][key].length; ij++) {
+                        for (let ij = 0; ij < result["landing_conversion"][key].length; ij++) {
                             lading_max_visitor_count.push(result["landing_conversion"][key][ij] + result["landing_conversion"]["conversion_count"][ij]);
                         }
 
@@ -686,7 +682,7 @@ class ConversionDashboard extends React.Component {
                                 anchor: "end",
                                 clip: true,
                                 font: {
-                                    size: "16",
+                                    size: "12",
                                     weight: "bold"
                                 }
                             }
@@ -781,7 +777,7 @@ class ConversionDashboard extends React.Component {
                     <div className={classes.toolbar}/>
 
                     <div style={{display: "flex"}}>
-                        <h2 style={{margin: "2% 1% 1% 5%"}}>Conversion Dashboard</h2>
+                        <h3 style={{margin: "2% 1% 1% 5%"}}>Conversion Dashboard</h3>
 
 
                         <Button
@@ -848,94 +844,142 @@ class ConversionDashboard extends React.Component {
 
                     <Divider style={{margin: "0% 5%"}}/>
 
+                    <div style={{display: "flex"}}>
+                        <Card style={{margin: "2% 1% 0 5%", width: "44%"}}>
+                            <CardContent>
 
-                    <Card style={{margin: "2% 5%"}}>
-                        <CardContent>
+                                <h4 style={{margin: "0.5% 0% 0% 2%"}}>
+                                    SHOP FUNNEL ANALYSIS
+                                </h4>
+                                <Divider style={{margin: "1% 2%"}}/>
+                                <div style={{padding: "0.5%", margin: "1% 0% 0% 1%", width: "100%"}}>
+                                    <p id={"shop_funnels_summary"}/>
+                                    <p id={"shop_funnels_conclusion"}/>
+                                </div>
 
-                            <h3 style={{margin: "0.5% 0% 0% 2%"}}>
-                                SHOP FUNNEL ANALYSIS
-                            </h3>
-                            <Divider style={{margin: "1% 2%"}}/>
-                            <div style={{padding: "0.5%", margin: "1% 0% 0% 2%", width: "97%"}}>
-                                <p id={"shop_funnels_summary"}/>
-                                <p id={"shop_funnels_conclusion"}/>
-                            </div>
+                                <div style={{margin: "0% 0.5% 1% 1.5%", width: "96%"}}>
 
-                            <div style={{margin: "0% 0.5% 1% 1.5%", width: "96%"}}>
+                                    <Divider style={{margin: "1% 1%"}}/>
 
-                                <Divider style={{margin: "1% 1%"}}/>
+                                    <center>
+                                        <Bar
+                                            width={100}
+                                            height={50}
+                                            type={'bar'}
+                                            ref={(reference) => this.shop_funnel_ref = reference}
+                                            data={this.state.shop_funnels}
+                                            options={{
+                                                maintainAspectRatio: true,
+                                                tooltips: {
+                                                    callbacks: {
+                                                        title: function (tooltipItem, data) {
+                                                            return data['labels'][tooltipItem[0]['index']];
+                                                        },
+                                                        label: function (tooltipItem, data) {
+                                                            return data['datasets'][0]['data'][tooltipItem['index']];
+                                                        }
+                                                    },
+                                                    displayColors: false,
+                                                },
 
-                                <center>
+                                                scales: {
+                                                    xAxes: [{
+                                                        barPercentage: 0.5,
+                                                        linePercentage: 0.5
+                                                    }],
+                                                    yAxes: [{
+                                                        type: "linear", // only linear but allow scale type registration. This allows extensions to exist solely for log scale for instance
+                                                        display: true,
+                                                        position: "left",
+                                                        id: "y-axis-2",
+
+                                                        // grid line settings
+                                                        gridLines: {
+                                                            drawOnChartArea: false, // only want the grid lines for one axis to show up
+                                                        },
+                                                        scaleLabel: {
+                                                            display: true,
+                                                            labelString: "# Visitors"
+                                                        },
+                                                        ticks: {
+                                                            min: 0,
+                                                            stepSize: this.state.step_size_shop_funnel,
+                                                            max: (Math.round(this.state.shop_funnel_max_val / this.state.step_size_shop_funnel) + 2) * this.state.step_size_shop_funnel,
+                                                            // suggestedMax: 200,
+                                                            callback: function (value) {
+                                                                return value
+                                                            }
+                                                        },
+                                                    }, {
+                                                        type: "linear", // only linear but allow scale type registration. This allows extensions to exist solely for log scale for instance
+                                                        display: false,
+                                                        position: "left",
+                                                        id: "y-axis-1",
+                                                        ticks: {
+                                                            min: 0,
+                                                            stepSize: this.state.step_size_shop_funnel,
+                                                            // suggestedMax: 200,
+                                                            max: (Math.round(this.state.shop_funnel_max_val / this.state.step_size_shop_funnel) + 2) * this.state.step_size_shop_funnel,
+                                                            callback: function (value) {
+                                                                return value
+                                                            }
+                                                        },
+                                                    }]
+                                                }
+                                            }}>
+                                        </Bar>
+                                    </center>
+                                </div>
+                            </CardContent>
+                        </Card>
+
+                        <Card style={{margin: "2% 0 0 0", width: "44%"}}>
+                            <CardContent>
+                                <h4 style={{margin: "0.5% 0% 0% 2%"}}>
+                                    LANDING PAGE ANALYSIS
+                                </h4>
+                                <Divider/>
+                                <div style={{padding: "0.5%", margin: "1% 0% 0% 1%", width: "100%"}}>
+                                    <p id={"landing_page_conversion_summary"}/>
+                                    <p id={"landing_page_conversion_conclusion"}/>
+                                </div>
+
+                                <div style={{margin: "0% 0.5% 1% 1.5%", width: "96%"}}>
+                                    <hr/>
                                     <Bar
-                                        width={45}
-                                        height={20}
-                                        type={'bar'}
-                                        ref={(reference) => this.shop_funnel_ref = reference }
-                                        data={this.state.shop_funnels}
+                                        width={100}
+                                        height={50}
+                                        data={this.state.landing_page_conversion}
+                                        ref={(reference) => this.landing_page_ref = reference}
                                         options={{
                                             maintainAspectRatio: true,
-                                            tooltips: {
-                                                callbacks: {
-                                                    title: function (tooltipItem, data) {
-                                                        return data['labels'][tooltipItem[0]['index']];
-                                                    },
-                                                    label: function (tooltipItem, data) {
-                                                        return data['datasets'][0]['data'][tooltipItem['index']];
-                                                    }
-                                                },
-                                                displayColors: false,
-                                            },
-
                                             scales: {
                                                 xAxes: [{
-                                                    barPercentage: 0.5,
-                                                    linePercentage: 0.5
+                                                    stacked: true,
+                                                    barPercentage: 0.3
                                                 }],
                                                 yAxes: [{
-                                                    type: "linear", // only linear but allow scale type registration. This allows extensions to exist solely for log scale for instance
-                                                    display: true,
-                                                    position: "left",
-                                                    id: "y-axis-2",
-
-                                                    // grid line settings
-                                                    gridLines: {
-                                                        drawOnChartArea: false, // only want the grid lines for one axis to show up
+                                                    stacked: true,
+                                                    ticks: {
+                                                        min: 0,
+                                                        stepSize: this.state.step_size_landing_page,
+                                                        max: (Math.round(this.state.landing_page_max_val / this.state.step_size_landing_page) + 2) * this.state.step_size_landing_page,
+                                                        callback: function (value) {
+                                                            return value
+                                                        }
                                                     },
                                                     scaleLabel: {
                                                         display: true,
-                                                        labelString: "# Visitors"
-                                                    },
-                                                    ticks: {
-                                                        min: 0,
-                                                        stepSize: this.state.step_size_shop_funnel,
-                                                        max: (Math.round(this.state.shop_funnel_max_val / this.state.step_size_shop_funnel) + 2) * this.state.step_size_shop_funnel,
-                                                        // suggestedMax: 200,
-                                                        callback: function (value) {
-                                                            return value
-                                                        }
-                                                    },
-                                                }, {
-                                                    type: "linear", // only linear but allow scale type registration. This allows extensions to exist solely for log scale for instance
-                                                    display: false,
-                                                    position: "left",
-                                                    id: "y-axis-1",
-                                                    ticks: {
-                                                        min: 0,
-                                                        stepSize: this.state.step_size_shop_funnel,
-                                                        // suggestedMax: 200,
-                                                        max: (Math.round(this.state.shop_funnel_max_val / this.state.step_size_shop_funnel) + 2) * this.state.step_size_shop_funnel,
-                                                        callback: function (value) {
-                                                            return value
-                                                        }
-                                                    },
+                                                        labelString: "# Unique Visitors"
+                                                    }
                                                 }]
                                             }
                                         }}>
                                     </Bar>
-                                </center>
-                            </div>
-                        </CardContent>
-                    </Card>
+                                </div>
+                            </CardContent>
+                        </Card>
+                    </div>
 
                     <Divider style={{margin: "1% 5%"}}/>
 
@@ -978,7 +1022,6 @@ class ConversionDashboard extends React.Component {
 
                             <Divider style={{margin: "1% 2%"}}/>
 
-
                             <div style={{padding: "0.5%", margin: "1% 0% 0% 2%", width: "97%"}}>
                                 <p id={"product_conversion_summary"}/>
                                 <p id={"product_conversion_conclusion"}/>
@@ -990,10 +1033,10 @@ class ConversionDashboard extends React.Component {
 
                                 <Bar
                                     yAxisID="Unique Visitors"
-                                    width={45}
-                                    height={20}
+                                    width={100}
+                                    height={50}
                                     redraw={true}
-                                    ref={(reference) => this.product_conversion_ref = reference }
+                                    ref={(reference) => this.product_conversion_ref = reference}
                                     data={this.state.product_conversion}
                                     options={{
                                         maintainAspectRatio: true,
@@ -1026,53 +1069,6 @@ class ConversionDashboard extends React.Component {
                     </Card>
 
                     <Divider style={{margin: "1% 5%"}}/>
-
-                    <Card style={{margin: "2% 5%"}}>
-                        <CardContent>
-                            <h3 style={{margin: "0.5% 0% 0% 2%"}}>
-                                LANDING PAGE ANALYSIS
-                            </h3>
-                            <Divider/>
-                            <div style={{padding: "0.5%", margin: "1% 0% 0% 2%", width: "97%"}}>
-                                <p id={"landing_page_conversion_summary"}/>
-                                <p id={"landing_page_conversion_conclusion"}/>
-                            </div>
-
-                            <div style={{margin: "0% 0.5% 1% 1.5%", width: "96%"}}>
-                                <hr/>
-                                <Bar
-                                    width={50}
-                                    height={20}
-                                    data={this.state.landing_page_conversion}
-                                    ref={(reference) => this.landing_page_ref = reference }
-                                    options={{
-                                        maintainAspectRatio: true,
-                                        scales: {
-                                            xAxes: [{
-                                                stacked: true,
-                                                barPercentage: 0.3
-                                            }],
-                                            yAxes: [{
-                                                stacked: true,
-                                                ticks: {
-                                                    min: 0,
-                                                    stepSize: this.state.step_size_landing_page,
-                                                    max: (Math.round(this.state.landing_page_max_val / this.state.step_size_landing_page) + 2) * this.state.step_size_landing_page,
-                                                    callback: function (value) {
-                                                        return value
-                                                    }
-                                                },
-                                                scaleLabel: {
-                                                    display: true,
-                                                    labelString: "# Unique Visitors"
-                                                }
-                                            }]
-                                        }
-                                    }}>
-                                </Bar>
-                            </div>
-                        </CardContent>
-                    </Card>
 
 
                 </main>

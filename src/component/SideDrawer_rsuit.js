@@ -1,19 +1,10 @@
 import * as React from "react";
 
-import {fade, MenuItem, MenuList} from "@material-ui/core";
-import {withStyles} from "@material-ui/core/styles";
 import {Link} from "react-router-dom";
 import Divider from "@material-ui/core/Divider";
-import DnsIcon from "@material-ui/icons/Dns";
-import AddIcon from "@material-ui/icons/Add";
-import EditIcon from "@material-ui/icons/Edit";
-import Drawer from "@material-ui/core/Drawer";
-import ListItemIcon from "@material-ui/core/ListItemIcon";
-import DashboardIcon from "@material-ui/icons/Dashboard";
-import PriorityHighIcon from "@material-ui/icons/PriorityHigh";
 import {ReactComponent as BinaizeWhiteLogo} from "../images/binaize-logo-white.svg";
 import 'rsuite/dist/styles/rsuite-default.css'
-import {Dropdown, Icon, Nav, Sidenav, Toggle} from "rsuite";
+import {Dropdown, Icon, Nav, Sidenav} from "rsuite";
 import "./SideBar.css"
 
 
@@ -27,7 +18,6 @@ class Demo extends React.Component {
         this.handleSelect = this.handleSelect.bind(this);
 
         let path_name = window.location.pathname
-
         console.log(path_name)
 
         if (path_name === "/experiment") {
@@ -38,9 +28,7 @@ class Demo extends React.Component {
             localStorage.setItem("activeKey", "1-1")
         }
 
-
     }
-
 
     handleSelect(eventKey) {
         this.setState({

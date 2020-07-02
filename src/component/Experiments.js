@@ -44,6 +44,7 @@ const exp_style = theme => ({
         flexGrow: 1,
         backgroundColor: theme.palette.background.default,
         padding: theme.spacing(1),
+        marginLeft: "300px"
     },
     grow: {
         flexGrow: 1,

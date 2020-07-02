@@ -57,6 +57,7 @@ const exp_style = theme => ({
         flexGrow: 1,
         backgroundColor: theme.palette.background.default,
         padding: theme.spacing(1),
+        marginLeft: "300px"
     },
     grow: {
         flexGrow: 1,
@@ -612,30 +613,6 @@ class ABTestingDashboard extends React.Component {
 
         try {
 
-            // let max = [];
-
-            // Object.keys(this.state.full_conversion_over_time["goal_conversion_percentage"]).forEach((key) => {
-            //     max.push(Math.max.apply(null, this.state.full_conversion_over_time["goal_conversion_percentage"][key]))
-            // })
-            //
-            // let max_goal_value = Math.max.apply(null, max)
-            //
-            // for (let s = 0; s < tickSizes.length; s++) {
-            //     console.log("-------" + max_goal_value);
-            //     let val = max_goal_value / tickSizes[s]
-            //     if (val < 6) {
-            //         console.log(tickSizes[s]);
-            //         this.setState({
-            //             step_size_visitor: tickSizes[s]
-            //         })
-            //         break
-            //     }
-            // }
-            //
-            // this.setState({
-            //     visitor_max_value: max_visitor_value
-            // })
-
             Object.keys(this.state.full_conversion_over_time["goal_conversion_percentage"]).sort().forEach((key) => {
 
                 let localDataGoalPercent
@@ -735,9 +712,6 @@ class ABTestingDashboard extends React.Component {
 
     getAllData(exp_id) {
 
-
-        // console.log(exp_id)
-
         this.setState({selected: this.state.selected})
         const params = new URLSearchParams({
             experiment_id: exp_id
@@ -780,39 +754,6 @@ class ABTestingDashboard extends React.Component {
                 console.log(err)
             })
 
-
-        // CONVERSION OVER TIME API CALL
-        const urlSession = REACT_APP_URL_CONVERSION_OVER_TIME + `?${params.toString()}`
-
-        fetch(REACT_APP_BASE_URL + urlSession, {
-            method: 'GET',
-            headers: {
-                'Access-Control-Allow-Origin': '*',
-                'Authorization': access,
-                'Accept': 'application/json'
-            }
-        })
-            .then(response => response.json())
-            .then(result => {
-                // console.log("Success:", result);
-
-                this.setState({
-                    full_conversion_over_time: result
-                })
-
-                console.log(this.state.full_conversion_over_time)
-
-                this.getSession();
-                this.getVisitor();
-                this.getGoalConversion();
-                this.getSalesConversion();
-                this.getGoalConversionPercentage();
-                this.getSalesConversionPercentage();
-
-            })
-            .catch(err => {
-                console.log(err)
-            })
 
 
         // CONVERSION TABLE API CALL
@@ -866,6 +807,42 @@ class ABTestingDashboard extends React.Component {
         }
 
 
+
+        // CONVERSION OVER TIME API CALL
+        const urlSession = REACT_APP_URL_CONVERSION_OVER_TIME + `?${params.toString()}`
+
+        fetch(REACT_APP_BASE_URL + urlSession, {
+            method: 'GET',
+            headers: {
+                'Access-Control-Allow-Origin': '*',
+                'Authorization': access,
+                'Accept': 'application/json'
+            }
+        })
+            .then(response => response.json())
+            .then(result => {
+                // console.log("Success:", result);
+
+                this.setState({
+                    full_conversion_over_time: result
+                })
+
+                console.log(this.state.full_conversion_over_time)
+
+                this.getSession();
+                this.getVisitor();
+                this.getGoalConversion();
+                this.getSalesConversion();
+                this.getGoalConversionPercentage();
+                this.getSalesConversionPercentage();
+
+            })
+            .catch(err => {
+                console.log(err)
+            })
+
+
+
     }
 
 
@@ -891,7 +868,7 @@ class ABTestingDashboard extends React.Component {
 
                     <div style={{display: "flex"}}>
                         {/*<h2 style={{margin: "2% 2%"}}>A/B Testing  Dashboard</h2>*/}
-                        <h2 style={{margin: "2% 1% 1% 5%"}}> {this.state.exp_name} </h2>
+                        <h3 style={{margin: "2% 1% 1% 5%"}}> {this.state.exp_name} </h3>
 
                         <Button
                             color="primary"
@@ -927,7 +904,7 @@ class ABTestingDashboard extends React.Component {
                     </div>
                     <Card style={{margin: "2% 5%"}}>
                         <CardContent>
-                            <div style={{padding: "0.5%", margin: "0% 2%", width: "90%", fontSize: "14px"}}>
+                            <div style={{padding: "0.5%", margin: "0% 1%", width: "95%", fontSize: "14px"}}>
                                 <p id="summary"/>
                                 <p id="summary_conclusion"/>
                                 <p id="summary_recommendation"/>
@@ -970,212 +947,237 @@ class ABTestingDashboard extends React.Component {
 
                     <Divider style={{margin: "0% 5%"}}/>
 
-                    <Card style={{margin: "2% 5%"}}>
-                        <CardContent style={{display: "flex"}}>
-                            <div style={{margin: "0% 0.5% 1% 1.5%", width: "96%"}}>
-                                <h3>
-                                    Session Over Time
-                                </h3>
-                                <hr/>
 
-                                <Bar
-                                    width={100}
-                                    height={40}
-                                    data={this.state.SessionCountData}
-                                    redraw={true}
-                                    options={{
-                                        maintainAspectRatio: true,
-                                        scales: {
-                                            yAxes: [{
-                                                ticks: {
-                                                    min: 0,
-                                                    stepSize: this.state.step_size_session,
-                                                    max: (Math.round(this.state.session_max_value / this.state.step_size_session) + 2) * this.state.step_size_session,
-                                                },
-                                                scaleLabel: {
-                                                    display: true,
-                                                    labelString: "# Sessions"
-                                                }
-                                            }]
-                                        }
-                                    }}>
-                                </Bar>
-                            </div>
+                    <div style={{display: "flex"}}>
+                        <Card style={{margin: "2% 1% 0 5%", width: "44%"}}>
+                            <CardContent style={{display: "flex"}}>
+                                <div style={{margin: "0% 1.5% 1% 1.5%", width: "96%"}}>
+                                    <h4>
+                                        Session Over Time
+                                    </h4>
+                                    <hr/>
 
-                            <div style={{margin: "0% 0.5% 1% 1.5%", width: "96%"}}>
-                                <h3>
-                                    Visitor Count
-                                </h3>
-                                <hr/>
+                                    <Bar
+                                        width={100}
+                                        height={60}
+                                        data={this.state.SessionCountData}
+                                        redraw={true}
+                                        options={{
+                                            maintainAspectRatio: true,
+                                            scales: {
+                                                yAxes: [{
+                                                    ticks: {
+                                                        min: 0,
+                                                        stepSize: this.state.step_size_session,
+                                                        max: (Math.round(this.state.session_max_value / this.state.step_size_session) + 2) * this.state.step_size_session,
+                                                    },
+                                                    scaleLabel: {
+                                                        display: true,
+                                                        labelString: "# Sessions"
+                                                    }
+                                                }]
+                                            }
+                                        }}>
+                                    </Bar>
+                                </div>
+                            </CardContent>
+                        </Card>
 
-                                <Bar
-                                    width={100}
-                                    height={40}
-                                    data={this.state.VisitorCountData}
-                                    redraw={true}
-                                    options={{
-                                        maintainAspectRatio: true,
-                                        scales: {
-                                            yAxes: [{
-                                                ticks: {
-                                                    min: 0,
-                                                    stepSize: this.state.step_size_visitor,
-                                                    max: (Math.round(this.state.visitor_max_value / this.state.step_size_visitor) + 2) * this.state.step_size_visitor,
-                                                },
-                                                scaleLabel: {
-                                                    display: true,
-                                                    labelString: "# Visitors"
-                                                }
-                                            }]
-                                        }
-                                    }}>
-                                </Bar>
-                            </div>
+                        <Card style={{margin: "2% 0 0 0", width: "44%"}}>
+                            <CardContent style={{display: "flex"}}>
 
-                        </CardContent>
+                                <div style={{margin: "0% 0.5% 1% 1.5%", width: "96%"}}>
+                                    <h4>
+                                        Visitor Count
+                                    </h4>
+                                    <hr/>
 
-                        <CardContent style={{display: "flex"}}>
-                            <div style={{margin: "0% 0.5% 1% 1.5%", width: "96%"}}>
-                                <h3>
-                                    Goal Conversion Count
-                                </h3>
-                                <hr/>
+                                    <Bar
+                                        width={100}
+                                        height={60}
+                                        data={this.state.VisitorCountData}
+                                        redraw={true}
+                                        options={{
+                                            maintainAspectRatio: true,
+                                            scales: {
+                                                yAxes: [{
+                                                    ticks: {
+                                                        min: 0,
+                                                        stepSize: this.state.step_size_visitor,
+                                                        max: (Math.round(this.state.visitor_max_value / this.state.step_size_visitor) + 2) * this.state.step_size_visitor,
+                                                    },
+                                                    scaleLabel: {
+                                                        display: true,
+                                                        labelString: "# Visitors"
+                                                    }
+                                                }]
+                                            }
+                                        }}>
+                                    </Bar>
+                                </div>
 
-                                <Bar
-                                    width={100}
-                                    height={40}
-                                    data={this.state.GoalConversionData}
-                                    redraw={true}
-                                    options={{
-                                        maintainAspectRatio: true,
-                                        scales: {
-                                            yAxes: [{
-                                                ticks: {
-                                                    min: 0,
-                                                    stepSize: this.state.step_size_goal_conversion,
-                                                    max: (Math.round(this.state.goal_conversion_max_value / this.state.step_size_goal_conversion) + 2) * this.state.step_size_goal_conversion,
-                                                },
-                                                scaleLabel: {
-                                                    display: true,
-                                                    labelString: "# Visitors"
-                                                }
-                                            }]
-                                        }
-                                    }}>
-                                </Bar>
-                            </div>
+                            </CardContent>
 
-                            <div style={{margin: "0% 0.5% 1% 1.5%", width: "96%"}}>
-                                <h3>
-                                    Sales Conversion Count
-                                </h3>
-                                <hr/>
+                        </Card>
+                    </div>
 
-                                <Bar
-                                    width={100}
-                                    height={40}
-                                    data={this.state.SalesConversionData}
-                                    redraw={true}
-                                    options={{
-                                        maintainAspectRatio: true,
-                                        scales: {
-                                            yAxes: [{
-                                                ticks: {
-                                                    min: 0,
-                                                    stepSize: this.state.step_size_sales_conversion,
-                                                    max: (Math.round(this.state.sales_conversion_max_value / this.state.step_size_sales_conversion) + 2) * this.state.step_size_sales_conversion,
-                                                },
-                                                scaleLabel: {
-                                                    display: true,
-                                                    labelString: "# Sales"
-                                                }
-                                            }]
-                                        }
-                                    }}>
-                                </Bar>
-                            </div>
+                    <div style={{display: "flex"}}>
+                        <Card style={{margin: "2% 1% 0 5%", width: "44%"}}>
+                            <CardContent style={{display: "flex"}}>
+                                <div style={{margin: "0% 0.5% 1% 1.5%", width: "96%"}}>
+                                    <h4>
+                                        Goal Conversion Count
+                                    </h4>
+                                    <hr/>
 
-                        </CardContent>
+                                    <Bar
+                                        width={100}
+                                        height={60}
+                                        data={this.state.GoalConversionData}
+                                        redraw={true}
+                                        options={{
+                                            maintainAspectRatio: true,
+                                            scales: {
+                                                yAxes: [{
+                                                    ticks: {
+                                                        min: 0,
+                                                        stepSize: this.state.step_size_goal_conversion,
+                                                        max: (Math.round(this.state.goal_conversion_max_value / this.state.step_size_goal_conversion) + 2) * this.state.step_size_goal_conversion,
+                                                    },
+                                                    scaleLabel: {
+                                                        display: true,
+                                                        labelString: "# Visitors"
+                                                    }
+                                                }]
+                                            }
+                                        }}>
+                                    </Bar>
+                                </div>
 
+                            </CardContent>
+                        </Card>
 
-                        {/*LINE*/}
+                        <Card style={{margin: "2% 0 0 0", width: "44%"}}>
+                            <CardContent style={{display: "flex"}}>
+                                <div style={{margin: "0% 0.5% 1% 1.5%", width: "96%"}}>
+                                    <h4>
+                                        Sales Conversion Count
+                                    </h4>
+                                    <hr/>
 
+                                    <Bar
+                                        width={100}
+                                        height={60}
+                                        data={this.state.SalesConversionData}
+                                        redraw={true}
+                                        options={{
+                                            maintainAspectRatio: true,
+                                            scales: {
+                                                yAxes: [{
+                                                    ticks: {
+                                                        min: 0,
+                                                        stepSize: this.state.step_size_sales_conversion,
+                                                        max: (Math.round(this.state.sales_conversion_max_value / this.state.step_size_sales_conversion) + 2) * this.state.step_size_sales_conversion,
+                                                    },
+                                                    scaleLabel: {
+                                                        display: true,
+                                                        labelString: "# Sales"
+                                                    }
+                                                }]
+                                            }
+                                        }}>
+                                    </Bar>
+                                </div>
 
-                        <CardContent style={{display: "flex"}}>
-                            <div style={{margin: "0% 0.5% 1% 1.5%", width: "96%"}}>
-                                <h3>
-                                    Goal Conversion Percentage
-                                </h3>
-                                <hr/>
+                            </CardContent>
+                        </Card>
+                    </div>
 
-                                <Line
-                                    width={100}
-                                    height={40}
-                                    data={this.state.GoalConversionPercentData}
-                                    redraw={true}
-                                    options={{
-                                        tooltips: {
-                                            intersect: false,
-                                        },
-                                        hover: {
-                                            intersect: false
-                                        },
-                                        maintainAspectRatio: true,
-                                        scales: {
-                                            yAxes: [{
-                                                ticks: {
-                                                    min: 0,
-                                                    max: 100,
-                                                },
-                                                scaleLabel: {
-                                                    display: true,
-                                                    labelString: "% Goal Conversion"
-                                                }
-                                            }]
-                                        }
-                                    }}>
-                                </Line>
+                    {/*LINE*/}
 
-                            </div>
+                    <div style={{display: "flex"}}>
+                        <Card style={{margin: "2% 1% 0 5%", width: "44%"}}>
+                            <CardContent style={{display: "flex"}}>
+                                <div style={{margin: "0% 0.5% 1% 1.5%", width: "96%"}}>
+                                    <h4>
+                                        Goal Conversion
+                                    </h4>
+                                    <hr/>
 
-                            <div style={{margin: "0% 0.5% 1% 1.5%", width: "96%"}}>
-                                <h3>
-                                    Sales Conversion Percentage
-                                </h3>
-                                <hr/>
+                                    <Line
+                                        width={100}
+                                        height={60}
+                                        data={this.state.GoalConversionPercentData}
+                                        redraw={true}
+                                        options={{
+                                            tooltips: {
+                                                intersect: false,
+                                            },
+                                            hover: {
+                                                intersect: false
+                                            },
+                                            maintainAspectRatio: true,
+                                            scales: {
+                                                yAxes: [{
+                                                    ticks: {
+                                                        min: 0,
+                                                        max: 100,
+                                                    },
+                                                    scaleLabel: {
+                                                        display: true,
+                                                        labelString: "% Goal Conversion"
+                                                    }
+                                                }]
+                                            }
+                                        }}>
+                                    </Line>
 
-                                <Line
-                                    width={100}
-                                    height={40}
-                                    data={this.state.SalesConversionPercentData}
-                                    redraw={true}
-                                    options={{
-                                        tooltips: {
-                                            intersect: false,
-                                        },
-                                        hover: {
-                                            intersect: false
-                                        },
-                                        maintainAspectRatio: true,
-                                        scales: {
-                                            yAxes: [{
-                                                ticks: {
-                                                    min: 0,
-                                                    max: 100,
-                                                },
-                                                scaleLabel: {
-                                                    display: true,
-                                                    labelString: "% Sales Conversion"
-                                                }
-                                            }]
-                                        }
-                                    }}>
-                                </Line>
-                            </div>
+                                </div>
+                            </CardContent>
+                        </Card>
 
-                        </CardContent>
+                        <Card style={{margin: "2% 0 0 0", width: "44%"}}>
+                            <CardContent style={{display: "flex"}}>
+                                <div style={{margin: "0% 0.5% 1% 1.5%", width: "96%"}}>
+                                    <h4>
+                                        Sales Conversion
+                                    </h4>
+                                    <hr/>
 
-                    </Card>
+                                    <Line
+                                        width={100}
+                                        height={60}
+                                        data={this.state.SalesConversionPercentData}
+                                        redraw={true}
+                                        options={{
+                                            tooltips: {
+                                                intersect: false,
+                                            },
+                                            hover: {
+                                                intersect: false
+                                            },
+                                            maintainAspectRatio: true,
+                                            scales: {
+                                                yAxes: [{
+                                                    ticks: {
+                                                        min: 0,
+                                                        max: 100,
+                                                    },
+                                                    scaleLabel: {
+                                                        display: true,
+                                                        labelString: "% Sales Conversion"
+                                                    }
+                                                }]
+                                            }
+                                        }}>
+                                    </Line>
+                                </div>
+
+                            </CardContent>
+
+                        </Card>
+                    </div>
+
                     <Divider style={{margin: "1% 5%"}}/>
 
 

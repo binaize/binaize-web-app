@@ -3,6 +3,7 @@
     width: 300px !important;
     z-index: 1200 !important;
     background-color: #1A2330 !important;
+    position: fixed;
 }
 
 .rs-sidenav-default {

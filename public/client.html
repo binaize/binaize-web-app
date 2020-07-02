@@ -5,6 +5,7 @@
     <title>Title</title>
 
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/ClientJS/0.1.11/client.min.js"></script>
 
     <!-- Compiled and minified CSS -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/css/materialize.min.css">
@@ -16,45 +17,164 @@
 </head>
 <body>
 
-
-<div class="container">
-    <h2>Client Details</h2>
-
-    <div class="row">
-        <div class="col s12 m6">
+    <div class="row" style="margin: 0 5%;">
+        <center><h4>Client Details</h4></center>
+        <div class="col s4 m4">
             <div class="card">
                 <div class="card-content">
                     <table class="striped">
                         <thead>
                         <tr>
-                            <th>Name</th>
-                            <th>Item Name</th>
-                            <th>Item Price</th>
+                            <th>IP Info</th>
+                            <th>Details</th>
                         </tr>
                         </thead>
 
-                        <tbody>
-                        <tr>
-                            <td>Bivav</td>
-                            <td>Eclair</td>
-                        </tr>
+                        <tbody id="ipBody">
                         </tbody>
                     </table>
                 </div>
             </div>
         </div>
+
+        <div class="col s8 m8">
+            <div class="card">
+                <div class="card-content">
+                    <table class="striped" style="table-layout: fixed;">
+                        <thead>
+                        <tr>
+                            <th>Methods</th>
+                            <th>Value</th>
+                        </tr>
+                        </thead>
+
+                        <tbody id="tableBody">
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
     </div>
 
-</div>
 
 
 <script>
 
+    const ip_table = document.getElementById("ipBody");
+
+    // IP info data
     $.get("https://ipinfo.io", function(response) {
         console.log(response);
+
+        Object.keys(response).forEach(key => {
+            let row = ip_table.insertRow();
+            let name = row.insertCell(0);
+            name.innerHTML = key;
+            let value = row.insertCell(1);
+            value.innerHTML = response[key];
+        })
+
+
     }, "json")
 
+
+    // Client JS methods
+    let client = new ClientJS();
+
+    let all_data = {
+        "getBrowser()": client.getBrowser(),
+        "getBrowserData()" : client.getBrowserData(),
+        "getFingerprint()" : client.getFingerprint(),
+
+        "getUserAgent()" : client.getUserAgent(),
+        "getUserAgentLowerCase()" : client.getUserAgentLowerCase(),
+
+        "getBrowserVersion()" : client.getBrowserVersion(),
+        "getBrowserMajorVersion()" : client.getBrowserMajorVersion(),
+        "isIE()" : client.isIE(),
+        "isChrome()" : client.isChrome(),
+        "isFirefox()" : client.isFirefox(),
+        "isSafari()" : client.isSafari(),
+        "isOpera()" : client.isOpera(),
+
+        "getEngine()" : client.getEngine(),
+        "getEngineVersion()" : client.getEngineVersion(),
+
+        "getOS()" : client.getOS(),
+        "getOSVersion()" : client.getOSVersion(),
+        "isWindows()" : client.isWindows(),
+        "isMac()" : client.isMac(),
+        "isLinux()" : client.isLinux(),
+        "isUbuntu()" : client.isUbuntu(),
+        "isSolaris()" : client.isSolaris(),
+
+        "getDevice()" : client.getDevice(),
+        "getDeviceType()" : client.getDeviceType(),
+        "getDeviceVendor()" : client.getDeviceVendor(),
+
+        "getCPU()" : client.getCPU(),
+
+        "isMobile()" : client.isMobile(),
+        "isMobileMajor()" : client.isMobileMajor(),
+        "isMobileAndroid()" : client.isMobileAndroid(),
+        "isMobileOpera()," : client.isMobileOpera(),
+        "isMobileWindows(" : client.isMobileWindows(),
+        "isMobileBlackBer" : client.isMobileBlackBerry(),
+
+        "isMobileIOS()," : client.isMobileIOS(),
+        "isIphone()," : client.isIphone(),
+        "isIpad()," : client.isIpad(),
+        "isIpod()," : client.isIpod(),
+
+        "getScreenPrint()" : client.getScreenPrint(),
+        "getColorDepth()," : client.getColorDepth(),
+        "getCurrentResolution()" : client.getCurrentResolution(),
+        "getAvailableResolution()" : client.getAvailableResolution(),
+        "getDeviceXDPI()," : client.getDeviceXDPI(),
+        "getDeviceYDPI()," : client.getDeviceYDPI(),
+
+        "getPlugins()," : client.getPlugins(),
+        "isJava()," : client.isJava(),
+        "getJavaVersion()" : client.getJavaVersion(),
+        "isFlash()," : client.isFlash(),
+        "getFlashVersion()" : client.getFlashVersion(),
+        "isSilverlight()," : client.isSilverlight(),
+        "getSilverlightVersion()" : client.getSilverlightVersion(),
+
+        "getMimeTypes()," : client.getMimeTypes(),
+        "isMimeTypes()," : client.isMimeTypes(),
+
+        "isFont()," : client.isFont(),
+        "getFonts()," : client.getFonts(),
+
+        "isLocalStorage()" : client.isLocalStorage(),
+        "isSessionStorage()" : client.isSessionStorage(),
+        "isCookie()," : client.isCookie(),
+
+        "getTimeZone()," : client.getTimeZone(),
+
+        "getLanguage()," : client.getLanguage(),
+        "getSystemLanguage()" : client.getSystemLanguage()
+    }
+
+
+    function loadTableData() {
+        const table = document.getElementById("tableBody");
+
+        Object.keys(all_data).forEach(key => {
+            let row = table.insertRow();
+            let method = row.insertCell(0);
+            method.innerHTML = key;
+            let value = row.insertCell(1);
+            value.innerHTML = all_data[key];
+        })
+    }
+    loadTableData();
+
+
 </script>
+
 
 </body>
 </html>
