@@ -1056,47 +1056,8 @@ class ABTestingDashboard extends React.Component {
 
                             </CardContent>
                         </Card>
-
                         <Card style={{margin: "2% 0 0 0", width: "44%"}}>
-                            <CardContent style={{display: "flex"}}>
-                                <div style={{margin: "0% 0.5% 1% 1.5%", width: "96%"}}>
-                                    <h4>
-                                        Sales Conversion Count
-                                    </h4>
-                                    <hr/>
 
-                                    <Bar
-                                        width={100}
-                                        height={60}
-                                        data={this.state.SalesConversionData}
-                                        redraw={true}
-                                        options={{
-                                            maintainAspectRatio: true,
-                                            scales: {
-                                                yAxes: [{
-                                                    ticks: {
-                                                        min: 0,
-                                                        stepSize: this.state.step_size_sales_conversion,
-                                                        max: (Math.round(this.state.sales_conversion_max_value / this.state.step_size_sales_conversion) + 2) * this.state.step_size_sales_conversion,
-                                                    },
-                                                    scaleLabel: {
-                                                        display: true,
-                                                        labelString: "# Sales"
-                                                    }
-                                                }]
-                                            }
-                                        }}>
-                                    </Bar>
-                                </div>
-
-                            </CardContent>
-                        </Card>
-                    </div>
-
-                    {/*LINE*/}
-
-                    <div style={{display: "flex"}}>
-                        <Card style={{margin: "2% 1% 0 5%", width: "44%"}}>
                             <CardContent style={{display: "flex"}}>
                                 <div style={{margin: "0% 0.5% 1% 1.5%", width: "96%"}}>
                                     <h4>
@@ -1122,10 +1083,11 @@ class ABTestingDashboard extends React.Component {
                                                     ticks: {
                                                         min: 0,
                                                         max: 100,
+                                                        stepSize: 20
                                                     },
                                                     scaleLabel: {
                                                         display: true,
-                                                        labelString: "% Goal Conversion"
+                                                        labelString: "% Conversion"
                                                     }
                                                 }]
                                             }
@@ -1135,6 +1097,51 @@ class ABTestingDashboard extends React.Component {
                                 </div>
                             </CardContent>
                         </Card>
+
+                    </div>
+
+                    {/*LINE*/}
+
+                    <div style={{display: "flex"}}>
+
+
+                        <Card style={{margin: "2% 1% 0 5%", width: "44%"}}>
+                            <CardContent style={{display: "flex"}}>
+                                <div style={{margin: "0% 0.5% 1% 1.5%", width: "96%"}}>
+                                    <h4>
+                                        Sales Conversion Count
+                                    </h4>
+                                    <hr/>
+
+                                    <Bar
+                                        width={100}
+                                        height={60}
+                                        data={this.state.SalesConversionData}
+                                        redraw={true}
+                                        options={{
+                                            maintainAspectRatio: true,
+                                            scales: {
+                                                yAxes: [{
+                                                    ticks: {
+                                                        min: 0,
+                                                        stepSize: this.state.step_size_sales_conversion,
+                                                        max: (Math.round(this.state.sales_conversion_max_value / this.state.step_size_sales_conversion) + 2) * this.state.step_size_sales_conversion,
+                                                    },
+                                                    scaleLabel: {
+                                                        display: true,
+                                                        labelString: "# Visitors"
+                                                    }
+                                                }]
+                                            }
+                                        }}>
+                                    </Bar>
+                                </div>
+
+                            </CardContent>
+                        </Card>
+
+
+
 
                         <Card style={{margin: "2% 0 0 0", width: "44%"}}>
                             <CardContent style={{display: "flex"}}>
@@ -1162,10 +1169,11 @@ class ABTestingDashboard extends React.Component {
                                                     ticks: {
                                                         min: 0,
                                                         max: 100,
+                                                        stepSize: 20
                                                     },
                                                     scaleLabel: {
                                                         display: true,
-                                                        labelString: "% Sales Conversion"
+                                                        labelString: "% Conversion"
                                                     }
                                                 }]
                                             }

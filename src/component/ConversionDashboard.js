@@ -21,13 +21,14 @@ import Button from "@material-ui/core/Button";
 import RefreshRoundedIcon from "@material-ui/icons/RefreshRounded";
 
 import ChartDataLabels from 'chartjs-plugin-datalabels';
-import {DateRangePicker} from "rsuite";
+import {Container, Content, DateRangePicker, Footer, Sidebar} from "rsuite";
 import $ from "jquery";
 import Demo from "./SideDrawer_rsuit";
 import FormControl from "@material-ui/core/FormControl";
 import InputLabel from "@material-ui/core/InputLabel";
 import Select from "@material-ui/core/Select";
 import MenuItem from "@material-ui/core/MenuItem";
+import Header from "rsuite/es/Header";
 
 const {allowedRange} = DateRangePicker;
 
@@ -393,8 +394,8 @@ class ConversionDashboard extends React.Component {
             }
         })
 
-        let shop_fun_ref = this.shop_funnel_ref.chartInstance
-        shop_fun_ref.update()
+        let product_conv_ref = this.product_conversion_ref.chartInstance
+        product_conv_ref.update()
 
 
     }
@@ -581,6 +582,9 @@ class ConversionDashboard extends React.Component {
 
                 this.getProductTag(0);
 
+                let product_conv_ref = this.product_conversion_ref.chartInstance
+                product_conv_ref.update()
+
 
             })
             .catch(err => {
@@ -745,8 +749,8 @@ class ConversionDashboard extends React.Component {
                     }
                 })
 
-                let shop_fun_ref = this.shop_funnel_ref.chartInstance
-                shop_fun_ref.update()
+                let landing_fun_ref = this.landing_page_ref.chartInstance
+                landing_fun_ref.update()
 
 
             })
@@ -859,7 +863,7 @@ class ConversionDashboard extends React.Component {
 
                                 <div style={{margin: "0% 0.5% 1% 1.5%", width: "96%"}}>
 
-                                    <Divider style={{margin: "1% 1%"}}/>
+                                    <Divider style={{margin: "2% 2%"}}/>
 
                                     <center>
                                         <Bar
@@ -938,14 +942,14 @@ class ConversionDashboard extends React.Component {
                                 <h4 style={{margin: "0.5% 0% 0% 2%"}}>
                                     LANDING PAGE ANALYSIS
                                 </h4>
-                                <Divider/>
+                                <Divider style={{margin: "1% 2%"}}/>
                                 <div style={{padding: "0.5%", margin: "1% 0% 0% 1%", width: "100%"}}>
                                     <p id={"landing_page_conversion_summary"}/>
                                     <p id={"landing_page_conversion_conclusion"}/>
                                 </div>
 
                                 <div style={{margin: "0% 0.5% 1% 1.5%", width: "96%"}}>
-                                    <hr/>
+                                    <Divider style={{margin: "1% 2%"}}/>
                                     <Bar
                                         width={100}
                                         height={50}
@@ -983,7 +987,7 @@ class ConversionDashboard extends React.Component {
 
                     <Divider style={{margin: "1% 5%"}}/>
 
-                    <Card style={{margin: "2% 5%"}}>
+                    <Card style={{margin: "2% 5% 30% 5%"}}>
                         <CardContent>
 
                             <h3 style={{margin: "0.5% 0% 0% 2%"}}>
@@ -1033,8 +1037,8 @@ class ConversionDashboard extends React.Component {
 
                                 <Bar
                                     yAxisID="Unique Visitors"
-                                    width={100}
-                                    height={50}
+                                    width={50}
+                                    height={20}
                                     redraw={true}
                                     ref={(reference) => this.product_conversion_ref = reference}
                                     data={this.state.product_conversion}
@@ -1067,9 +1071,6 @@ class ConversionDashboard extends React.Component {
                             </div>
                         </CardContent>
                     </Card>
-
-                    <Divider style={{margin: "1% 5%"}}/>
-
 
                 </main>
             </div>
