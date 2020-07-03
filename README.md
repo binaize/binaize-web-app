@@ -10,7 +10,6 @@ sudo apt -y install docker-compose
 git clone https://github.com/binaize/binaize-ui.git
 cd binaize-ui
 git checkout development
-scp -i "binaize-optimize.pem" ./theia-dev.env ubuntu@dev.app.binaize.com:~/binaize-ui/
 cp binaize-ui/theia-dev.env binaize-ui/theia.env
 ```
 
@@ -24,7 +23,6 @@ sudo apt -y install docker-compose
 git clone https://github.com/binaize/binaize-ui.git
 cd binaize-ui
 git checkout staging
-scp -i "binaize-optimize.pem" ./theia-staging.env ubuntu@staging.app.binaize.com:~/binaize-ui/
 cp binaize-ui/theia-staging.env binaize-ui/theia.env
 ```
 
@@ -38,7 +36,6 @@ sudo apt -y install docker-compose
 git clone https://github.com/binaize/binaize-ui.git
 cd binaize-ui
 git checkout master
-scp -i "binaize-optimize.pem" ./theia-dev.env ubuntu@app.binaize.com:~/binaize-ui/
 cp binaize-ui/theia-prod.env binaize-ui/theia.env
 ```
 
