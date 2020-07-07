@@ -9,6 +9,7 @@ import Login from "./component/Login";
 import Experiments from "./component/Experiments";
 import ConversionDashboard from "./component/ConversionDashboard";
 import ABTestingDashboard from "./component/ABTestingDashboard";
+import CustomerAnalytics from "./component/CustomerAnalytics";
 
 class App extends React.Component {
 
@@ -25,6 +26,7 @@ class App extends React.Component {
                         <Route exact={true} path={"/experiment"} component={Experiments}/>
                         <Route exact={true} path={"/ABTestingDashboard"} component={ABTestingDashboard}/>
                         <Route exact={true} path={"/conversionDashboard"} component={ConversionDashboard}/>
+                        <Route exact={true} path={"/customerAnalytics"} component={CustomerAnalytics}/>
 
                     </Switch>
                 </Router>

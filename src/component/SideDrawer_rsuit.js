@@ -26,6 +26,8 @@ class Demo extends React.Component {
             localStorage.setItem("activeKey", "1-2")
         }else if (path_name === "/conversionDashboard") {
             localStorage.setItem("activeKey", "1-1")
+        }else if (path_name === "/customerAnalytics") {
+            localStorage.setItem("activeKey", "1-3")
         }
 
     }
@@ -86,7 +88,17 @@ class Demo extends React.Component {
                                     to={"/experiment"}
                                     style={{fontSize: "16px"}}
                                     icon={<Icon icon="dashboard" style={{marginRight: "10px"}}/>}>A/B
-                                    Testing</Dropdown.Item>
+                                    Testing
+                                </Dropdown.Item>
+
+                                <Dropdown.Item
+                                    eventKey="1-3"
+                                    componentClass={Link}
+                                    to={"/customerAnalytics"}
+                                    style={{fontSize: "16px"}}
+                                    icon={<Icon icon="dashboard" style={{marginRight: "10px"}}/>}>
+                                    Customer
+                                </Dropdown.Item>
                             </Dropdown>
                             <Dropdown
                                 placement="rightStart"
