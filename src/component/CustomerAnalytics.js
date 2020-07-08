@@ -10,10 +10,12 @@ import CardContent from "@material-ui/core/CardContent";
 import Card from "@material-ui/core/Card";
 import {HorizontalBar} from 'react-chartjs-2';
 
+import L from "leaflet"
+import {geoJson} from "leaflet"
+import { Map, TileLayer, Marker, Popup } from 'react-leaflet'
 import Choropleth from 'react-leaflet-choropleth'
-import { Map } from 'react-leaflet'
 
-import statesData from "./us-states"
+import {statesData} from "./us-states"
 
 import $ from 'jquery';
 
@@ -30,7 +32,25 @@ import Button from "@material-ui/core/Button";
 import Demo from "./SideDrawer_rsuit";
 import {DateRangePicker} from "rsuite";
 
+
 const {allowedRange} = DateRangePicker;
+const style = {
+    fillColor: '#F28F3B',
+    weight: 2,
+    opacity: 1,
+    color: 'white',
+    dashArray: '3',
+    fillOpacity: 0.5
+}
+
+const leaveStyle = {
+    fillColor: '#F28F3B',
+    weight: 2,
+    opacity: 1,
+    color: 'white',
+    dashArray: '3',
+    fillOpacity: 0.5
+}
 
 const drawerWidth = 280;
 const exp_style = theme => ({
@@ -157,11 +177,13 @@ const tickSizes = [
     1000000, 2000000, 5000000
 ];
 
-const bar_colors = ['#89f4ff', '#15a2cd',
-    '#4fc3f7', "#4dd0e1", "#64b5f6"]
+// const bar_colors = ['#89f4ff', '#15a2cd',
+//     '#4fc3f7', "#4dd0e1", "#64b5f6"]
+const bar_colors = ['#89f4ff', '#4dd0e1',
+    '#4fc3f7', "#64b5f6", "#15a2cd"]
 
-const bar_colors_hover = ['#74d2de', '#138aae',
-    '#35b7ea', "#3ab7c4", "#4fa0dd"]
+const bar_colors_hover = ['#5fced7', '#2bb2c4',
+    '#30a3d6', "#3c93d7", "#0480a5"]
 
 
 class CustomerAnalytics extends React.Component {
@@ -180,6 +202,12 @@ class CustomerAnalytics extends React.Component {
         let today_year = startDate.getFullYear();
 
         this.state = {
+            lat: 38.491897,
+            lng: -100.748953,
+            zoom: 4,
+
+            choropleth_ref : React.createRef(),
+
             access_token: localStorage.getItem("access_token"),
 
             creation_time: localStorage.getItem("creation_time"),
@@ -254,6 +282,33 @@ class CustomerAnalytics extends React.Component {
 
     pad(n) {
         return n < 10 ? '0' + n : n
+    }
+
+    zoomToFeature(e) {
+        // map.fitBounds(e.target.getBounds());
+    }
+
+    highlightFeature(e) {
+        let layer = e.target;
+
+        layer.setStyle({
+            weight: 5,
+            color: '#666',
+            dashArray: '',
+            fillOpacity: 0.7
+        });
+
+        // if (!L.Browser.ie && !L.Browser.opera && !L.Browser.edge) {
+        //     layer.bringToFront();
+        // }
+    }
+
+    resetHighlight(e) {
+
+        let choropleth_ref = this.choropleth_ref;
+        console.log(e.target)
+        console.log(choropleth_ref)
+
     }
 
     getDeviceSessionData(){
@@ -868,15 +923,14 @@ class CustomerAnalytics extends React.Component {
     }
 
 
-
-
-
     componentDidMount() {
         this.getVisitorActivity();
     }
 
     render() {
         const {classes} = this.props;
+
+        const position = [this.state.lat, this.state.lng]
 
         return (
             <div className={classes.root}>
@@ -1456,10 +1510,39 @@ class CustomerAnalytics extends React.Component {
                     {/*<Card style={{margin: "2% 5%"}}>*/}
                     {/*    <CardContent>*/}
                     {/*        <div style={{padding: "0.5%", margin: "0% 1%", width: "95%", fontSize: "14px"}}>*/}
-                    {/*            <Map>*/}
+                    {/*            <Map style={{height: "500px"}} center={position} zoom={this.state.zoom}>*/}
+                    {/*                /!*<TileLayer*!/*/}
+                    {/*                /!*    attribution='&amp;copy <a href="http://osm.org/copyright">OpenStreetMap</a> contributors'*!/*/}
+                    {/*                /!*    url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" />*!/*/}
+                    {/*                /!*<Marker position={position}>*!/*/}
+                    {/*                /!*    <Popup>*!/*/}
+                    {/*                /!*        A pretty CSS3 popup. <br /> Easily customizable.*!/*/}
+                    {/*                /!*    </Popup>*!/*/}
+                    {/*                /!*</Marker>*!/*/}
+
                     {/*                <Choropleth*/}
                     {/*                    data={{type: 'FeatureCollection', features: statesData.features}}*/}
+                    {/*                    valueProperty={(feature) => feature.properties.value}*/}
+                    {/*                    scale={['#b3cde0', '#011f4b']}*/}
+                    {/*                    steps={7}*/}
+                    {/*                    mode='e'*/}
+                    {/*                    style={style}*/}
+                    {/*                    onChange={()=> {}}*/}
+                    {/*                    ref={(reference) => {*/}
+                    {/*                        this.choropleth_ref = reference*/}
+                    {/*                        console.log(reference)*/}
+                    {/*                    }}*/}
+
+                    {/*                    onEachFeature={(feature, layer) => {*/}
+                    {/*                        layer.bindPopup(feature.properties.name)*/}
+                    {/*                        layer.on({*/}
+                    {/*                            mouseover: this.highlightFeature,*/}
+                    {/*                            mouseout: this.resetHighlight,*/}
+                    {/*                            click: this.zoomToFeature*/}
+                    {/*                        });*/}
+                    {/*                    }}*/}
                     {/*                />*/}
+
                     {/*            </Map>*/}
                     {/*        </div>*/}
                     {/*    </CardContent>*/}
