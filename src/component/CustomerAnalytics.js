@@ -12,10 +12,10 @@ import {HorizontalBar} from 'react-chartjs-2';
 
 import L from "leaflet"
 import {geoJson} from "leaflet"
-import { Map, TileLayer, Marker, Popup } from 'react-leaflet'
+import {Map, TileLayer, Marker, Popup} from 'react-leaflet'
 import Choropleth from 'react-leaflet-choropleth'
 
-import {statesData} from "./us-states"
+// import {statesData} from "./us-states"
 
 import $ from 'jquery';
 
@@ -31,6 +31,10 @@ import SideDrawer from "./SideDrawer";
 import Button from "@material-ui/core/Button";
 import Demo from "./SideDrawer_rsuit";
 import {DateRangePicker} from "rsuite";
+import FormControl from "@material-ui/core/FormControl";
+import InputLabel from "@material-ui/core/InputLabel";
+import Select from "@material-ui/core/Select";
+import MenuItem from "@material-ui/core/MenuItem";
 
 
 const {allowedRange} = DateRangePicker;
@@ -206,7 +210,11 @@ class CustomerAnalytics extends React.Component {
             lng: -100.748953,
             zoom: 4,
 
-            choropleth_ref : React.createRef(),
+            statesData: '',
+            select_val: '',
+
+            map_ref: React.createRef(),
+            choropleth_ref: React.createRef(),
 
             access_token: localStorage.getItem("access_token"),
 
@@ -219,46 +227,46 @@ class CustomerAnalytics extends React.Component {
             today_yearMonthDate: today_year + '-' + this.pad(today_month + 1) + "-" + this.pad(today_date),
 
             device_data: '',
-            device_session_count : [],
-            device_session_count_ref : React.createRef(),
-            device_visitor_count : [],
-            device_visitor_count_ref : React.createRef(),
-            device_total_sales : [],
-            device_total_sales_ref : React.createRef(),
-            device_sales_conversion : [],
-            device_sales_conversion_ref : React.createRef(),
-            device_avg_order_value : [],
-            device_avg_order_value_ref : React.createRef(),
-            device_sales_conversion_count : [],
-            device_order_count : [],
+            device_session_count: [],
+            device_session_count_ref: React.createRef(),
+            device_visitor_count: [],
+            device_visitor_count_ref: React.createRef(),
+            device_total_sales: [],
+            device_total_sales_ref: React.createRef(),
+            device_sales_conversion: [],
+            device_sales_conversion_ref: React.createRef(),
+            device_avg_order_value: [],
+            device_avg_order_value_ref: React.createRef(),
+            device_sales_conversion_count: [],
+            device_order_count: [],
 
             browser_data: '',
-            browser_session_count : [],
-            browser_session_count_ref : React.createRef(),
-            browser_visitor_count : [],
-            browser_visitor_count_ref : React.createRef(),
-            browser_total_sales : [],
-            browser_total_sales_ref : React.createRef(),
-            browser_sales_conversion : [],
-            browser_sales_conversion_ref : React.createRef(),
-            browser_avg_order_value : [],
-            browser_avg_order_value_ref : React.createRef(),
-            browser_sales_conversion_count : [],
-            browser_order_count : [],
+            browser_session_count: [],
+            browser_session_count_ref: React.createRef(),
+            browser_visitor_count: [],
+            browser_visitor_count_ref: React.createRef(),
+            browser_total_sales: [],
+            browser_total_sales_ref: React.createRef(),
+            browser_sales_conversion: [],
+            browser_sales_conversion_ref: React.createRef(),
+            browser_avg_order_value: [],
+            browser_avg_order_value_ref: React.createRef(),
+            browser_sales_conversion_count: [],
+            browser_order_count: [],
 
             os_data: '',
-            os_session_count : [],
-            os_session_count_ref : React.createRef(),
-            os_visitor_count : [],
-            os_visitor_count_ref : React.createRef(),
-            os_total_sales : [],
-            os_total_sales_ref : React.createRef(),
-            os_sales_conversion : [],
-            os_sales_conversion_ref : React.createRef(),
-            os_avg_order_value : [],
-            os_avg_order_value_ref : React.createRef(),
-            os_sales_conversion_count : [],
-            os_order_count : [],
+            os_session_count: [],
+            os_session_count_ref: React.createRef(),
+            os_visitor_count: [],
+            os_visitor_count_ref: React.createRef(),
+            os_total_sales: [],
+            os_total_sales_ref: React.createRef(),
+            os_sales_conversion: [],
+            os_sales_conversion_ref: React.createRef(),
+            os_avg_order_value: [],
+            os_avg_order_value_ref: React.createRef(),
+            os_sales_conversion_count: [],
+            os_order_count: [],
 
             step_size_session: '',
             step_size_visitor: '',
@@ -284,34 +292,39 @@ class CustomerAnalytics extends React.Component {
         return n < 10 ? '0' + n : n
     }
 
-    zoomToFeature(e) {
-        // map.fitBounds(e.target.getBounds());
-    }
 
-    highlightFeature(e) {
+    highlightFeature(e, feat) {
         let layer = e.target;
 
         layer.setStyle({
-            weight: 5,
-            color: '#666',
+            weight: 3,
+            color: '#888888',
             dashArray: '',
-            fillOpacity: 0.7
+            fillOpacity: 0.8
         });
+
 
         // if (!L.Browser.ie && !L.Browser.opera && !L.Browser.edge) {
         //     layer.bringToFront();
         // }
     }
 
-    resetHighlight(e) {
+    resetHighlight(e, featu) {
 
-        let choropleth_ref = this.choropleth_ref;
-        console.log(e.target)
-        console.log(choropleth_ref)
+        let layer = e.target;
+
+        layer.setStyle({
+            fillColor: '#F28F3B',
+            weight: 2,
+            opacity: 1,
+            color: 'white',
+            dashArray: '3',
+            fillOpacity: 0.5
+        });
 
     }
 
-    getDeviceSessionData(){
+    getDeviceSessionData() {
         let labels = []
         let session_count = []
         let visitor_count = []
@@ -458,23 +471,23 @@ class CustomerAnalytics extends React.Component {
 
 
         this.setState({
-            device_session_count : {
+            device_session_count: {
                 labels: labels,
                 datasets: session_data
             },
-            device_visitor_count : {
+            device_visitor_count: {
                 labels: labels,
                 datasets: visitor_data
             },
-            device_total_sales : {
+            device_total_sales: {
                 labels: labels,
                 datasets: total_data
             },
-            device_sales_conversion : {
+            device_sales_conversion: {
                 labels: labels,
                 datasets: sales_data
             },
-            device_avg_order_value : {
+            device_avg_order_value: {
                 labels: labels,
                 datasets: avg_order_data
             }
@@ -497,7 +510,7 @@ class CustomerAnalytics extends React.Component {
 
     }
 
-    getBrowserData(){
+    getBrowserData() {
         let labels = []
         let session_count = []
         let visitor_count = []
@@ -643,23 +656,23 @@ class CustomerAnalytics extends React.Component {
 
 
         this.setState({
-            browser_session_count : {
+            browser_session_count: {
                 labels: labels,
                 datasets: session_data
             },
-            browser_visitor_count : {
+            browser_visitor_count: {
                 labels: labels,
                 datasets: visitor_data
             },
-            browser_total_sales : {
+            browser_total_sales: {
                 labels: labels,
                 datasets: total_data
             },
-            browser_sales_conversion : {
+            browser_sales_conversion: {
                 labels: labels,
                 datasets: sales_data
             },
-            browser_avg_order_value : {
+            browser_avg_order_value: {
                 labels: labels,
                 datasets: avg_order_data
             }
@@ -682,7 +695,7 @@ class CustomerAnalytics extends React.Component {
 
     }
 
-    getOSData(){
+    getOSData() {
         let labels = []
         let session_count = []
         let visitor_count = []
@@ -827,23 +840,23 @@ class CustomerAnalytics extends React.Component {
         ]
 
         this.setState({
-            os_session_count : {
+            os_session_count: {
                 labels: labels,
                 datasets: session_data
             },
-            os_visitor_count : {
+            os_visitor_count: {
                 labels: labels,
                 datasets: visitor_data
             },
-            os_total_sales : {
+            os_total_sales: {
                 labels: labels,
                 datasets: total_data
             },
-            os_sales_conversion : {
+            os_sales_conversion: {
                 labels: labels,
                 datasets: sales_data
             },
-            os_avg_order_value : {
+            os_avg_order_value: {
                 labels: labels,
                 datasets: avg_order_data
             }
@@ -894,22 +907,158 @@ class CustomerAnalytics extends React.Component {
                             this.setState({
                                 device_data: result["device"],
                                 browser_data: result["browser"],
-                                os_data: result["os"]
+                                os_data: result["os"],
+                                statesData: result["region"],
+                                response: true
                             });
 
                             this.getDeviceSessionData();
                             this.getBrowserData();
                             this.getOSData();
 
+                            document.getElementById('weathermap').innerHTML = "<div id='mapp' style='width: 100%'></div>";
+                            let map = L.map('mapp').setView([37.8, -96], 4);
+
+                            L.tileLayer('https://api.mapbox.com/styles/v1/{id}/tiles/{z}/{x}/{y}?access_token=pk.eyJ1IjoibWFwYm94IiwiYSI6ImNpejY4NXVycTA2emYycXBndHRqcmZ3N3gifQ.rJcFIG214AriISLbB6B5aw', {
+                                maxZoom: 18,
+                                attribution: 'Map data &copy; <a href="https://www.openstreetmap.org/">OpenStreetMap</a> contributors, ' +
+                                    '<a href="https://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>, ' +
+                                    'Imagery © <a href="https://www.mapbox.com/">Mapbox</a>',
+                                id: 'mapbox/light-v9',
+                                tileSize: 512,
+                                zoomOffset: -1
+                            }).addTo(map);
+
+
+                            // control that shows state info on hover
+                            let info = L.control();
+
+                            info.remove(map)
+
+
+                            info.onAdd = function (map) {
+                                this._div = L.DomUtil.create('div', 'info');
+                                this.update();
+                                return this._div;
+                            };
+
+                            info.update = function (props) {
+                                this._div.innerHTML = '<h4>US States</h4>' + (props ?
+                                    '<b>' + props.name + '</b><br />' + props["session_count"] : 'Hover over a state');
+                            };
+
+
+                            info.addTo(map);
+
+
+                            // get color depending on population density value
+                            function getColor(d) {
+                                return d > 1000 ? '#800026' :
+                                    d > 500 ? '#BD0026' :
+                                        d > 200 ? '#E31A1C' :
+                                            d > 100 ? '#FC4E2A' :
+                                                d > 50 ? '#FD8D3C' :
+                                                    d > 20 ? '#FEB24C' :
+                                                        d > 10 ? '#FED976' :
+                                                            '#FFEDA0';
+                            }
+
+                            function style(feature) {
+                                return {
+                                    weight: 2,
+                                    opacity: 1,
+                                    color: 'white',
+                                    dashArray: '3',
+                                    fillOpacity: 0.7,
+                                    fillColor: getColor(feature.properties["total_sales"])
+                                };
+                            }
+
+                            function highlightFeature(e) {
+                                let layer = e.target;
+
+                                layer.setStyle({
+                                    weight: 4,
+                                    color: '#666',
+                                    dashArray: '',
+                                    fillOpacity: 0.7
+                                });
+
+                                if (!L.Browser.ie && !L.Browser.opera && !L.Browser.edge) {
+                                    layer.bringToFront();
+                                }
+
+                                info.update(layer.feature.properties);
+                            }
+
+                            let geojson;
+
+                            function resetHighlight(e) {
+                                geojson.resetStyle(e.target);
+                                info.update();
+                            }
+
+                            function zoomToFeature(e) {
+                                map.fitBounds(e.target.getBounds());
+                            }
+
+                            function onEachFeature(feature, layer) {
+                                layer.bindPopup(
+                                    '<h6>' + feature.properties.name + '</h6>' +
+                                    '<strong>Session:</strong> ' + feature.properties["session_count"] +
+                                    '<br/> <strong>Visitor Count:</strong> ' + feature.properties["visitor_count"] +
+                                    '<br/> <strong>Total Sales:</strong> ' + feature.properties["total_sales"] +
+                                    '<br/> <strong>Sales Conversion:</strong> ' + feature.properties["sales_conversion"] +
+                                    '<br/> <strong>Avg Order Value:</strong> ' + feature.properties["avg_order_value"]
+                                )
+                                layer.on({
+                                    mouseover: highlightFeature,
+                                    mouseout: resetHighlight
+                                });
+                            }
+
+                            geojson = L.geoJson(this.state.statesData, {
+                                style: style,
+                                onEachFeature: onEachFeature
+                            }).addTo(map);
+
+                            map.attributionControl.addAttribution('Population data &copy; <a href="http://census.gov/">US Census Bureau</a>');
+
+
+                            let legend = L.control({position: 'bottomright'});
+
+                            legend.onAdd = function (map) {
+
+                                let div = L.DomUtil.create('div', 'info legend'),
+                                    grades = [0, 10, 20, 50, 100, 200, 500, 1000],
+                                    labels = [],
+                                    from, to;
+
+                                div.innerHTML = "Total Sales<br>"
+
+                                for (let i = 0; i < grades.length; i++) {
+                                    from = grades[i];
+                                    to = grades[i + 1];
+
+                                    labels.push(
+                                        '<i style="background:' + getColor(from + 1) + '"></i> ' +
+                                        from + (to ? '&ndash;' + to : '+'));
+                                }
+
+                                div.innerHTML += labels.join('<br>');
+                                return div;
+                            };
+
+                            legend.addTo(map);
+
                             // console.log(this.state.device_data_labels)
-                            console.log(this.state.device_data);
-                            console.log(this.state.browser_data);
-                            console.log(this.state.os_data);
+                            // console.log(this.state.device_data);
+                            // console.log(this.state.browser_data);
+                            // console.log(this.state.os_data);
 
                         } else {
                             console.log(result)
                         }
-
 
 
                     });
@@ -917,7 +1066,7 @@ class CustomerAnalytics extends React.Component {
                     console.log("No visitor activity data")
                 }
             }).catch(error => {
-                console.log(error)
+            console.log(error)
         })
 
     }
@@ -925,12 +1074,16 @@ class CustomerAnalytics extends React.Component {
 
     componentDidMount() {
         this.getVisitorActivity();
+
+
     }
+
 
     render() {
         const {classes} = this.props;
 
         const position = [this.state.lat, this.state.lng]
+
 
         return (
             <div className={classes.root}>
@@ -1018,10 +1171,10 @@ class CustomerAnalytics extends React.Component {
                             <CardContent>
                                 <div style={{margin: "0% 1.5% 1% 1.5%"}}>
                                     <h4>
-                                        Sales Analytics By Device
+                                        Sales Analytics by Device
                                     </h4>
-                                    <Divider/>
-                                    <div style={{display:"flex", width: "20%"}}>
+                                    <Divider style={{margin: "0.5% 0% 0% 0%"}}/>
+                                    <div style={{display: "flex", width: "20%"}}>
                                         <HorizontalBar
                                             width={50}
                                             height={35}
@@ -1029,7 +1182,7 @@ class CustomerAnalytics extends React.Component {
                                             ref={(reference) => this.device_session_count_ref = reference}
                                             options={{
                                                 maintainAspectRatio: true,
-                                                scales : {
+                                                scales: {
                                                     xAxes: [{
                                                         ticks: {
                                                             min: 0,
@@ -1088,10 +1241,10 @@ class CustomerAnalytics extends React.Component {
                                                 maintainAspectRatio: true,
                                                 scales: {
                                                     xAxes: [{
-                                                       ticks: {
-                                                           min: 0,
-                                                           display: false
-                                                       },
+                                                        ticks: {
+                                                            min: 0,
+                                                            display: false
+                                                        },
                                                         gridLines: {
                                                             display: false
                                                         }
@@ -1183,10 +1336,10 @@ class CustomerAnalytics extends React.Component {
                             <CardContent>
                                 <div style={{margin: "0% 1.5% 1% 1.5%"}}>
                                     <h4>
-                                        Sales Analytics By Browser
+                                        Sales Analytics by Browser
                                     </h4>
-                                    <Divider/>
-                                    <div style={{display:"flex", width: "20%"}}>
+                                    <Divider style={{margin: "0.5% 0% 0% 0%"}}/>
+                                    <div style={{display: "flex", width: "20%"}}>
                                         <HorizontalBar
                                             width={50}
                                             height={50}
@@ -1194,7 +1347,7 @@ class CustomerAnalytics extends React.Component {
                                             ref={(reference) => this.browser_session_count_ref = reference}
                                             options={{
                                                 maintainAspectRatio: true,
-                                                scales : {
+                                                scales: {
                                                     xAxes: [{
                                                         ticks: {
                                                             min: 0,
@@ -1347,10 +1500,10 @@ class CustomerAnalytics extends React.Component {
                             <CardContent>
                                 <div style={{margin: "0% 1.5% 1% 1.5%"}}>
                                     <h4>
-                                        Sales Analytics By OS
+                                        Sales Analytics by OS
                                     </h4>
-                                    <Divider/>
-                                    <div style={{display:"flex", width: "20%"}}>
+                                    <Divider style={{margin: "0.5% 0% 0% 0%"}}/>
+                                    <div style={{display: "flex", width: "20%"}}>
                                         <HorizontalBar
                                             width={50}
                                             height={50}
@@ -1358,7 +1511,7 @@ class CustomerAnalytics extends React.Component {
                                             ref={(reference) => this.os_session_count_ref = reference}
                                             options={{
                                                 maintainAspectRatio: true,
-                                                scales : {
+                                                scales: {
                                                     xAxes: [{
                                                         ticks: {
                                                             min: 0,
@@ -1507,51 +1660,118 @@ class CustomerAnalytics extends React.Component {
 
                     {/*---------------------------- END OS -----------------------------*/}
 
-                    {/*<Card style={{margin: "2% 5%"}}>*/}
-                    {/*    <CardContent>*/}
-                    {/*        <div style={{padding: "0.5%", margin: "0% 1%", width: "95%", fontSize: "14px"}}>*/}
-                    {/*            <Map style={{height: "500px"}} center={position} zoom={this.state.zoom}>*/}
-                    {/*                /!*<TileLayer*!/*/}
-                    {/*                /!*    attribution='&amp;copy <a href="http://osm.org/copyright">OpenStreetMap</a> contributors'*!/*/}
-                    {/*                /!*    url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" />*!/*/}
-                    {/*                /!*<Marker position={position}>*!/*/}
-                    {/*                /!*    <Popup>*!/*/}
-                    {/*                /!*        A pretty CSS3 popup. <br /> Easily customizable.*!/*/}
-                    {/*                /!*    </Popup>*!/*/}
-                    {/*                /!*</Marker>*!/*/}
+                    <Card style={{margin: "2% 5%"}}>
+                        <CardContent>
 
-                    {/*                <Choropleth*/}
-                    {/*                    data={{type: 'FeatureCollection', features: statesData.features}}*/}
-                    {/*                    valueProperty={(feature) => feature.properties.value}*/}
-                    {/*                    scale={['#b3cde0', '#011f4b']}*/}
-                    {/*                    steps={7}*/}
-                    {/*                    mode='e'*/}
-                    {/*                    style={style}*/}
-                    {/*                    onChange={()=> {}}*/}
-                    {/*                    ref={(reference) => {*/}
-                    {/*                        this.choropleth_ref = reference*/}
-                    {/*                        console.log(reference)*/}
-                    {/*                    }}*/}
+                            {/*<FormControl variant="outlined" className={classes.formControl}>*/}
+                            {/*    <InputLabel id="demo-simple-select-outlined-label">Product Tag</InputLabel>*/}
+                            {/*    <Select*/}
+                            {/*        labelId="demo-simple-select-outlined-label"*/}
+                            {/*        value={this.state.select_val}*/}
+                            {/*        onChange={(e) => {*/}
+                            {/*            console.log(e.target.value);*/}
 
-                    {/*                    onEachFeature={(feature, layer) => {*/}
-                    {/*                        layer.bindPopup(feature.properties.name)*/}
-                    {/*                        layer.on({*/}
-                    {/*                            mouseover: this.highlightFeature,*/}
-                    {/*                            mouseout: this.resetHighlight,*/}
-                    {/*                            click: this.zoomToFeature*/}
-                    {/*                        });*/}
-                    {/*                    }}*/}
-                    {/*                />*/}
+                            {/*            this.setState({select_val: e.target.value})*/}
+                            {/*        }}*/}
+                            {/*        label="Product Tag">*/}
 
-                    {/*            </Map>*/}
-                    {/*        </div>*/}
-                    {/*    </CardContent>*/}
-                    {/*</Card>*/}
+                            {/*        {this.state.full_product_data.tags.map((pro_tag) => (*/}
+                            {/*            <MenuItem*/}
+                            {/*                className={classes.expMenu}*/}
+                            {/*                key={this.state.full_product_data.tags.indexOf(pro_tag)}*/}
+                            {/*                value={this.state.full_product_data.tags.indexOf(pro_tag)}>*/}
+                            {/*                {pro_tag}*/}
+                            {/*            </MenuItem>*/}
+                            {/*        ))}*/}
+
+                            {/*        /!*{this.state.experiment_names.map((exp_name) => (*!/*/}
+                            {/*        /!*    <MenuItem className={classes.expMenu} value={exp_name[0]}>{exp_name[0]}</MenuItem>*!/*/}
+                            {/*        /!*))}*!/*/}
+
+                            {/*    </Select>*/}
+                            {/*</FormControl>*/}
+
+                            {/*<div style={{padding: "0.5%", margin: "0% 1%", width: "95%", fontSize: "14px"}}>*/}
+                            {/*    <Map*/}
+                            {/*        ref={(reference) => {*/}
+
+                            {/*            try {*/}
+                            {/*                this.state.map_ref = reference.leafletElement*/}
+                            {/*                console.log("map reference")*/}
+                            {/*                console.log(this.state.map_ref);*/}
+
+                            {/*            }*/}
+                            {/*            catch (e) {*/}
+                            {/*                // console.log("null")*/}
+                            {/*            }*/}
+                            {/*        }}*/}
+                            {/*        id={"leafletMap"}*/}
+                            {/*        style={{height: "550px"}} center={position} zoom={this.state.zoom}>*/}
+                            {/*        <TileLayer*/}
+                            {/*            attribution='&amp;copy <a href="http://osm.org/copyright">OpenStreetMap</a> contributors'*/}
+                            {/*            url="https://api.mapbox.com/styles/v1/{id}/tiles/{z}/{x}/{y}?access_token=pk.eyJ1IjoibWFwYm94IiwiYSI6ImNpejY4NXVycTA2emYycXBndHRqcmZ3N3gifQ.rJcFIG214AriISLbB6B5aw"*/}
+                            {/*            id='mapbox/light-v9'*/}
+                            {/*            tileSize={512}*/}
+                            {/*            zoomOffset={-1}*/}
+
+                            {/*        />*/}
+
+                            {/*        <Choropleth*/}
+                            {/*            data={{type: 'FeatureCollection', features: this.state.statesData.features}}*/}
+                            {/*            valueProperty={(feature) => feature.properties.value}*/}
+                            {/*            scale={['#b3cde0', '#011f4b']}*/}
+                            {/*            steps={7}*/}
+                            {/*            mode='e'*/}
+                            {/*            style={style}*/}
+                            {/*            ref={(reference) => {*/}
+
+                            {/*                try {*/}
+                            {/*                    this.state.choropleth_ref = reference.leafletElement*/}
+                            {/*                    console.log("reference")*/}
+                            {/*                    console.log(this.state.choropleth_ref)*/}
+
+                            {/*                }*/}
+                            {/*                catch (e) {*/}
+                            {/*                    // console.log("null")*/}
+                            {/*                }*/}
+                            {/*            }}*/}
+                            {/*            onEachFeature={(feature, layer) => {*/}
+                            {/*                layer.bindPopup(*/}
+                            {/*                    '<h6>' + feature.properties.name + '</h6>' +*/}
+                            {/*                    '<strong>Session:</strong> ' + feature.properties["session_count"] +*/}
+                            {/*                    '<br/> <strong>Visitor Count:</strong> ' + feature.properties["visitor_count"]+*/}
+                            {/*                    '<br/> <strong>Total Sales:</strong> ' + feature.properties["total_sales"]+*/}
+                            {/*                    '<br/> <strong>Sales Conversion:</strong> ' + feature.properties["sales_conversion"]+*/}
+                            {/*                    '<br/> <strong>Avg Order Value:</strong> ' + feature.properties["avg_order_value"]*/}
+                            {/*                )*/}
+                            {/*                layer.on({*/}
+                            {/*                    mouseover: this.highlightFeature,*/}
+                            {/*                    mouseout: this.resetHighlight,*/}
+                            {/*                    // click: () => {*/}
+                            {/*                    //     this.state.map_ref.fitBounds(layer.getBounds());*/}
+                            {/*                    //*/}
+                            {/*                    // }*/}
+                            {/*                });*/}
+                            {/*            }}*/}
+                            {/*        />*/}
+
+                            {/*    </Map>*/}
+                            {/*</div>*/}
+
+                            {/*<div id="mapp" style={{width: "100%", border: "2px solid black" }} />*/}
+                            <div style={{margin: "0% 1.5% 1% 1.5%"}}>
+                                <h4>
+                                    Sales Analytics by Geo
+                                </h4>
+                                <div id="weathermap" style={{margin: "1% 0% 0% 0%"}}></div>
+                            </div>
+                        </CardContent>
+                    </Card>
 
                 </main>
 
             </div>
-        )
+        );
     }
 }
 
