@@ -1660,7 +1660,7 @@ class CustomerAnalytics extends React.Component {
 
                     {/*---------------------------- END OS -----------------------------*/}
 
-                    <Card style={{margin: "2% 5%"}}>
+                    <Card style={{margin: "2% 1% 0 5%"}}>
                         <CardContent>
 
                             {/*<FormControl variant="outlined" className={classes.formControl}>*/}
