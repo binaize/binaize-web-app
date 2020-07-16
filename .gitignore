@@ -35,3 +35,4 @@ modules.xml
 
 binaize-optimize.pem
 theia.env
+nginx.env
