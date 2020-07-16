@@ -10,7 +10,8 @@ sudo apt -y install docker-compose
 git clone https://github.com/binaize/binaize-ui.git
 cd binaize-ui
 git checkout development
-cp binaize-ui/theia-dev.env binaize-ui/theia.env
+cp theia-dev.env theia.env
+cp nginx-dev.env nginx.env
 ```
 
 ## To deploy in EC2 STAGING cluster
@@ -23,7 +24,8 @@ sudo apt -y install docker-compose
 git clone https://github.com/binaize/binaize-ui.git
 cd binaize-ui
 git checkout staging
-cp binaize-ui/theia-staging.env binaize-ui/theia.env
+cp theia-staging.env theia.env
+cp nginx-staging.env nginx.env
 ```
 
 ## To deploy in EC2 PROD cluster
@@ -36,16 +38,12 @@ sudo apt -y install docker-compose
 git clone https://github.com/binaize/binaize-ui.git
 cd binaize-ui
 git checkout master
-cp binaize-ui/theia-prod.env binaize-ui/theia.env
+cp theia-prod.env theia.env
+cp nginx-prod.env nginx.env
 ```
 
-# For first time deployment
+# For deployment
 
-```bash
-nohup sudo docker-compose -f docker-compose-theia.yaml up --build --remove-orphans >> ~/theia.out&
-```
-
-# For re-deployment
 ```bash
 nohup sudo docker-compose -f docker-compose-theia.yaml up --build --remove-orphans >> ~/theia.out&
 ```
