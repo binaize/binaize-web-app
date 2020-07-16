@@ -23,9 +23,7 @@ class App extends React.Component {
                             <Route exact={true} path={"/"} render={() => (
                                 <Login/>
                             )}/>
-                            <Route exact={true} path={"/*"} render={() => (
-                                <div>YO</div>
-                            )}/>
+
                             {/*<Route exact={true} path={"/expi"} component={ResponsiveDrawer}/>*/}
 
                             <Route exact={true} path={"/experiment"} component={Experiments}/>
