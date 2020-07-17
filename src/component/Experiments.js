@@ -16,7 +16,7 @@ import {withStyles} from "@material-ui/core/styles";
 import {withRouter} from "react-router-dom";
 import "./Experiments.css"
 
-import {REACT_APP_BASE_URL, REACT_APP_URL_EXPERIMENTS} from "../config"
+import {REACT_APP_BASE_URL, REACT_APP_CLIENT_DETAILS, REACT_APP_URL_EXPERIMENTS} from "../config"
 import AppToolbar from "./AppToolbar";
 import SideDrawer from "./SideDrawer";
 import Demo from "./SideDrawer_rsuit";
@@ -121,9 +121,6 @@ class Experiments extends React.Component {
             mobileMoreAnchorEl: null,
         }
 
-        if (this.state.access_token === "") {
-            this.props.history.push("/");
-        }
 
     }
 
@@ -131,12 +128,12 @@ class Experiments extends React.Component {
         return [experiment_name, experiment_type, status, page_type, creation_time, last_updation_time];
     }
 
-    getExperiments() {
-
-        console.log(localStorage.getItem("access_token"));
-        let access = "Bearer " + localStorage.getItem("access_token");
+    getExperiments(access) {
 
         try {
+
+            console.log(access)
+
             fetch(REACT_APP_BASE_URL + REACT_APP_URL_EXPERIMENTS, {
                 method: 'GET',
                 headers: {
@@ -147,6 +144,8 @@ class Experiments extends React.Component {
             })
                 .then(response => response.json())
                 .then(res => {
+
+                    console.log(res)
 
                     let result = res;
                     let i = 0;
@@ -177,7 +176,42 @@ class Experiments extends React.Component {
     }
 
     componentDidMount() {
-        this.getExperiments();
+
+        let field = 'access_token';
+        let url = window.location.href;
+        if(url.indexOf('?' + field + '=') !== -1){
+
+            console.log(this.props.location.search)
+            const access_token = new URLSearchParams(window.location.search)
+            localStorage.setItem("access_token", access_token.get("access_token").toString())
+
+            console.log(access_token.get("access_token").toString());
+            fetch(REACT_APP_BASE_URL + REACT_APP_CLIENT_DETAILS, {
+                method: 'GET',
+                headers: {
+                    'Access-Control-Allow-Origin': '*',
+                    'Authorization': "Bearer " + access_token.get("access_token"),
+                    'Accept': 'application/json'
+                }
+            })
+                .then(response => response.json())
+                .then(result => {
+                    localStorage.setItem("creation_time", result["creation_time"])
+                })
+                .catch(err => {
+                    console.log(err)
+                })
+
+            this.getExperiments("Bearer " + access_token.get("access_token"));
+
+        }
+        else {
+            console.log(localStorage.getItem("access_token"));
+            let access = "Bearer " + localStorage.getItem("access_token");
+            this.getExperiments(access);
+        }
+
+
     }
 
     render() {
