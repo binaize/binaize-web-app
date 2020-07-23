@@ -1,5 +1,5 @@
 import React from "react";
-// noinspection NpmUsedModulesInstalled
+
 import clsx from "clsx";
 import {withRouter} from "react-router-dom";
 import {useHistory} from "react-router-dom";

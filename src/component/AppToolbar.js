@@ -13,12 +13,6 @@ import {withStyles} from "@material-ui/core/styles";
 import {withRouter} from "react-router-dom";
 import AppBar from "@material-ui/core/AppBar";
 import {REACT_APP_BASE_URL, REACT_APP_CLIENT_DETAILS} from "../config";
-// import $ from "jquery";
-// import Badge from "@material-ui/core/Badge";
-// import MailIcon from "@material-ui/icons/Mail";
-// import NotificationsIcon from "@material-ui/icons/Notifications";
-// import {useHistory} from "react-router-dom";
-
 
 const drawerWidth = 280;
 const exp_style = theme => ({

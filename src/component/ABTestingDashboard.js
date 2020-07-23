@@ -3,7 +3,7 @@ import CssBaseline from '@material-ui/core/CssBaseline';
 
 import Divider from '@material-ui/core/Divider';
 import {fade} from "@material-ui/core";
-import {Link} from "react-router-dom";
+
 import Paper from '@material-ui/core/Paper';
 import Table from '@material-ui/core/Table';
 import TableBody from '@material-ui/core/TableBody';
@@ -13,7 +13,7 @@ import TableHead from '@material-ui/core/TableHead';
 import TableRow from '@material-ui/core/TableRow';
 import {withStyles} from "@material-ui/core/styles";
 import {withRouter} from "react-router-dom";
-// import "./Experiments.css"
+
 import CardContent from "@material-ui/core/CardContent";
 import Card from "@material-ui/core/Card";
 import {Bar, Line} from "react-chartjs-2";
@@ -28,11 +28,10 @@ import {
     REACT_APP_URL_EXPERIMENTS,
     REACT_APP_EXPERIMENT_SUMMARY
 } from "../config"
+
 import AppToolbar from "./AppToolbar";
-import SideDrawer from "./SideDrawer";
 import Button from "@material-ui/core/Button";
 import Demo from "./SideDrawer_rsuit";
-// import Chart from "react-apexcharts";
 
 const drawerWidth = 280;
 const exp_style = theme => ({

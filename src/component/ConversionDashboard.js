@@ -16,19 +16,19 @@ import CardContent from "@material-ui/core/CardContent";
 import Card from "@material-ui/core/Card";
 import {Bar} from "react-chartjs-2";
 import AppToolbar from "./AppToolbar";
-import SideDrawer from "./SideDrawer";
+
 import Button from "@material-ui/core/Button";
 import RefreshRoundedIcon from "@material-ui/icons/RefreshRounded";
 
 import ChartDataLabels from 'chartjs-plugin-datalabels';
-import {Container, Content, DateRangePicker, Footer, Sidebar} from "rsuite";
+import {DateRangePicker} from "rsuite";
 import $ from "jquery";
 import Demo from "./SideDrawer_rsuit";
 import FormControl from "@material-ui/core/FormControl";
 import InputLabel from "@material-ui/core/InputLabel";
 import Select from "@material-ui/core/Select";
 import MenuItem from "@material-ui/core/MenuItem";
-import Header from "rsuite/es/Header";
+
 
 const {allowedRange} = DateRangePicker;
 

@@ -3,7 +3,7 @@ import React from 'react';
 import './App.css';
 import {AppProvider} from '@shopify/polaris';
 import enTranslations from '@shopify/polaris/locales/en.json';
-import {BrowserRouter as Router, Switch, Route, HashRouter} from "react-router-dom";
+import {BrowserRouter as Router, Switch, Route} from "react-router-dom";
 import { createBrowserHistory } from 'history'
 
 import Login from "./component/Login";

@@ -18,7 +18,6 @@ import "./Experiments.css"
 
 import {REACT_APP_BASE_URL, REACT_APP_CLIENT_DETAILS, REACT_APP_URL_EXPERIMENTS} from "../config"
 import AppToolbar from "./AppToolbar";
-import SideDrawer from "./SideDrawer";
 import Demo from "./SideDrawer_rsuit";
 
 const drawerWidth = 300;

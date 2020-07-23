@@ -11,13 +11,6 @@ import Card from "@material-ui/core/Card";
 import {HorizontalBar} from 'react-chartjs-2';
 
 import L from "leaflet"
-import {geoJson} from "leaflet"
-import {Map, TileLayer, Marker, Popup} from 'react-leaflet'
-import Choropleth from 'react-leaflet-choropleth'
-
-// import {statesData} from "./us-states"
-
-import $ from 'jquery';
 
 import RefreshRoundedIcon from '@material-ui/icons/RefreshRounded';
 
@@ -27,34 +20,12 @@ import {
 } from "../config"
 
 import AppToolbar from "./AppToolbar";
-import SideDrawer from "./SideDrawer";
+
 import Button from "@material-ui/core/Button";
 import Demo from "./SideDrawer_rsuit";
 import {DateRangePicker} from "rsuite";
-import FormControl from "@material-ui/core/FormControl";
-import InputLabel from "@material-ui/core/InputLabel";
-import Select from "@material-ui/core/Select";
-import MenuItem from "@material-ui/core/MenuItem";
-
 
 const {allowedRange} = DateRangePicker;
-const style = {
-    fillColor: '#F28F3B',
-    weight: 2,
-    opacity: 1,
-    color: 'white',
-    dashArray: '3',
-    fillOpacity: 0.5
-}
-
-const leaveStyle = {
-    fillColor: '#F28F3B',
-    weight: 2,
-    opacity: 1,
-    color: 'white',
-    dashArray: '3',
-    fillOpacity: 0.5
-}
 
 const drawerWidth = 280;
 const exp_style = theme => ({
@@ -171,18 +142,6 @@ const exp_style = theme => ({
     }
 })
 
-const tickSizes = [
-    1, 2, 5,
-    10, 20, 50,
-    100, 200, 500,
-    1000, 2000, 5000,
-    10000, 20000, 50000,
-    100000, 200000, 500000,
-    1000000, 2000000, 5000000
-];
-
-// const bar_colors = ['#89f4ff', '#15a2cd',
-//     '#4fc3f7', "#4dd0e1", "#64b5f6"]
 const bar_colors = ['#89f4ff', '#4dd0e1',
     '#4fc3f7', "#64b5f6", "#15a2cd"]
 
@@ -194,10 +153,6 @@ class CustomerAnalytics extends React.Component {
 
     constructor(props) {
         super(props);
-
-        this.device_ref = React.createRef();
-        this.browser_ref = React.createRef();
-        this.os_ref = React.createRef();
 
         let startDate = new Date();
 
@@ -302,11 +257,7 @@ class CustomerAnalytics extends React.Component {
             dashArray: '',
             fillOpacity: 0.8
         });
-
-
-        // if (!L.Browser.ie && !L.Browser.opera && !L.Browser.edge) {
-        //     layer.bringToFront();
-        // }
+        
     }
 
     resetHighlight(e, featu) {
@@ -916,7 +867,7 @@ class CustomerAnalytics extends React.Component {
                             this.getBrowserData();
                             this.getOSData();
 
-                            document.getElementById('weathermap').innerHTML = "<div id='mapp' style='width: 100%'></div>";
+                            document.getElementById('totalSalesMap').innerHTML = "<div id='mapp' style='width: 100%'></div>";
                             let map = L.map('mapp').setView([37.8, -96], 4);
 
                             L.tileLayer('https://api.mapbox.com/styles/v1/{id}/tiles/{z}/{x}/{y}?access_token=pk.eyJ1IjoibWFwYm94IiwiYSI6ImNpejY4NXVycTA2emYycXBndHRqcmZ3N3gifQ.rJcFIG214AriISLbB6B5aw', {
@@ -944,12 +895,11 @@ class CustomerAnalytics extends React.Component {
 
                             info.update = function (props) {
                                 this._div.innerHTML = '<h4>US States</h4>' + (props ?
-                                    '<b>' + props.name + '</b><br />' + props["session_count"] : 'Hover over a state');
+                                    '<b>' + props.name + '</b><br />' + props["total_sales"] : 'Hover over a state');
                             };
 
 
                             info.addTo(map);
-
 
                             // get color depending on population density value
                             function getColor(d) {
@@ -998,9 +948,9 @@ class CustomerAnalytics extends React.Component {
                                 info.update();
                             }
 
-                            function zoomToFeature(e) {
-                                map.fitBounds(e.target.getBounds());
-                            }
+                            // function zoomToFeature(e) {
+                            //     map.fitBounds(e.target.getBounds());
+                            // }
 
                             function onEachFeature(feature, layer) {
                                 layer.bindPopup(
@@ -1023,8 +973,7 @@ class CustomerAnalytics extends React.Component {
                             }).addTo(map);
 
                             map.attributionControl.addAttribution('Population data &copy; <a href="http://census.gov/">US Census Bureau</a>');
-
-
+                            
                             let legend = L.control({position: 'bottomright'});
 
                             legend.onAdd = function (map) {
@@ -1074,17 +1023,13 @@ class CustomerAnalytics extends React.Component {
 
     componentDidMount() {
         this.getVisitorActivity();
-
-
     }
 
 
     render() {
         const {classes} = this.props;
-
-        const position = [this.state.lat, this.state.lng]
-
-
+        // const position = [this.state.lat, this.state.lng]
+        
         return (
             <div className={classes.root}>
                 <CssBaseline/>
@@ -1763,7 +1708,7 @@ class CustomerAnalytics extends React.Component {
                                 <h4>
                                     Sales Analytics by Geo
                                 </h4>
-                                <div id="weathermap" style={{margin: "1% 0% 0% 0%"}}></div>
+                                <div id="totalSalesMap" style={{margin: "1% 0% 0% 0%"}}></div>
                             </div>
                         </CardContent>
                     </Card>
