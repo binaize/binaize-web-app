@@ -6,7 +6,6 @@ import 'rsuite/dist/styles/rsuite-default.css'
 import {Dropdown, Icon, Nav, Sidenav} from "rsuite";
 import "./SideBar.css"
 
-
 class Demo extends React.Component {
     constructor() {
         super();
