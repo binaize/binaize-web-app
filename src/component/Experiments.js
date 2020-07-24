@@ -1,7 +1,6 @@
 import React from 'react';
 
 import CssBaseline from '@material-ui/core/CssBaseline';
-
 import Divider from '@material-ui/core/Divider';
 import {fade} from "@material-ui/core";
 import {Link} from "react-router-dom";
@@ -112,15 +111,12 @@ class Experiments extends React.Component {
 
     constructor(props) {
         super(props);
-
         this.state = {
             access_token: localStorage.getItem("access_token"),
             rows: [],
             anchorEl: null,
             mobileMoreAnchorEl: null,
         }
-
-
     }
 
     createData(experiment_name, experiment_type, status, page_type, creation_time, last_updation_time) {
@@ -130,8 +126,6 @@ class Experiments extends React.Component {
     getExperiments(access) {
 
         try {
-
-            console.log(access)
 
             fetch(REACT_APP_BASE_URL + REACT_APP_URL_EXPERIMENTS, {
                 method: 'GET',

@@ -33,7 +33,6 @@ import MenuItem from "@material-ui/core/MenuItem";
 const {allowedRange} = DateRangePicker;
 
 const drawerWidth = 280;
-
 const exp_style = theme => ({
     root: {
         display: 'flex',
@@ -466,19 +465,10 @@ class ConversionDashboard extends React.Component {
                     shop_funnel_max_val: max
                 })
 
-                // console.log("blah" + this.state.shop_funnel_max_value)
-
-                // alert("asdasd")
-
-                // console.log(shop_funnel_per_data)
-
                 Object.keys(result["shop_funnel"]).forEach((key) => {
 
                     let localData;
                     if (key === "percentage") {
-                        // console.log("something.............")
-                        // console.log(result["shop_funnel"][key])
-                        // console.log(shop_funnel_per_data)
                         localData = {
                             label: "Traffic Percentage",
                             type: 'line',
@@ -496,7 +486,6 @@ class ConversionDashboard extends React.Component {
                             datalabels: {
                                 display: true,
                                 formatter: (value, context) => {
-                                    // console.log("asdasdasdasdasdddddddddddddddddddddddddddddddddd")
                                     return this.state.shop_funnel_per[0][context.dataIndex] + "%";
                                 },
                                 align: "top",
@@ -615,7 +604,6 @@ class ConversionDashboard extends React.Component {
                     if (key === "conversion_percentage") {
                         landing_per_data.push(result["landing_conversion"][key])
                     } else if (key === "non_conversion_count") {
-                        // lading_max_visitor_count = result["landing_conversion"][key]
 
                         for (let ij = 0; ij < result["landing_conversion"][key].length; ij++) {
                             lading_max_visitor_count.push(result["landing_conversion"][key][ij] + result["landing_conversion"]["conversion_count"][ij]);
@@ -700,35 +688,6 @@ class ConversionDashboard extends React.Component {
 
                 });
 
-
-                //
-                //
-                //
-                // Object.keys(data3.landing_conversion).forEach(function (key) {
-                //     data.push(key)
-                //     datasets.push(data3.landing_conversion[key])
-                // });
-                // // // console.log(data);
-                // // // console.log(datasets);
-                //
-                // let localdata = {}
-                //
-                // let i = 0;
-                // for (i; i < data.length; i++) {
-                //
-                //     localdata = {
-                //         label: data[i],
-                //         backgroundColor: this.state.bar_background_color[i],
-                //         borderColor: this.state.bar_background_color[i],
-                //         borderWidth: 1,
-                //         hoverBackgroundColor: this.state.bar_background_hover_color[i],
-                //         hoverBorderColor: this.state.bar_background_hover_color[i],
-                //         data: datasets[i]
-                //     }
-                //     mainDataLanding.push(localdata);
-                //     localdata = {}
-                // }
-
                 let $landing_page_conversion_summary = $("#landing_page_conversion_summary"),
                     landing_page_conversion_summary_str = result["summary"],
                     landing_page_conversion_summary_html = $.parseHTML(landing_page_conversion_summary_str)
@@ -740,7 +699,6 @@ class ConversionDashboard extends React.Component {
                     landing_page_conversion_conclusion_html = $.parseHTML(landing_page_conversion_conclusion_str)
 
                 $landing_page_conversion_conclusion.html(landing_page_conversion_conclusion_html);
-
 
                 this.setState({
                     landing_page_conversion: {
@@ -833,7 +791,6 @@ class ConversionDashboard extends React.Component {
                                 this.getAllData(s_yearMonthDate + 'T00-00-00', e_yearMonthDate + 'T23-59-59')
 
                             } catch (e) {
-                                // console.log(e)
 
                                 this.setState({
                                     start_yearMonthDate: ''
@@ -841,7 +798,6 @@ class ConversionDashboard extends React.Component {
 
                                 this.getAllData(this.state.creation_time + 'T00-00-00', this.state.today_yearMonthDate + 'T23-59-59');
                             }
-
                         }}
                     />
 

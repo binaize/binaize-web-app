@@ -1,17 +1,13 @@
 import React from 'react';
 import CssBaseline from '@material-ui/core/CssBaseline';
-
 import Divider from '@material-ui/core/Divider';
 import {fade} from "@material-ui/core";
 import {withStyles} from "@material-ui/core/styles";
 import {withRouter} from "react-router-dom";
-
 import CardContent from "@material-ui/core/CardContent";
 import Card from "@material-ui/core/Card";
 import {HorizontalBar} from 'react-chartjs-2';
-
 import L from "leaflet"
-
 import RefreshRoundedIcon from '@material-ui/icons/RefreshRounded';
 
 import {

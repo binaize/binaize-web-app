@@ -14,7 +14,6 @@ import DashboardIcon from "@material-ui/icons/Dashboard";
 import PriorityHighIcon from "@material-ui/icons/PriorityHigh";
 import {ReactComponent as BinaizeWhiteLogo} from "../images/binaize-logo-white.svg";
 
-
 const drawerWidth = 300;
 const exp_style = theme => ({
     root: {
@@ -32,7 +31,6 @@ const exp_style = theme => ({
         width: drawerWidth,
         backgroundColor: "#1A2330"
     },
-    // necessary for content to be below app bar
     toolbar: theme.mixins.toolbar,
     content: {
         flexGrow: 1,

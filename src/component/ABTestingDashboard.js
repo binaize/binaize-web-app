@@ -1,6 +1,5 @@
 import React from 'react';
 import CssBaseline from '@material-ui/core/CssBaseline';
-
 import Divider from '@material-ui/core/Divider';
 import {fade} from "@material-ui/core";
 import Paper from '@material-ui/core/Paper';
@@ -16,7 +15,6 @@ import CardContent from "@material-ui/core/CardContent";
 import Card from "@material-ui/core/Card";
 import {Bar, Line} from "react-chartjs-2";
 import $ from 'jquery';
-
 import RefreshRoundedIcon from '@material-ui/icons/RefreshRounded';
 
 import {

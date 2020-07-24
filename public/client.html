@@ -74,8 +74,6 @@
             let value = row.insertCell(1);
             value.innerHTML = response[key];
         })
-
-
     }, "json")
 
 
@@ -161,7 +159,6 @@
 
     function loadTableData() {
         const table = document.getElementById("tableBody");
-
         Object.keys(all_data).forEach(key => {
             let row = table.insertRow();
             let method = row.insertCell(0);
@@ -171,7 +168,6 @@
         })
     }
     loadTableData();
-
 
 </script>
 

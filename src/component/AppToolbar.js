@@ -1,5 +1,4 @@
 import * as React from "react";
-
 import 'rsuite/dist/styles/rsuite-default.css'
 import Toolbar from "@material-ui/core/Toolbar";
 import SearchIcon from "@material-ui/icons/Search";
@@ -123,7 +122,6 @@ class AppToolbar extends React.Component {
     constructor(props) {
         super(props);
 
-
         this.state = {
             full_name : '',
             client : localStorage.getItem("client"),
@@ -140,7 +138,6 @@ class AppToolbar extends React.Component {
     getClientData(){
 
         let access = "Bearer " + this.state.access_token;
-
         fetch(REACT_APP_BASE_URL + REACT_APP_CLIENT_DETAILS, {
             method: 'GET',
             headers: {
@@ -158,25 +155,19 @@ class AppToolbar extends React.Component {
                 this.setState({
                     full_name: result["full_name"]
                 })
-
-
             })
             .catch(err => {
                 console.log(err)
             })
-
-
     }
 
     componentDidMount() {
         this.getClientData()
     }
 
-
     render() {
 
         const {classes} = this.props;
-
         return (<AppBar position="fixed" className={classes.appBar}>
             <Toolbar>
                 {/* Toolbar */}
@@ -221,8 +212,6 @@ class AppToolbar extends React.Component {
                         <Typography style={{marginTop: "10px"}}>
                             {this.state.full_name}
                         </Typography>
-                        {/*<Typography style={{fontSize: '12px'}}>*/}
-                        {/*</Typography>*/}
                     </div>
 
                 </div>
