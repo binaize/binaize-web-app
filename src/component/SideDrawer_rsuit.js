@@ -1,5 +1,4 @@
 import * as React from "react";
-
 import {Link} from "react-router-dom";
 import Divider from "@material-ui/core/Divider";
 import {ReactComponent as BinaizeWhiteLogo} from "../images/binaize-logo-white.svg";

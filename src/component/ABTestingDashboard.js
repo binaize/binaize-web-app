@@ -3,7 +3,6 @@ import CssBaseline from '@material-ui/core/CssBaseline';
 
 import Divider from '@material-ui/core/Divider';
 import {fade} from "@material-ui/core";
-
 import Paper from '@material-ui/core/Paper';
 import Table from '@material-ui/core/Table';
 import TableBody from '@material-ui/core/TableBody';
@@ -13,7 +12,6 @@ import TableHead from '@material-ui/core/TableHead';
 import TableRow from '@material-ui/core/TableRow';
 import {withStyles} from "@material-ui/core/styles";
 import {withRouter} from "react-router-dom";
-
 import CardContent from "@material-ui/core/CardContent";
 import Card from "@material-ui/core/Card";
 import {Bar, Line} from "react-chartjs-2";
