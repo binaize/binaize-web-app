@@ -128,9 +128,9 @@ class AppToolbar extends React.Component {
             access_token : localStorage.getItem("access_token")
         }
 
-        if (this.state.access_token === "") {
-            this.props.history.push("/");
-        }
+        // if (this.state.access_token === "") {
+        //     this.props.history.push("/");
+        // }
 
     }
 
